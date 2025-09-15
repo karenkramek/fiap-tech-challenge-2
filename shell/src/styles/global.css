@@ -1,0 +1,378 @@
+/* ByteBank Design Tokens - Minimal */
+/* Only tokens actually used in the app */
+
+:root {
+  /* ========================================
+     COLORS - From Figma Design
+     ======================================== */
+
+  /* Primary Colors (Deep Teal) */
+  --primary-100: #F0F9FA;
+  --primary-200: #CDF1FF;
+  --primary-300: #A3E6F5;
+  --primary-700: #264653;
+
+  /* Secondary Colors (Orange) */
+  --secondary-200: #FFE5D1;
+  --secondary-700: #F4A261;
+
+  /* Tertiary Colors (Green) */
+  --tertiary-600: #2A9D8F;
+  --tertiary-700: #228F80;
+
+  /* Error Colors (Red) */
+  --error-700: #C1121F;
+
+  /* Success Colors (Green) */
+  --success-700: #22C55E;
+
+  /* Neutral Colors */
+  --white-50: #FFFFFF;
+  --white-600: #E5E7EB;
+  --white-800: #999999;
+  --white-700: #B5B5B5;
+  --black-400: #333333;
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  --font-family-primary: 'Rubik', sans-serif;
+  --font-family-secondary: 'Inter', sans-serif;
+
+  /* Font sizes - only what we use */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Font weights - only what we use */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights - only what we use */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  /* ========================================
+     SPACING & LAYOUT
+     ======================================== */
+
+  /* Spacing - only what we use */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.5rem;
+  --space-2xl: 2rem;
+
+  /* Border radius - only what we use */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadows - only what we use */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px;
+
+  /* ========================================
+     SEMANTIC ALIASES
+     ======================================== */
+
+  --background: #F4F9FB;
+  --foreground: var(--black-400);
+  --background-muted: #F5F5F5;
+  --foreground-muted: #737373;
+  --accent: var(--primary-700);
+}
+
+/* Global styles for the shell app */
+body {
+  margin: 0;
+  font-family: var(--font-family-primary), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Tailwind CSS utilities using design tokens */
+.bg-primary-700 { background-color: var(--primary-700); }
+.text-white-50 { color: var(--white-50); }
+.text-primary-700 { color: var(--primary-700); }
+.text-black-400 { color: var(--black-400); }
+.text-white-800 { color: var(--white-800); }
+.bg-white-50 { background-color: var(--white-50); }
+.bg-white-600 { background-color: var(--white-600); }
+.bg-secondary-200 { background-color: var(--secondary-200); }
+.border-secondary-200 { border-color: var(--secondary-200); }
+.border-primary-700 { border-color: var(--primary-700); }
+.hover\:bg-primary-600:hover { background-color: #2B5A5E; }
+.bg-white { background-color: var(--white-50); }
+.shadow-md { box-shadow: var(--shadow-base); }
+.shadow-xl { box-shadow: var(--shadow-lg); }
+
+/* Basic utility classes - we'll use more from shared styles */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+/* Common utility classes */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-x-4 > * + * { margin-left: 1rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.w-64 { width: 16rem; }
+.w-full { width: 100%; }
+.w-6 { width: 1.5rem; }
+.w-8 { width: 2rem; }
+.h-6 { height: 1.5rem; }
+.h-8 { height: 2rem; }
+.h-4 { height: 1rem; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+.text-xl { font-size: var(--font-size-xl); }
+.text-sm { font-size: var(--font-size-sm); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.rounded { border-radius: 0.25rem; }
+.rounded-full { border-radius: 9999px; }
+.border-2 { border-width: 2px; }
+.border-l-4 { border-left-width: 4px; }
+.block { display: block; }
+.hidden { display: none; }
+.fixed { position: fixed; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.top-0 { top: 0; }
+.left-0 { left: 0; }
+.z-50 { z-index: 50; }
+.z-\[9998\] { z-index: 9998; }
+.z-\[9999\] { z-index: 9999; }
+.transform { transform: translateX(0); }
+.transition-colors { transition: color 150ms ease-in-out, background-color 150ms ease-in-out; }
+.transition-transform { transition: transform 150ms ease-in-out; }
+.duration-300 { transition-duration: 300ms; }
+.translate-x-0 { transform: translateX(0); }
+.-translate-x-full { transform: translateX(-100%); }
+.cursor-not-allowed { cursor: not-allowed; }
+.opacity-60 { opacity: 0.6; }
+.bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+.bg-black { background-color: black; }
+.text-left { text-align: left; }
+
+/* Responsive utilities */
+.md\:block { display: none; }
+@media (min-width: 768px) {
+  .md\:block { display: block; }
+}
+
+.xl\:hidden { display: block; }
+@media (min-width: 1280px) {
+  .xl\:hidden { display: none; }
+}
+
+.xl\:block { display: none; }
+@media (min-width: 1280px) {
+  .xl\:block { display: block; }
+}
+
+/* Missing CSS variables for transactions and other components */
+:root {
+  --primary-50: #F0F9FA;
+  --primary-100: #F0F9FA;
+  --primary-600: #1e3a3b;
+  --font-size-lg: 1.125rem;
+  --success-700: #22C55E;
+  --error-700: #C1121F;
+}
+
+/* Transaction-specific styles */
+.transactions-page-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+  color: var(--primary-700);
+  margin-bottom: var(--space-xl);
+}
+
+.transactions-month-header {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  color: var(--primary-700);
+  margin-bottom: var(--space-lg);
+}
+
+.transaction-item {
+  padding: var(--space-lg);
+  background-color: var(--primary-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-100);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.transaction-item:hover {
+  background-color: var(--primary-100);
+  border-color: var(--primary-200);
+}
+
+.transaction-description {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--black-400);
+  margin-top: var(--space-xs);
+}
+
+.transaction-date-small {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+  color: var(--white-800);
+}
+
+.transaction-amount {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.transaction-amount.positive {
+  color: var(--success-700);
+}
+
+.transaction-amount.negative {
+  color: var(--error-700);
+}
+
+.transactions-loading {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--white-800);
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.transactions-empty {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--white-800);
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.transactions-empty-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  color: var(--primary-600);
+  margin-bottom: var(--space-sm);
+}
+
+/* Modal styles */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: var(--white-50);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  margin: var(--space-xl);
+}
+
+.modal-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  color: var(--primary-700);
+  margin-bottom: var(--space-lg);
+}
+
+.modal-text {
+  font-family: var(--font-family-secondary);
+  font-size: var(--font-size-base);
+  color: var(--black-400);
+  margin-bottom: var(--space-xl);
+}
+
+/* Additional utility classes */
+.space-y-8 > * + * { margin-top: 2rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-x-3 > * + * { margin-left: 0.75rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.ml-2 { margin-left: 0.5rem; }
+.flex-col { flex-direction: column; }
+.items-end { align-items: flex-end; }
+.max-width-500 { max-width: 500px; }
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+  .transactions-page-title {
+    font-size: var(--font-size-2xl);
+  }
+  .transactions-month-header {
+    font-size: var(--font-size-base);
+  }
+}

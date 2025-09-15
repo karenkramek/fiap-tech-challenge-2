@@ -1,0 +1,90 @@
+/* ByteBank Design Tokens - Minimal */
+/* Only tokens actually used in the app */
+
+:root {
+  /* ========================================
+     COLORS - From Figma Design
+     ======================================== */
+
+  /* Primary Colors (Deep Teal) */
+  --primary-100: #F0F9FA;
+  --primary-200: #CDF1FF;
+  --primary-300: #A3E6F5;
+  --primary-700: #264653;
+
+  /* Secondary Colors (Orange) */
+  --secondary-700: #F4A261;
+
+  /* Tertiary Colors (Green) */
+  --tertiary-600: #2A9D8F;
+  --tertiary-700: #228F80;
+
+  /* Error Colors (Red) */
+  --error-700: #C1121F;
+
+  /* Success Colors (Green) */
+  --success-700: #22C55E;
+
+  /* Neutral Colors */
+  --white-50: #FFFFFF;
+  --white-800: #999999;
+  --white-700: #B5B5B5;
+  --black-400: #333333;
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  --font-family-primary: 'Rubik', sans-serif;
+  --font-family-secondary: 'Inter', sans-serif;
+
+  /* Font sizes - only what we use */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  /* Font weights - only what we use */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights - only what we use */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  /* ========================================
+     SPACING & LAYOUT
+     ======================================== */
+
+  /* Spacing - only what we use */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.5rem;
+  --space-2xl: 2rem;
+
+  /* Border radius - only what we use */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadows - only what we use */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px;
+
+  /* ========================================
+     SEMANTIC ALIASES
+     ======================================== */
+
+  --background: #F4F9FB;
+  --foreground: var(--black-400);
+  --background-muted: #F5F5F5;
+  --foreground-muted: #737373;
+  --accent: var(--primary-700);
+}
