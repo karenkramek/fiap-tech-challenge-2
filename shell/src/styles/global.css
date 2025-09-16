@@ -1,3 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('../../../shared/src/styles/tokens.css');
+/* ByteBank Design Tokens - Minimal */
+/* Only tokens actually used in the app */
 /* ByteBank Design Tokens - Minimal */
 /* Only tokens actually used in the app */
 
