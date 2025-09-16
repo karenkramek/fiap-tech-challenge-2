@@ -1,23 +1,49 @@
 import React from 'react';
-import { TransactionType, getTransactionTypeLabel } from '@/models/Transaction';
+import { TransactionType, getTransactionTypeLabel } from '../../models/Transaction';
 
 interface TransactionBadgeProps {
   type: TransactionType;
 }
 
+
 const TransactionBadge = ({ type }: TransactionBadgeProps) => {
-  const getTransactionTypeColor = (type: TransactionType) => {
-    const colors: Record<TransactionType, string> = {
-      [TransactionType.DEPOSIT]: 'bg-success-50 text-success-800 border-success-700',
-      [TransactionType.WITHDRAWAL]: 'bg-error-50 text-error-800 border-error-700',
-      [TransactionType.TRANSFER]: 'bg-info-50 text-info-800 border-info-700',
-      [TransactionType.PAYMENT]: 'bg-warning-50 text-warning-800 border-warning-700'
-    };
-    return colors[type];
+  // Define cores usando variáveis CSS universais
+  const getStyles = (type: TransactionType): React.CSSProperties => {
+    switch (type) {
+      case TransactionType.DEPOSIT:
+        return {
+          backgroundColor: 'var(--success-700)',
+          color: 'var(--white-50)',
+          border: '1px solid var(--success-700)'
+        };
+      case TransactionType.WITHDRAWAL:
+        return {
+          backgroundColor: 'var(--error-700)',
+          color: 'var(--white-50)',
+          border: '1px solid var(--error-700)'
+        };
+      case TransactionType.TRANSFER:
+        return {
+          backgroundColor: 'var(--primary-300)',
+          color: 'var(--primary-700)',
+          border: '1px solid var(--primary-700)'
+        };
+      case TransactionType.PAYMENT:
+        return {
+          backgroundColor: 'var(--secondary-700)',
+          color: 'var(--white-50)',
+          border: '1px solid var(--secondary-700)'
+        };
+      default:
+        return {};
+    }
   };
 
   return (
-    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getTransactionTypeColor(type)}`}>
+    <span
+      style={getStyles(type)}
+      className="inline-block px-3 py-1 rounded-full text-xs font-medium"
+    >
       {getTransactionTypeLabel(type)}
     </span>
   );

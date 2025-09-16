@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('../../../shared/src/styles/tokens.css');
+/* Estilos universais para Transactions MFE */
+
+/* Adicione aqui estilos específicos do transactions-mfe, se necessário */

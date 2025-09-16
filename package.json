@@ -13,11 +13,16 @@
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["microfrontend", "module-federation", "react"],
+  "keywords": [
+    "microfrontend",
+    "module-federation",
+    "react"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
     "concurrently": "^9.2.1",
     "json-server": "^1.0.0-beta.3"
   }

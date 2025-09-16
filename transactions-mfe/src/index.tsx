@@ -1,6 +1,6 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Transactions from './Transactions';
+import './styles/styles.css';
 
 const container = document.getElementById('root');
 if (!container) {

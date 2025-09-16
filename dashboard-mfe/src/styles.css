@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('../../shared/src/styles/tokens.css');
 /* Dashboard MFE Styles */
 .dashboard-container {
   padding: 2rem;
@@ -57,10 +61,6 @@
 
 .submit-btn:hover {
   background: #0052a3;
-}
-
-.transactions-list {
-  space-y: 1rem;
 }
 
 .transaction-item {
