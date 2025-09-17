@@ -21,7 +21,8 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../transactions-mfe/src/hooks"
   ],
   "exclude": [
     "node_modules"

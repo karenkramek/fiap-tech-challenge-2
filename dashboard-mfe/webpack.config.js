@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const { DefinePlugin } = require('webpack');
+const path = require('path');
 
 module.exports = {
   entry: './src/index.tsx',

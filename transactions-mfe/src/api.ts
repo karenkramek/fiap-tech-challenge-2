@@ -1,20 +1,8 @@
 import axios from 'axios';
+import { Account } from 'shared/models/Account';
+import { Transaction } from 'shared/models/Transaction';
 
 const API_BASE_URL = 'http://localhost:3034';
-
-export interface Transaction {
-  id: string;
-  type: 'deposit' | 'withdrawal' | 'transfer';
-  amount: number;
-  description: string;
-  date: string;
-}
-
-export interface Account {
-  id: string;
-  name: string;
-  balance: number;
-}
 
 class TransactionAPIService {
   private api = axios.create({

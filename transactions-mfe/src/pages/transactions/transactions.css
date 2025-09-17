@@ -1,0 +1,154 @@
+/* Transaction Pages Typography and Layout System - Using Design Tokens */
+
+/* Page Headers */
+.transactions-page-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+  color: var(--primary-700);
+  margin-bottom: var(--space-xl);
+}
+
+.transactions-section-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+  color: var(--primary-700);
+  margin-bottom: var(--space-lg);
+}
+
+.transactions-month-header {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  color: var(--primary-700);
+  margin-bottom: var(--space-lg);
+}
+
+/* Form Elements - Universal utilities replace these:
+ * .transactions-form-input -> .form-input
+ * .transactions-form-select -> .form-select
+ * .transactions-form-label -> .form-label
+ * .transactions-error-message -> .error-message
+ */
+
+/* Form Field Prefix */
+
+.transactions-currency-prefix {
+  color: var(--white-800);
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+
+
+/* Transaction List Items */
+.transaction-item {
+  padding: var(--space-lg);
+  background-color: var(--primary-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-100);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.transaction-item:hover {
+  background-color: var(--primary-100);
+  border-color: var(--primary-200);
+}
+
+.transaction-description {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--black-400);
+  margin-top: var(--space-xs);
+}
+
+.transaction-date-small {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+  color: var(--white-800);
+}
+
+.transaction-amount {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.transaction-amount.positive {
+  color: var(--success-700);
+}
+
+.transaction-amount.negative {
+  color: var(--error-700);
+}
+
+/* Loading and Empty States */
+.transactions-loading {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--white-800);
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.transactions-empty {
+  font-family: var(--font-family-secondary);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--white-800);
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.transactions-empty-title {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  color: var(--primary-600);
+  margin-bottom: var(--space-sm);
+}
+
+/* Modal Styles - Universal utilities replace these:
+ * .modal-overlay -> .modal-overlay (already universal)
+ * .modal-content -> .modal-content (already universal)
+ * .modal-title -> .modal-title (already universal)
+ * .modal-text -> .modal-text (already universal)
+ */
+
+/* Container and Layout - Universal utilities replace these:
+ * .transactions-container -> .container
+ * .transactions-form-container -> .container .container--sm
+ */
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .transactions-page-title {
+    font-size: var(--font-size-2xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .transactions-section-title {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .transactions-month-header {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-tight);
+  }
+}

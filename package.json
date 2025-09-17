@@ -13,12 +13,21 @@
     "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["microfrontend", "module-federation", "react"],
+  "keywords": [
+    "microfrontend",
+    "module-federation",
+    "react"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "concurrently": "^9.2.1",
     "json-server": "^1.0.0-beta.3"
+  },
+  "dependencies": {
+    "lucide-react": "^0.544.0",
+    "tailwind-merge": "^3.3.1"
   }
 }

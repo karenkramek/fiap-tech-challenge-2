@@ -1,6 +1,7 @@
-import React from 'react';
+
 import { createRoot } from 'react-dom/client';
 import Transactions from './Transactions';
+import '../../shared/src/styles/tokens.css';
 
 const container = document.getElementById('root');
 if (!container) {

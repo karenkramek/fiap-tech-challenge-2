@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { Toaster } from 'react-hot-toast';
 import Home from './components/Home';
 import ErrorBoundary from './components/ErrorBoundary';
-import Header from './components/layout/Header';
-import Sidebar from './components/layout/Sidebar';
+import Header from '../../shared/src/components/Header';
+import Sidebar from '../../shared/src/components/Sidebar';
 import './styles/global.css';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime

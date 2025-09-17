@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { transactionAPI, Transaction, Account } from './api';
+import { Account } from 'shared/models/Account';
+import { Transaction } from 'shared/models/Transaction';
+import { transactionAPI } from './api';
 
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -42,7 +44,7 @@ const Transactions: React.FC = () => {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString): string => {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
@@ -74,11 +76,11 @@ const Transactions: React.FC = () => {
 
   // Calculate totals
   const totalEntries = transactions
-    .filter(t => t.type === 'deposit')
+    .filter(t => t.type === 'DEPOSIT')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalExits = transactions
-    .filter(t => t.type === 'withdrawal' || t.type === 'transfer')
+    .filter(t => t.type === 'WITHDRAWAL' || t.type === 'TRANSFER')
     .reduce((sum, t) => sum + t.amount, 0);
 
   return (
@@ -109,8 +111,8 @@ const Transactions: React.FC = () => {
               <div key={transaction.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className={`w-3 h-3 rounded-full ${
-                    transaction.type === 'deposit' ? 'bg-green-500' :
-                    transaction.type === 'withdrawal' ? 'bg-red-500' : 'bg-blue-500'
+                    transaction.type === 'DEPOSIT' ? 'bg-green-500' :
+                    transaction.type === 'WITHDRAWAL' ? 'bg-red-500' : 'bg-blue-500'
                   }`}></div>
                   <div>
                     <p className="font-medium text-gray-900 capitalize">{transaction.type}</p>

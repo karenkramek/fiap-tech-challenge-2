@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import BalanceCard from './components/dashboard/BalanceCard';
-import TransactionForm from './components/dashboard/TransactionForm';
-import StatementCard from './components/dashboard/StatementCard';
-import { useAccount } from './hooks/useAccount';
-import { useTransactions } from './hooks/useTransactions';
-import { Transaction, TransactionType } from './models/Transaction';
-import { createCurrencyInputHandler, parseCurrencyStringToNumber } from './utils/currencyUtils';
-import { getMonthKey } from './utils/utils';
+import { useTransactions } from 'shared/hooks/useTransactions';
+import { Transaction } from 'shared/models/Transaction';
+import { TransactionType } from 'shared/types/TransactionType';
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
+import { useAccount } from 'shared/hooks/useAccount';
+import BalanceCard from 'shared/components/BalanceCard';
+import TransactionForm from 'shared/components/TransactionForm';
+import StatementCard from 'shared/components/StatementCard';
 import './dashboard-styles.css';
 
 type GroupedTransactions = {
@@ -20,70 +20,26 @@ const Dashboard: React.FC = () => {
   const [showBalance, setShowBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
 
-  // Use the reusable currency input handler
+  // Handler reutilizável para campo de valor monetário
   const handleAmountChange = createCurrencyInputHandler(setAmount);
 
   const [transactionType, setTransactionType] = useState<TransactionType>(TransactionType.DEPOSIT);
   const [description, setDescription] = useState<string>("");
+  const [formLoading, setFormLoading] = useState(false);
 
   const { account, loading: accountLoading, refreshAccount } = useAccount();
-  const { transactions, loading: transactionsLoading, addTransaction } = useTransactions();
-
-  // Get the 5 most recent transactions.
-  const recentTransactions = transactions
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5);
-
-  // Helper function to group transactions by month.
-  const groupTransactionsByMonth = (transactions: Transaction[]): GroupedTransactions => {
-    const grouped: Record<string, Transaction[]> = {};
-
-    // First group transactions by month.
-    transactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
-      const monthKey = getMonthKey(date);
-
-      if (!grouped[monthKey]) {
-        grouped[monthKey] = [];
-      }
-
-      grouped[monthKey].push(transaction);
-    });
-
-    // Then sort each group internally.
-    Object.keys(grouped).forEach((key) => {
-      grouped[key] = grouped[key].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-    });
-
-    // Sort months (from newest to oldest).
-    const sortedKeys = Object.keys(grouped).sort((a, b) => {
-      const [monthA, yearA] = a.split("-").map(Number);
-      const [monthB, yearB] = b.split("-").map(Number);
-
-      if (yearA !== yearB) {
-        return yearB - yearA;
-      }
-
-      return monthB - monthA;
-    });
-
-    return { grouped, sortedKeys };
-  };
-
-  // Group transactions by month.
-  const { grouped, sortedKeys } = groupTransactionsByMonth(recentTransactions);
+  const { loading: transactionsLoading, addTransaction } = useTransactions();
 
   // Logic to add a new transaction.
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+    setFormLoading(true);
 
-    // Use the reusable parser
     const normalizedAmount = parseCurrencyStringToNumber(amount);
 
     if (!amount || isNaN(normalizedAmount) || normalizedAmount <= 0) {
       toast.error("Por favor, insira um valor válido.");
+      setFormLoading(false);
       return;
     }
 
@@ -95,7 +51,7 @@ const Dashboard: React.FC = () => {
         description
       );
 
-      // Refresh account balance after successful transaction
+      // Atualiza saldo após nova transação
       try {
         await refreshAccount();
       } catch (refreshError) {
@@ -108,10 +64,12 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       toast.error("Erro ao adicionar transação.");
       console.error(error);
+    } finally {
+      setFormLoading(false);
     }
   };
 
-  if (accountLoading || transactionsLoading) {
+  if (accountLoading || transactionsLoading || formLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <p>Carregando...</p>
@@ -121,7 +79,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-8">
+      <div className="container mx-auto px-4 space-y-8">
         <div className="grid md:grid-cols-5 gap-6">
           {/* Conteúdo principal */}
           <div className="md:col-span-3 space-y-6">
@@ -140,17 +98,14 @@ const Dashboard: React.FC = () => {
               description={description}
               onAmountChange={handleAmountChange}
               onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-              onDescriptionChange={(e) => setDescription(e.target.value)}
+              onDescriptionChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
               onSubmit={handleSubmit}
+              loading={accountLoading || transactionsLoading || formLoading}
             />
           </div>
 
           {/* Extrato */}
-          <StatementCard
-            grouped={grouped}
-            sortedKeys={sortedKeys}
-            recentTransactions={recentTransactions}
-          />
+          <StatementCard />
         </div>
       </div>
       <Toaster />

@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const { DefinePlugin } = require('webpack');
+const path = require('path');
 
 module.exports = {
   entry: './src/index.tsx',
@@ -42,6 +43,9 @@ module.exports = {
       filename: 'remoteEntry.js',
       exposes: {
         './Transactions': './src/Transactions'
+      },
+      remotes: {
+        shared: 'shared@http://localhost:3033/remoteEntry.js'
       },
       shared: {
         react: {
