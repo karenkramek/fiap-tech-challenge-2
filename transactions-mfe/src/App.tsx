@@ -1,19 +1,20 @@
-"use client";
+import React from 'react';
+import { useTransactions } from 'shared/hooks/useTransactions';
+import { formatDate, getMonthKey, getMonthName } from 'shared/utils/utils';
+import TransactionBadge from 'shared/components/TransactionBadge';
+import { formatCurrencyWithSymbol } from 'shared/utils/currencyUtils';
+import ConfirmationModal from 'shared/components/ConfirmationModal';
+import EditTransactionModal from 'shared/components/EditTransactionModal';
+import Card from 'shared/components/Card';
+import Button from 'shared/components/Button';
+import { Link } from 'react-router-dom';
 
-import React from "react";
-import Card from "shared/components/Card";
-import Button from "shared/components/Button";
-import TransactionBadge from "shared/components/TransactionBadge";
-import ConfirmationModal from "shared/components/ConfirmationModal";
-import EditTransactionModal from "shared/components/EditTransactionModal";
-import { formatDate, getMonthName } from "shared/utils/utils";
-import { formatCurrencyWithSymbol } from "shared/utils/currencyUtils";
-import { useTransactions } from "shared/hooks/useTransactions";
-import "./transactions.css";
-
-export default function TransactionsPage() {
+const TransactionsPage: React.FC = () => {
   const { transactions, loading, deleteTransaction, fetchTransactions } = useTransactions();
-  const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   const [modalOpen, setModalOpen] = React.useState(false);
   const [transactionToDelete, setTransactionToDelete] = React.useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
@@ -65,7 +66,7 @@ export default function TransactionsPage() {
 
     sortedTransactions.forEach((transaction) => {
       const date = new Date(transaction.date);
-      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      const monthKey = getMonthKey(date);
 
       if (!grouped[monthKey]) {
         grouped[monthKey] = [];
@@ -109,19 +110,15 @@ export default function TransactionsPage() {
   return (
     <div className="container mx-auto px-4 space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        {/* Sidebar em telas maiores */}
-        <div className="hidden bg-white-50 rounded-lg shadow-md xl:block lg:hidden md:col-span-1">
-          {/* <Sidebar /> */}
-        </div>
 
         {/* Conteúdo principal */}
         <div className="col-span-1 md:col-span-5 xl:col-span-4 space-y-6">
           <Card>
             <div className="flex justify-between items-center mb-6">
               <h1 className="transactions-page-title">Extrato</h1>
-              <a href="/transactions/add">
+              {/* <Link to="/transactions"> */}
                 <Button variant="primary">Nova Transação</Button>
-              </a>
+              {/* </Link> */}
             </div>
             <div className="space-y-8">
               {transactions.length > 0 ? (
@@ -165,12 +162,14 @@ export default function TransactionsPage() {
                               <div className="mt-2 flex space-x-2">
                                 <Button
                                   variant="secondary"
+                                  size="sm"
                                   onClick={() => openEditModal(transaction.id)}
                                 >
                                   Editar
                                 </Button>
                                 <Button
                                   variant="danger"
+                                  size="sm"
                                   onClick={() => openDeleteModal(transaction.id)}
                                 >
                                   Excluir
@@ -188,9 +187,9 @@ export default function TransactionsPage() {
                   <p className="transactions-empty-title mb-2">
                     Nenhuma transação encontrada.
                   </p>
-                  <a href="/transactions/add">
+                  <Link to="/dashboard">
                     <Button variant="primary">Adicionar nova transação</Button>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
@@ -222,3 +221,5 @@ export default function TransactionsPage() {
     </div>
   );
 }
+
+export default TransactionsPage;

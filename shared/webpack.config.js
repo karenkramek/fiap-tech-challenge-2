@@ -44,8 +44,6 @@ module.exports = {
         './components/TransactionBadge': './src/components/TransactionBadge',
         './components/ConfirmationModal': './src/components/ConfirmationModal',
         './components/EditTransactionModal': './src/components/EditTransactionModal',
-        './components/Header': './src/components/Header',
-        './components/Sidebar': './src/components/Sidebar',
         './components/TransactionForm': './src/components/TransactionForm',
         './components/StatementCard': './src/components/StatementCard',
         './components/BalanceCard': './src/components/BalanceCard',
@@ -69,11 +67,7 @@ module.exports = {
         './utils/currencyUtils': './src/utils/currencyUtils',
         './utils/utils': './src/utils/utils',
         // Types
-        './types/TransactionType': './src/types/TransactionType',
-        // Styles
-        './styles/tokens.css': './src/styles/tokens.css',
-        // Index (caso queira importar tudo de shared)
-        './index': './src/index.ts'
+        './types/TransactionType': './src/types/TransactionType'
       },
       shared: {
         react: { singleton: true },
@@ -84,5 +78,6 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
     })
-  ]
+  ],
+  entry: './src/app/index.ts',
 };

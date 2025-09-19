@@ -8,7 +8,6 @@ import { useAccount } from 'shared/hooks/useAccount';
 import BalanceCard from 'shared/components/BalanceCard';
 import TransactionForm from 'shared/components/TransactionForm';
 import StatementCard from 'shared/components/StatementCard';
-import './dashboard-styles.css';
 
 type GroupedTransactions = {
   grouped: Record<string, Transaction[]>;
@@ -98,16 +97,17 @@ const Dashboard: React.FC = () => {
               description={description}
               onAmountChange={handleAmountChange}
               onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-              onDescriptionChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
+              onDescriptionChange={(e) => setDescription(e.target.value)}
               onSubmit={handleSubmit}
-              loading={accountLoading || transactionsLoading || formLoading}
+              loading={formLoading}
             />
           </div>
-
+          
           {/* Extrato */}
           <StatementCard />
         </div>
       </div>
+      
       <Toaster />
     </>
   );

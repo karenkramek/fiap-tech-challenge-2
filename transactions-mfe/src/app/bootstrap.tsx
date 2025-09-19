@@ -1,7 +1,7 @@
-
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Transactions from './Transactions';
-import '../../shared/src/styles/tokens.css';
+import App from '../App';
+import '../styles/styles.css';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -9,4 +9,4 @@ if (!container) {
 }
 
 const root = createRoot(container);
-root.render(<Transactions />);
+root.render(<App />);

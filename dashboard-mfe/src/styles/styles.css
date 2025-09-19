@@ -1,3 +1,5 @@
+@import '../../../shared/src/styles/globals.css';
+
 /* Dashboard MFE Styles */
 .dashboard-container {
   padding: 2rem;
@@ -57,10 +59,6 @@
 
 .submit-btn:hover {
   background: #0052a3;
-}
-
-.transactions-list {
-  space-y: 1rem;
 }
 
 .transaction-item {

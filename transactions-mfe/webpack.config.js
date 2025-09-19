@@ -1,10 +1,9 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const { DefinePlugin } = require('webpack');
-const path = require('path');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/app/index.tsx',
   mode: 'development',
   devServer: {
     port: 3032,
@@ -33,16 +32,36 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                config: './postcss.config.js'
+              }
+            }
+          }
+        ]
       }
     ]
   },
   plugins: [
+    new DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
+    }),
     new ModuleFederationPlugin({
       name: 'transactionsMFE',
       filename: 'remoteEntry.js',
       exposes: {
-        './Transactions': './src/Transactions'
+        './Transactions': './src/App.tsx'
       },
       remotes: {
         shared: 'shared@http://localhost:3033/remoteEntry.js'
@@ -62,10 +81,6 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    }),
-    new DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-      'process.env.API_URL': JSON.stringify(process.env.API_URL || 'http://localhost:3034')
     })
   ]
 };

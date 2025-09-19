@@ -1,9 +1,25 @@
-/* Import tokens first */
-@import '../../shared/src/styles/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Component-specific styles only - no global resets */
+@import './tokens.css';
 
-/* Utility classes needed for dashboard components */
+/* Exemplo de reset e estilos globais */
+html, body {
+  font-family: var(--font-family-primary, sans-serif);
+  background: var(--background, #fff);
+  color: var(--foreground, #222);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Estilos globais, utilidades, etc. */
+
 .flex { display: flex; }
 .grid { display: grid; }
 .justify-center { justify-content: center; }

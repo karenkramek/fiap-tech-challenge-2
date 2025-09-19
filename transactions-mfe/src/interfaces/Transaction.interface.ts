@@ -1,4 +1,4 @@
-import { TransactionType } from '../../../shared/src/types/TransactionType';
+import { TransactionType } from 'shared/types/TransactionType';
 
 export interface ITransaction {
   id: string;

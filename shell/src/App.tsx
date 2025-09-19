@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { Toaster } from 'react-hot-toast';
 import Home from './components/Home';
 import ErrorBoundary from './components/ErrorBoundary';
-import Header from '../../shared/src/components/Header';
-import Sidebar from '../../shared/src/components/Sidebar';
-import './styles/global.css';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
@@ -23,14 +22,14 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <>
       <Header toggleSidebar={toggleSidebar} />
-      <div className='flex'>
-        {/* Sidebar fixa para desktop, visível a partir de md */}
-        <div className='hidden xl:block w-64 p-4 min-h-screen'>
+      <div className='flex container mx-auto px-4 py-8'>
+        {/* Sidebar em telas maiores */}
+        <div className="hidden bg-white-50 rounded-lg shadow-md xl:block lg:hidden md:col-span-1 w-64 p-4 min-h-screen">
           <Sidebar currentPath={location.pathname} />
         </div>
 
         {/* Conteúdo principal */}
-        <main className='container mx-auto px-4 py-8 flex-1'>
+        <main className="col-span-1 md:col-span-5 xl:col-span-4 space-y-6">
           {children}
         </main>
       </div>
