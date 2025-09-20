@@ -1,0 +1,32 @@
+[33mcommit c0ae66ea27f7016159e7d60652e3a1a72d3a540d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpage-about-ssg[m[33m)[m
+Author: JeanVillelaDosSantos <villeladosantosjean@gmail.com>
+Date:   Fri Sep 19 23:33:01 2025 -0300
+
+    feat: Added to About page
+
+[33mcommit dbb09dd3cd09289cc554ae0a379a443b6fb88283[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: 9ff8f25 c101a27
+Author: Tatiane Gabrielle Costa <hello@tatishinoda.com>
+Date:   Tue Sep 16 10:09:42 2025 -0300
+
+    Merge pull request #1 from karenkramek/mfe-front
+    
+    chore(front): add styles and tailwind to project
+
+[33mcommit c101a27201c8c9e0f63bd3c4949d2499e9efb6d5[m[33m ([m[1;31morigin/mfe-front[m[33m)[m
+Author: Tatiane Gabrielle <hello@tatishinoda.com>
+Date:   Tue Sep 16 00:21:54 2025 -0300
+
+    chore(front): add styles and tailwind to project
+
+[33mcommit 9ff8f251e4aab6fa904d0b8bf2bf345b6eac7388[m
+Author: Karen Kramek <rm361140@fiap.com.br>
+Date:   Sun Sep 14 22:11:24 2025 -0300
+
+    feat: Implement microfrontend with React and module federation
+
+[33mcommit f63fbc4568b72b97385add657fa171222b1fbab7[m
+Author: Karen Kramek <kakakramek@gmail.com>
+Date:   Tue Sep 9 18:06:55 2025 -0300
+
+    Initial commit
