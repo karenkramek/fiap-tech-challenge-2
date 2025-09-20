@@ -1,21 +1,12 @@
 import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { Transaction, TransactionType } from '../models/Transaction';
 import api from './api';
 
-interface TransactionDTO {
-  id: string;
-  type: TransactionType;
-  amount: number;
-  date: string;
-  description?: string;
-}
-
-interface AccountDTO {
-  id: string;
-  name: string;
-  balance: number;
-}
+import { TransactionDTO } from '../dtos/Transaction.dto';
+import { AccountDTO } from '../dtos/Account.dto';
+import { Transaction } from '../models/Transaction';
+import { TransactionType } from '../types/TransactionType';
+import { Account } from '../models/Account';
 
 export class TransactionService {
   static async getAllTransactions(): Promise<Transaction[]> {
@@ -28,44 +19,16 @@ export class TransactionService {
     return Transaction.fromJSON(response.data);
   }
 
-  static async addTransaction(
-    type: TransactionType,
-    amount: number,
-    date: Date,
-    description?: string
-  ): Promise<Transaction> {
-    const newTransaction = new Transaction(
-      uuidv4(),
-      type,
-      amount,
-      date,
-      description
-    );
-
+  static async addTransaction(type: TransactionType, amount: number, date: Date, description?: string): Promise<Transaction> {
+    const newTransaction = new Transaction(uuidv4(), type, amount, date, description);
     const response = await api.post('/transactions', newTransaction.toJSON());
-
     await this.applyTransactionToBalance(newTransaction);
-
     return Transaction.fromJSON(response.data);
   }
 
-  static async updateTransaction(
-    id: string,
-    type: TransactionType,
-    amount: number,
-    date: Date,
-    description?: string
-  ): Promise<Transaction> {
+  static async updateTransaction(id: string, type: TransactionType, amount: number, date: Date, description?: string): Promise<Transaction> {
     const oldTransaction = await this.getTransactionById(id);
-
-    const updatedTransaction = new Transaction(
-      id,
-      type,
-      amount,
-      date,
-      description
-    );
-
+    const updatedTransaction = new Transaction(id, type, amount, date, description);
     const response = await api.put(`/transactions/${id}`, updatedTransaction.toJSON());
 
     // Update account balance based on the difference.
@@ -110,15 +73,62 @@ export class TransactionService {
 
     try {
       // Envia o objeto completo da conta para evitar aninhamento
-      await api.put('/account', {
-        id: account.id,
-        name: account.name,
-        balance: newBalance
-      });
+      await api.put('/account', { id: account.id, name: account.name, balance: newBalance });
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 409) {
         throw new Error('Account balance update conflict. Please retry.');
       }
+      throw error;
+    }
+  }
+
+  async getTransactions(): Promise<Transaction[]> {
+    try {
+      const response = await api.get('/transactions');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      return [];
+    }
+  }
+
+  async addTransaction(transaction: Omit<Transaction, 'id'>): Promise<Transaction> {
+    try {
+      const response = await api.post('/transactions', {
+        ...transaction,
+        id: Date.now().toString(), // Simple ID generation
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+      throw error;
+    }
+  }
+
+  async deleteTransaction(id: string): Promise<void> {
+    try {
+      await api.delete(`/transactions/${id}`);
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      throw error;
+    }
+  }
+
+  async getAccount(): Promise<Account | null> {
+    try {
+      const response = await api.get('/account');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching account:', error);
+      return null;
+    }
+  }
+
+  async updateAccountBalance(balance: number): Promise<void> {
+    try {
+      await api.patch('/account', { balance });
+    } catch (error) {
+      console.error('Error updating account balance:', error);
       throw error;
     }
   }
