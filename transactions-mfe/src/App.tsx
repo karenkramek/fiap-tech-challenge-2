@@ -1,13 +1,13 @@
 import React from 'react';
-import { useTransactions } from 'shared/hooks/useTransactions';
-import { formatDate, getMonthKey, getMonthName } from 'shared/utils/utils';
-import TransactionBadge from 'shared/components/TransactionBadge';
-import { formatCurrencyWithSymbol } from 'shared/utils/currencyUtils';
+import { Link } from 'react-router-dom';
+import Button from 'shared/components/Button';
+import Card from 'shared/components/Card';
 import ConfirmationModal from 'shared/components/ConfirmationModal';
 import EditTransactionModal from 'shared/components/EditTransactionModal';
-import Card from 'shared/components/Card';
-import Button from 'shared/components/Button';
-import { Link } from 'react-router-dom';
+import TransactionBadge from 'shared/components/TransactionBadge';
+import { useTransactions } from 'shared/hooks/useTransactions';
+import { formatCurrencyWithSymbol } from 'shared/utils/currencyUtils';
+import { formatDate, getMonthKey, getMonthName } from 'shared/utils/utils';
 
 const TransactionsPage: React.FC = () => {
   const { transactions, loading, deleteTransaction, fetchTransactions } = useTransactions();
@@ -108,94 +108,88 @@ const TransactionsPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-
-        {/* Conteúdo principal */}
-        <div className="col-span-1 md:col-span-5 xl:col-span-4 space-y-6">
-          <Card>
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="transactions-page-title">Extrato</h1>
-              {/* <Link to="/transactions"> */}
-                <Button variant="primary">Nova Transação</Button>
-              {/* </Link> */}
-            </div>
-            <div className="space-y-8">
-              {transactions.length > 0 ? (
-                sortedKeys.map((key) => {
-                  const [month, year] = key.split("-").map(Number);
-                  const monthName = getMonthName(month);
-
-                  return (
-                    <div key={key} className="space-y-4">
-                      <h2 className="transactions-month-header">
-                        {monthName} {year}
-                      </h2>
-
-                      <div className="space-y-3">
-                        {grouped[key].map((transaction) => (
-                          <div key={transaction.id} className="transaction-item flex justify-between items-center">
-                            <div>
-                              <div className="flex items-center">
-                                <TransactionBadge type={transaction.type} />
-                                <p className="transaction-date-small ml-2">
-                                  {formatDate(transaction.date)}
-                                </p>
-                              </div>
-                              <p className="transaction-description">
-                                {transaction.description || "Sem descrição"}
-                              </p>
-                            </div>
-
-                            <div className="flex flex-col items-end">
-                              <p
-                                className={`transaction-amount ${
-                                  transaction.isIncome()
-                                    ? "positive"
-                                    : "negative"
-                                }`}
-                              >
-                                {transaction.isIncome() ? "+" : "-"}{" "}
-                                {formatCurrencyWithSymbol(transaction.amount)}
-                              </p>
-
-                              <div className="mt-2 flex space-x-2">
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => openEditModal(transaction.id)}
-                                >
-                                  Editar
-                                </Button>
-                                <Button
-                                  variant="danger"
-                                  size="sm"
-                                  onClick={() => openDeleteModal(transaction.id)}
-                                >
-                                  Excluir
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="transactions-empty">
-                  <p className="transactions-empty-title mb-2">
-                    Nenhuma transação encontrada.
-                  </p>
-                  <Link to="/dashboard">
-                    <Button variant="primary">Adicionar nova transação</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </Card>
+    <div className="space-y-8">
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="transactions-page-title">Extrato</h1>
+          {/* <Link to="/transactions"> */}
+            <Button variant="primary">Nova Transação</Button>
+          {/* </Link> */}
         </div>
-      </div>
+        <div className="space-y-8">
+          {transactions.length > 0 ? (
+            sortedKeys.map((key) => {
+              const [month, year] = key.split("-").map(Number);
+              const monthName = getMonthName(month);
+
+              return (
+                <div key={key} className="space-y-4">
+                  <h2 className="transactions-month-header">
+                    {monthName} {year}
+                  </h2>
+
+                  <div className="space-y-3">
+                    {grouped[key].map((transaction) => (
+                      <div key={transaction.id} className="transaction-item flex justify-between items-center">
+                        <div>
+                          <div className="flex items-center">
+                            <TransactionBadge type={transaction.type} />
+                            <p className="transaction-date-small ml-2">
+                              {formatDate(transaction.date)}
+                            </p>
+                          </div>
+                          <p className="transaction-description">
+                            {transaction.description || "Sem descrição"}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col items-end">
+                          <p
+                            className={`transaction-amount ${
+                              transaction.isIncome()
+                                ? "positive"
+                                : "negative"
+                            }`}
+                          >
+                            {transaction.isIncome() ? "+" : "-"}{" "}
+                            {formatCurrencyWithSymbol(transaction.amount)}
+                          </p>
+
+                          <div className="mt-2 flex space-x-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => openEditModal(transaction.id)}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => openDeleteModal(transaction.id)}
+                            >
+                              Excluir
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="transactions-empty">
+              <p className="transactions-empty-title mb-2">
+                Nenhuma transação encontrada.
+              </p>
+              <Link to="/dashboard">
+                <Button variant="primary">Adicionar nova transação</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </Card>
 
       {/* Modal de confirmação de exclusão */}
       {modalOpen && (

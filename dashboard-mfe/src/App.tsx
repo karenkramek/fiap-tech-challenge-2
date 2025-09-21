@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
+import BalanceCard from 'shared/components/BalanceCard';
+import StatementCard from 'shared/components/StatementCard';
+import TransactionForm from 'shared/components/TransactionForm';
+import { useAccount } from 'shared/hooks/useAccount';
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { Transaction } from 'shared/models/Transaction';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
-import { useAccount } from 'shared/hooks/useAccount';
-import BalanceCard from 'shared/components/BalanceCard';
-import TransactionForm from 'shared/components/TransactionForm';
-import StatementCard from 'shared/components/StatementCard';
 
 type GroupedTransactions = {
   grouped: Record<string, Transaction[]>;
@@ -79,9 +79,9 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div className="container mx-auto px-4 space-y-8">
-        <div className="grid md:grid-cols-5 gap-6">
+        <div className="flex gap-6">
           {/* Conteúdo principal */}
-          <div className="md:col-span-3 space-y-6">
+          <div className="flex-1 space-y-6">
             {/* Saldo e transações recentes */}
             <BalanceCard
               accountName={account?.name}
@@ -102,12 +102,12 @@ const Dashboard: React.FC = () => {
               loading={formLoading}
             />
           </div>
-          
+
           {/* Extrato */}
           <StatementCard />
         </div>
       </div>
-      
+
       <Toaster />
     </>
   );
