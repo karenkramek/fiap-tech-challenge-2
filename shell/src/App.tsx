@@ -10,6 +10,42 @@ import Sidebar from './components/Sidebar';
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
 const Transactions = React.lazy(() => import('transactionsMFE/Transactions'));
 
+// Layout wrapper for home page
+const HomeLayout: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <>
+      <Header toggleSidebar={toggleSidebar} />
+      <Home />
+
+      {/* Overlay da sidebar mobile - backdrop */}
+      {isSidebarOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black bg-opacity-50 z-[9998] xl:hidden"
+        />
+      )}
+
+      {/* Sidebar mobile como overlay */}
+      <div
+        className={`fixed top-0 left-0 w-64 h-full bg-white-50 shadow-xl z-[9999] transform transition-transform duration-300 xl:hidden
+                   ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <Sidebar
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+          currentPath="/"
+        />
+      </div>
+    </>
+  );
+};
+
 // Layout wrapper for authenticated routes
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -63,7 +99,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         <Toaster position="top-right" />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeLayout />} />
           <Route
             path="/dashboard"
             element={

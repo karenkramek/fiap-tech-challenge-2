@@ -1,14 +1,11 @@
+import { Menu } from 'lucide-react';
 import React from 'react';
-import { Menu, User } from 'lucide-react';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
-  // For now, we'll use a static name. Later this could be fetched from API
-  const name = 'Usuário';
-
   return (
     <header className='bg-primary-700 text-white-50 shadow-md'>
       <div className='container mx-auto px-4 py-3 flex justify-between items-center'>
@@ -24,11 +21,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             ByteBank
           </button>
         </div>
-        <div className='flex items-center space-x-2'>
-          <span className='text-sm hidden md:block header-text'>{name}</span>
-          <div className='h-8 w-8 rounded-full border-2 border-secondary-200 bg-secondary-200 flex items-center justify-center text-black-400'>
-            <User className='h-4 w-4' />
-          </div>
+
+        {/* Botões de Conta e Login */}
+        <div className='flex items-center space-x-3'>
+          <button className='bg-white text-primary-700 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm'>
+            Crie uma conta
+          </button>
+          <button className='border border-white text-white px-4 py-2 rounded-full hover:bg-white hover:text-primary-700 transition-colors font-medium text-sm'>
+            Entre
+          </button>
         </div>
       </div>
     </header>
