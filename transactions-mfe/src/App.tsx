@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AttachmentDisplay from 'shared/components/AttachmentDisplay';
 import Button from 'shared/components/Button';
 import Card from 'shared/components/Card';
 import ConfirmationModal from 'shared/components/ConfirmationModal';
@@ -111,7 +112,7 @@ const TransactionsPage: React.FC = () => {
     <div className="space-y-8">
       <Card>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="transactions-page-title">Extrato</h1>
+          <h1 className="transactions-title text-primary-700">Extrato</h1>
           {/* <Link to="/transactions"> */}
             <Button variant="primary">Nova Transação</Button>
           {/* </Link> */}
@@ -141,6 +142,15 @@ const TransactionsPage: React.FC = () => {
                           <p className="transaction-description">
                             {transaction.description || "Sem descrição"}
                           </p>
+                          {transaction.attachmentPath && (
+                            <div className="mt-2">
+                              <AttachmentDisplay
+                                attachmentPath={transaction.attachmentPath}
+                                {...({ transactionType: transaction.type } as any)}
+                                className="text-sm"
+                              />
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex flex-col items-end">

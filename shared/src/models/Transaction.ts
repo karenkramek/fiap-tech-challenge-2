@@ -6,7 +6,8 @@ export class Transaction {
     public type: TransactionType,
     public amount: number,
     public date: Date,
-    public description?: string
+    public description?: string,
+    public attachmentPath?: string
   ) {
     if (!id || !type || isNaN(amount) || !(date instanceof Date)) {
       throw new Error('Dados inválidos para transação');
@@ -19,13 +20,15 @@ export class Transaction {
     amount: number;
     date: string;
     description?: string;
+    attachmentPath?: string;
   }): Transaction {
     return new Transaction(
       json.id,
       json.type as TransactionType,
       json.amount,
       new Date(json.date),
-      json.description
+      json.description,
+      json.attachmentPath
     );
   }
 
@@ -35,7 +38,8 @@ export class Transaction {
       type: this.type,
       amount: this.amount,
       date: this.date.toISOString(),
-      description: this.description
+      description: this.description,
+      attachmentPath: this.attachmentPath
     };
   }
 

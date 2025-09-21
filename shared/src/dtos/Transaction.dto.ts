@@ -6,4 +6,5 @@ export interface TransactionDTO {
   amount: number;
   date: string; // geralmente string (ISO) em APIs
   description?: string;
+  attachmentPath?: string;
 }

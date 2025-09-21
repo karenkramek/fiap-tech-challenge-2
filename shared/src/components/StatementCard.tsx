@@ -5,6 +5,7 @@ import { useModal } from '../hooks/useModal';
 import { useTransactions } from '../hooks/useTransactions';
 import { formatCurrencyWithSymbol } from '../utils/currencyUtils';
 import { formatDate, getMonthName } from '../utils/utils';
+import AttachmentDisplay from './AttachmentDisplay';
 import Card from './Card';
 import ConfirmationModal from './ConfirmationModal';
 import EditTransactionModal from './EditTransactionModal';
@@ -102,6 +103,16 @@ const StatementCard: React.FC = () => {
                             <p className="text-xs text-white-800 truncate">
                               {transaction.description || "Sem descrição"}
                             </p>
+                            {transaction.attachmentPath && (
+                              <div className="mt-1">
+                                <AttachmentDisplay
+                                  attachmentPath={transaction.attachmentPath}
+                                  transactionType={transaction.type}
+                                  showLabel={false}
+                                  className="text-xs"
+                                />
+                              </div>
+                            )}
                           </div>
                           <div className="text-right ml-4">
                             <p className={`text-sm font-medium ${transaction.isIncome() ? "text-green-600" : "text-red-600"}`}>

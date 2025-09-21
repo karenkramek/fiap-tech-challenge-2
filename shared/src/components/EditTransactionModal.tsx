@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
+import { TransactionService } from '../services/TransactionService';
 import { TransactionType } from '../types/TransactionType';
 import { createCurrencyInputHandler, formatCurrencyWithoutSymbol, parseCurrencyStringToNumber } from '../utils/currencyUtils';
-import { TransactionService } from '../services/TransactionService';
 import { formatDateForInput } from '../utils/utils';
 import Button from './Button';
+import FileUpload from './FileUpload';
 
 interface EditTransactionModalProps {
   open: boolean;
@@ -20,6 +21,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
   const handleAmountChange = createCurrencyInputHandler(setAmount);
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState<string>('');
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [existingAttachmentPath, setExistingAttachmentPath] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
@@ -34,6 +37,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
         setAmount(formatCurrencyWithoutSymbol(transaction.amount));
         setDescription(transaction.description || '');
         setDate(formatDateForInput(transaction.date));
+        setExistingAttachmentPath(transaction.attachmentPath);
+        setAttachmentFile(null);
         setError(null);
       } catch {
         setError('Erro ao carregar os dados da transação.');
@@ -65,7 +70,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
         type,
         normalizedAmount,
         localDate,
-        description
+        description,
+        attachmentFile || undefined
       );
       setLoading(false);
       if (onSuccess) onSuccess();
@@ -152,6 +158,12 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
                 className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
               />
             </div>
+            <FileUpload
+              onFileSelect={setAttachmentFile}
+              selectedFile={attachmentFile}
+              existingFilePath={existingAttachmentPath}
+              disabled={loading}
+            />
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"

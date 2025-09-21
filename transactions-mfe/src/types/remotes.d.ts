@@ -105,6 +105,25 @@ declare module 'shared/components/BalanceCard' {
   export default BalanceCard;
 }
 
+declare module 'shared/components/AttachmentDisplay' {
+  const AttachmentDisplay: React.FC<{
+    attachmentPath: string;
+    className?: string;
+    showLabel?: boolean;
+    showPreviewButton?: boolean;
+  }>;
+  export default AttachmentDisplay;
+}
+
+declare module 'shared/components/FilePreviewModal' {
+  const FilePreviewModal: React.FC<{
+    open: boolean;
+    onClose: () => void;
+    attachmentPath: string;
+  }>;
+  export default FilePreviewModal;
+}
+
 declare module 'shared/components/TransactionForm' {
   import { TransactionType } from 'shared/types/TransactionType';
   const TransactionForm: React.FC<{
@@ -136,6 +155,7 @@ declare module 'shared/models/Transaction' {
     amount: number;
     date: string | Date;
     description?: string;
+    attachmentPath?: string;
     isIncome(): boolean;
     isExpense(): boolean;
   }

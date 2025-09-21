@@ -70,3 +70,6 @@ storybook-static/
 # !package-lock.json
 # !yarn.lock
 # !pnpm-lock.yaml
+
+# Ignore upload files, but not the folder
+uploads/*

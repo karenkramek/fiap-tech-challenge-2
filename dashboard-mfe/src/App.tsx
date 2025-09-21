@@ -18,6 +18,7 @@ const Dashboard: React.FC = () => {
   // Estado para exibir ou esconder o saldo
   const [showBalance, setShowBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
   // Handler reutilizável para campo de valor monetário
   const handleAmountChange = createCurrencyInputHandler(setAmount);
@@ -47,7 +48,8 @@ const Dashboard: React.FC = () => {
         transactionType,
         normalizedAmount,
         new Date(),
-        description
+        description,
+        attachmentFile || undefined
       );
 
       // Atualiza saldo após nova transação
@@ -59,6 +61,7 @@ const Dashboard: React.FC = () => {
 
       setAmount("");
       setDescription("");
+      setAttachmentFile(null);
       toast.success("Transação adicionada com sucesso!");
     } catch (error) {
       toast.error("Erro ao adicionar transação.");
@@ -66,6 +69,10 @@ const Dashboard: React.FC = () => {
     } finally {
       setFormLoading(false);
     }
+  };
+
+  const handleFileSelect = (file: File | null) => {
+    setAttachmentFile(file);
   };
 
   if (accountLoading || transactionsLoading || formLoading) {
@@ -95,9 +102,11 @@ const Dashboard: React.FC = () => {
               amount={amount}
               transactionType={transactionType}
               description={description}
+              attachmentFile={attachmentFile}
               onAmountChange={handleAmountChange}
               onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
               onDescriptionChange={(e) => setDescription(e.target.value)}
+              onFileSelect={setAttachmentFile}
               onSubmit={handleSubmit}
               loading={formLoading}
             />
