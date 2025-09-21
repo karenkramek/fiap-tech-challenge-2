@@ -109,7 +109,7 @@ const TransactionsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <Card>
         <div className="flex justify-between items-center mb-6">
           <h1 className="transactions-title text-primary-700">Extrato</h1>
@@ -117,69 +117,71 @@ const TransactionsPage: React.FC = () => {
             <Button variant="primary">Nova Transação</Button>
           {/* </Link> */}
         </div>
-        <div className="space-y-8">
+        <div className="space-y-6">
           {transactions.length > 0 ? (
             sortedKeys.map((key) => {
               const [month, year] = key.split("-").map(Number);
               const monthName = getMonthName(month);
 
               return (
-                <div key={key} className="space-y-4">
-                  <h2 className="transactions-month-header">
+                <div key={key} className="space-y-3">
+                  <h2 className="text-lg font-semibold text-gray-600 border-b border-gray-200 pb-2">
                     {monthName} {year}
                   </h2>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {grouped[key].map((transaction) => (
-                      <div key={transaction.id} className="transaction-item flex justify-between items-center">
-                        <div>
-                          <div className="flex items-center">
-                            <TransactionBadge type={transaction.type} />
-                            <p className="transaction-date-small ml-2">
-                              {formatDate(transaction.date)}
-                            </p>
-                          </div>
-                          <p className="transaction-description">
-                            {transaction.description || "Sem descrição"}
-                          </p>
-                          {transaction.attachmentPath && (
-                            <div className="mt-2">
-                              <AttachmentDisplay
-                                attachmentPath={transaction.attachmentPath}
-                                {...({ transactionType: transaction.type } as any)}
-                                className="text-sm"
-                              />
+                      <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <TransactionBadge type={transaction.type} />
+                              <span className="text-sm text-gray-500">
+                                {formatDate(transaction.date)}
+                              </span>
                             </div>
-                          )}
-                        </div>
+                            <p className="text-gray-700 text-sm mb-2">
+                              {transaction.description || "Sem descrição"}
+                            </p>
+                            {transaction.attachmentPath && (
+                              <div className="mt-2">
+                                <AttachmentDisplay
+                                  attachmentPath={transaction.attachmentPath}
+                                  {...({ transactionType: transaction.type } as any)}
+                                  className="text-xs"
+                                />
+                              </div>
+                            )}
+                          </div>
 
-                        <div className="flex flex-col items-end">
-                          <p
-                            className={`transaction-amount ${
-                              transaction.isIncome()
-                                ? "positive"
-                                : "negative"
-                            }`}
-                          >
-                            {transaction.isIncome() ? "+" : "-"}{" "}
-                            {formatCurrencyWithSymbol(transaction.amount)}
-                          </p>
+                          <div className="flex flex-col items-end gap-2 ml-4">
+                            <p
+                              className={`text-lg font-semibold ${
+                                transaction.isIncome()
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {transaction.isIncome() ? "" : "-"}{" "}
+                              {formatCurrencyWithSymbol(transaction.amount)}
+                            </p>
 
-                          <div className="mt-2 flex space-x-2">
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => openEditModal(transaction.id)}
-                            >
-                              Editar
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => openDeleteModal(transaction.id)}
-                            >
-                              Excluir
-                            </Button>
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => openEditModal(transaction.id)}
+                              >
+                                Editar
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => openDeleteModal(transaction.id)}
+                              >
+                                Excluir
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
