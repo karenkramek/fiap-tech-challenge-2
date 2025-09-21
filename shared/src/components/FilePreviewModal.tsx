@@ -32,24 +32,25 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 modal-overlay flex items-center justify-center z-50 mt-0"
+      className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
       <div className="modal-content max-w-4xl max-h-[90vh] overflow-hidden relative">
-        {/* Header com título e botão fechar */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="modal-title flex items-center space-x-2 flex-1">
+        {/* Botão X no canto superior direito */}
+        <button
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
+          onClick={onClose}
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+        {/* Header com título */}
+        <div className="mb-4 pr-8">
+          <h2 className="modal-title flex items-center space-x-2">
             <File className="h-6 w-6" />
             <span className="truncate">Preview de Anexo</span>
           </h2>
-
-          <button
-            className="text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none ml-4 flex-shrink-0"
-            onClick={onClose}
-            aria-label="Fechar"
-          >
-            ×
-          </button>
         </div>
 
         {/* Action Buttons */}

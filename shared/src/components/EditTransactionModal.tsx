@@ -84,10 +84,10 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50 mt-0">
-      <div className="modal-content">
+    <div className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50">
+      <div className="modal-content relative">
         <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
           onClick={onClose}
           aria-label="Fechar"
         >
