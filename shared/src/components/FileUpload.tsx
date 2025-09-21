@@ -151,7 +151,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 Clique para selecionar ou arraste um arquivo
               </p>
               <p className="text-xs text-white-800 mt-1">
-                PDF, Word, Excel, imagens (PNG, JPG, GIF) - Máx. 5MB
+                PDF e imagens (PNG, JPG, GIF) - Máx. 2MB
               </p>
             </div>
           </div>
