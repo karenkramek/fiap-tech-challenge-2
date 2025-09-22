@@ -1,4 +1,5 @@
 import Button from "./Button";
+import React from 'react';
 
 // Modal de confirmação reutilizável
 interface ConfirmationModalProps {
