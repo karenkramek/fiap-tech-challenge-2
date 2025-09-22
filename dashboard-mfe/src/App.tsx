@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
+import BalanceCard from 'shared/components/BalanceCard';
+import StatementCard from 'shared/components/StatementCard';
+import TransactionForm from 'shared/components/TransactionForm';
+import { useAccount } from 'shared/hooks/useAccount';
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { Transaction } from 'shared/models/Transaction';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
-import { useAccount } from 'shared/hooks/useAccount';
-import BalanceCard from 'shared/components/BalanceCard';
-import TransactionForm from 'shared/components/TransactionForm';
-import StatementCard from 'shared/components/StatementCard';
 
 type GroupedTransactions = {
   grouped: Record<string, Transaction[]>;
@@ -18,6 +18,7 @@ const Dashboard: React.FC = () => {
   // Estado para exibir ou esconder o saldo
   const [showBalance, setShowBalance] = useState<boolean>(false);
   const [amount, setAmount] = useState<string>("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
   // Handler reutilizável para campo de valor monetário
   const handleAmountChange = createCurrencyInputHandler(setAmount);
@@ -47,7 +48,8 @@ const Dashboard: React.FC = () => {
         transactionType,
         normalizedAmount,
         new Date(),
-        description
+        description,
+        attachmentFile || undefined
       );
 
       // Atualiza saldo após nova transação
@@ -59,6 +61,7 @@ const Dashboard: React.FC = () => {
 
       setAmount("");
       setDescription("");
+      setAttachmentFile(null);
       toast.success("Transação adicionada com sucesso!");
     } catch (error) {
       toast.error("Erro ao adicionar transação.");
@@ -66,6 +69,10 @@ const Dashboard: React.FC = () => {
     } finally {
       setFormLoading(false);
     }
+  };
+
+  const handleFileSelect = (file: File | null) => {
+    setAttachmentFile(file);
   };
 
   if (accountLoading || transactionsLoading || formLoading) {
@@ -79,9 +86,9 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div className="container mx-auto px-4 space-y-8">
-        <div className="grid md:grid-cols-5 gap-6">
+        <div className="flex gap-6">
           {/* Conteúdo principal */}
-          <div className="md:col-span-3 space-y-6">
+          <div className="flex-1 space-y-6">
             {/* Saldo e transações recentes */}
             <BalanceCard
               accountName={account?.name}
@@ -95,19 +102,21 @@ const Dashboard: React.FC = () => {
               amount={amount}
               transactionType={transactionType}
               description={description}
+              attachmentFile={attachmentFile}
               onAmountChange={handleAmountChange}
               onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
               onDescriptionChange={(e) => setDescription(e.target.value)}
+              onFileSelect={setAttachmentFile}
               onSubmit={handleSubmit}
               loading={formLoading}
             />
           </div>
-          
+
           {/* Extrato */}
           <StatementCard />
         </div>
       </div>
-      
+
       <Toaster />
     </>
   );

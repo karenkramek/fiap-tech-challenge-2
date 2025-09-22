@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
+import { TransactionService } from '../services/TransactionService';
 import { TransactionType } from '../types/TransactionType';
 import { createCurrencyInputHandler, formatCurrencyWithoutSymbol, parseCurrencyStringToNumber } from '../utils/currencyUtils';
-import { TransactionService } from '../services/TransactionService';
 import { formatDateForInput } from '../utils/utils';
 import Button from './Button';
+import FileUpload from './FileUpload';
 
 interface EditTransactionModalProps {
   open: boolean;
@@ -20,6 +21,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
   const handleAmountChange = createCurrencyInputHandler(setAmount);
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState<string>('');
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [existingAttachmentPath, setExistingAttachmentPath] = useState<string | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
@@ -34,6 +37,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
         setAmount(formatCurrencyWithoutSymbol(transaction.amount));
         setDescription(transaction.description || '');
         setDate(formatDateForInput(transaction.date));
+        setExistingAttachmentPath(transaction.attachmentPath);
+        setAttachmentFile(null);
         setError(null);
       } catch {
         setError('Erro ao carregar os dados da transação.');
@@ -65,7 +70,8 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
         type,
         normalizedAmount,
         localDate,
-        description
+        description,
+        attachmentFile || undefined
       );
       setLoading(false);
       if (onSuccess) onSuccess();
@@ -78,10 +84,10 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50 mt-0">
-      <div className="modal-content">
+    <div className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50">
+      <div className="modal-content relative">
         <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
           onClick={onClose}
           aria-label="Fechar"
         >
@@ -152,6 +158,12 @@ export default function EditTransactionModal({ open, onClose, transactionId, onS
                 className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
               />
             </div>
+            <FileUpload
+              onFileSelect={setAttachmentFile}
+              selectedFile={attachmentFile}
+              existingFilePath={existingAttachmentPath}
+              disabled={loading}
+            />
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"

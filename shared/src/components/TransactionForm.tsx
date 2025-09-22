@@ -1,15 +1,18 @@
 import React from 'react';
-import Card from './Card';
-import Button from './Button';
 import { TransactionType } from '../types/TransactionType';
+import Button from './Button';
+import Card from './Card';
+import FileUpload from './FileUpload';
 
 interface TransactionFormProps {
   amount: string;
   transactionType: TransactionType;
   description: string;
+  attachmentFile: File | null;
   onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTypeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileSelect: (file: File | null) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading?: boolean;
 }
@@ -18,9 +21,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   amount,
   transactionType,
   description,
+  attachmentFile,
   onAmountChange,
   onTypeChange,
   onDescriptionChange,
+  onFileSelect,
   onSubmit,
   loading = false
 }) => (
@@ -75,6 +80,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           disabled={loading}
         />
       </div>
+      <FileUpload
+        onFileSelect={onFileSelect}
+        selectedFile={attachmentFile}
+        disabled={loading}
+      />
       <div className='pt-2'>
         <Button type='submit' variant='active' className='w-full py-3 bg-tertiary-600 hover:bg-tertiary-700 text-white-50 font-medium rounded-lg shadow-md' disabled={loading}>
           {loading ? (

@@ -18,7 +18,16 @@ declare module 'shared/hooks/useTransactions' {
       type: TransactionType,
       amount: number,
       date: Date,
-      description: string
+      description?: string,
+      attachmentFile?: File
+    ) => Promise<void>;
+    updateTransaction: (
+      id: string,
+      type: TransactionType,
+      amount: number,
+      date: Date,
+      description?: string,
+      attachmentFile?: File
     ) => Promise<void>;
     deleteTransaction: (id: string) => Promise<void>;
     fetchTransactions: () => Promise<void>;
@@ -111,9 +120,11 @@ declare module 'shared/components/TransactionForm' {
     amount: string;
     transactionType: TransactionType;
     description: string;
+    attachmentFile: File | null;
     onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onTypeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     onDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFileSelect: (file: File | null) => void;
     onSubmit: (e: React.FormEvent) => void;
     loading?: boolean;
   }>;
@@ -136,6 +147,7 @@ declare module 'shared/models/Transaction' {
     amount: number;
     date: string | Date;
     description?: string;
+    attachmentPath?: string;
     isIncome(): boolean;
     isExpense(): boolean;
   }

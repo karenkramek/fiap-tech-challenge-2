@@ -1,16 +1,15 @@
-import React, { useState } from "react";
 import { Edit, Trash2 } from 'lucide-react';
-import Card from './Card';
-import TransactionBadge from './TransactionBadge';
-import EditTransactionModal from './EditTransactionModal';
-import ConfirmationModal from './ConfirmationModal';
-import { useTransactions } from '../hooks/useTransactions';
-import { useModal } from '../hooks/useModal';
-import { formatDate } from '../utils/utils';
-import { formatCurrencyWithSymbol } from '../utils/currencyUtils';
-import { getMonthName } from '../utils/utils';
-import { Transaction } from "../models/Transaction";
+import React, { useState } from "react";
 import { useGroupedTransactions } from "../hooks/useGroupedTransactions";
+import { useModal } from '../hooks/useModal';
+import { useTransactions } from '../hooks/useTransactions';
+import { formatCurrencyWithSymbol } from '../utils/currencyUtils';
+import { formatDate, getMonthName } from '../utils/utils';
+import AttachmentDisplay from './AttachmentDisplay';
+import Card from './Card';
+import ConfirmationModal from './ConfirmationModal';
+import EditTransactionModal from './EditTransactionModal';
+import TransactionBadge from './TransactionBadge';
 
 const StatementCard: React.FC = () => {
   const { transactions, deleteTransaction, fetchTransactions } = useTransactions();
@@ -58,7 +57,7 @@ const StatementCard: React.FC = () => {
   };
 
   return (
-    <div className="sm:col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-1 space-y-6">
+    <div className="w-80 space-y-6">
       <Card>
         <div className="flex justify-between items-center mb-4">
           <h2 className="transactions-title text-primary-700">Extrato</h2>
@@ -104,6 +103,16 @@ const StatementCard: React.FC = () => {
                             <p className="text-xs text-white-800 truncate">
                               {transaction.description || "Sem descrição"}
                             </p>
+                            {transaction.attachmentPath && (
+                              <div className="mt-1">
+                                <AttachmentDisplay
+                                  attachmentPath={transaction.attachmentPath}
+                                  transactionType={transaction.type}
+                                  showLabel={false}
+                                  className="text-xs"
+                                />
+                              </div>
+                            )}
                           </div>
                           <div className="text-right ml-4">
                             <p className={`text-sm font-medium ${transaction.isIncome() ? "text-green-600" : "text-red-600"}`}>

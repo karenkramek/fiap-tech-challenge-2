@@ -21,7 +21,9 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              '@babel/preset-react',
+              ['@babel/preset-react', {
+                runtime: 'automatic'
+              }],
               '@babel/preset-typescript'
             ]
           }
@@ -47,6 +49,9 @@ module.exports = {
         './components/TransactionForm': './src/components/TransactionForm',
         './components/StatementCard': './src/components/StatementCard',
         './components/BalanceCard': './src/components/BalanceCard',
+        './components/FileUpload': './src/components/FileUpload',
+        './components/AttachmentDisplay': './src/components/AttachmentDisplay',
+        './components/FilePreviewModal': './src/components/FilePreviewModal',
         './components/Icon': './src/components/Icon',
         // Hooks
         './hooks/useTransactions': './src/hooks/useTransactions',
@@ -62,6 +67,7 @@ module.exports = {
         // Services
         './services/AccountService': './src/services/AccountService',
         './services/TransactionService': './src/services/TransactionService',
+        './services/FileUploadService': './src/services/FileUploadService',
         './services/api': './src/services/api',
         // Utils
         './utils/currencyUtils': './src/utils/currencyUtils',

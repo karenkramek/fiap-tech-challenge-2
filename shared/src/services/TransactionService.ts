@@ -2,11 +2,12 @@ import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import api from './api';
 
-import { TransactionDTO } from '../dtos/Transaction.dto';
 import { AccountDTO } from '../dtos/Account.dto';
+import { TransactionDTO } from '../dtos/Transaction.dto';
+import { Account } from '../models/Account';
 import { Transaction } from '../models/Transaction';
 import { TransactionType } from '../types/TransactionType';
-import { Account } from '../models/Account';
+import { FileUploadService } from './FileUploadService';
 
 export class TransactionService {
   static async getAllTransactions(): Promise<Transaction[]> {
@@ -19,16 +20,60 @@ export class TransactionService {
     return Transaction.fromJSON(response.data);
   }
 
-  static async addTransaction(type: TransactionType, amount: number, date: Date, description?: string): Promise<Transaction> {
-    const newTransaction = new Transaction(uuidv4(), type, amount, date, description);
+  static async addTransaction(
+    type: TransactionType,
+    amount: number,
+    date: Date,
+    description?: string,
+    attachmentFile?: File
+  ): Promise<Transaction> {
+    const transactionId = uuidv4();
+    let attachmentPath: string | undefined;
+
+    // Upload do arquivo se fornecido
+    if (attachmentFile) {
+      try {
+        attachmentPath = await FileUploadService.uploadFile(attachmentFile, type);
+      } catch (error) {
+        console.error('Erro no upload do arquivo:', error);
+        throw new Error('Falha no upload do arquivo. Transação não foi criada.');
+      }
+    }
+
+    const newTransaction = new Transaction(transactionId, type, amount, date, description, attachmentPath);
     const response = await api.post('/transactions', newTransaction.toJSON());
     await this.applyTransactionToBalance(newTransaction);
     return Transaction.fromJSON(response.data);
   }
 
-  static async updateTransaction(id: string, type: TransactionType, amount: number, date: Date, description?: string): Promise<Transaction> {
+  static async updateTransaction(
+    id: string,
+    type: TransactionType,
+    amount: number,
+    date: Date,
+    description?: string,
+    attachmentFile?: File
+  ): Promise<Transaction> {
     const oldTransaction = await this.getTransactionById(id);
-    const updatedTransaction = new Transaction(id, type, amount, date, description);
+    let attachmentPath = oldTransaction.attachmentPath;
+
+    // Gerenciar arquivo anexo
+    if (attachmentFile) {
+      // Upload novo arquivo
+      try {
+        attachmentPath = await FileUploadService.uploadFile(attachmentFile, type);
+
+        // Remove arquivo antigo se existir
+        if (oldTransaction.attachmentPath) {
+          await FileUploadService.deleteFile(oldTransaction.attachmentPath);
+        }
+      } catch (error) {
+        console.error('Erro no upload do arquivo:', error);
+        throw new Error('Falha no upload do arquivo. Transação não foi atualizada.');
+      }
+    }
+
+    const updatedTransaction = new Transaction(id, type, amount, date, description, attachmentPath);
     const response = await api.put(`/transactions/${id}`, updatedTransaction.toJSON());
 
     // Update account balance based on the difference.
@@ -47,6 +92,11 @@ export class TransactionService {
     try {
       const transaction = await this.getTransactionById(id);
       await api.delete(`/transactions/${id}`);
+
+      // Remove arquivo anexado se existir
+      if (transaction.attachmentPath) {
+        await FileUploadService.deleteFile(transaction.attachmentPath);
+      }
 
       // Update account balance.
       await this.applyTransactionToBalance(transaction, true);

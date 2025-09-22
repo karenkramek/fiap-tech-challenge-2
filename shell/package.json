@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "server": "json-server --watch ../../db.json --port 3001",
+    "server": "json-server --watch ../../db.json --port 3035",
     "serve": "serve dist -s -l 3000"
   },
   "dependencies": {

@@ -40,10 +40,11 @@ export function useTransactions() {
     type: TransactionType,
     amount: number,
     date: Date,
-    description?: string
+    description?: string,
+    attachmentFile?: File
   ) => {
     try {
-      const newTransaction = await TransactionService.addTransaction(type, amount, date, description);
+      const newTransaction = await TransactionService.addTransaction(type, amount, date, description, attachmentFile);
       setTransactions(prevTransactions => sortTransactions([ ...prevTransactions, newTransaction ]));
       return newTransaction;
     } catch (err) {
@@ -56,10 +57,11 @@ export function useTransactions() {
     type: TransactionType,
     amount: number,
     date: Date,
-    description?: string
+    description?: string,
+    attachmentFile?: File
   ) => {
     try {
-      const updatedTransaction = await TransactionService.updateTransaction(id, type, amount, date, description);
+      const updatedTransaction = await TransactionService.updateTransaction(id, type, amount, date, description, attachmentFile);
       setTransactions(prevTransactions => {
         const oldTx = prevTransactions.find(t => t.id === id);
         // Se a data mudou, reordena; se não, só substitui mantendo a ordem
