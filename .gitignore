@@ -37,6 +37,8 @@ stylelintcache
 .env.*
 **/.env
 **/.env.*
+
+# Database files (ignore local db.json but keep template)
 db.json
 
 # OS / Editor

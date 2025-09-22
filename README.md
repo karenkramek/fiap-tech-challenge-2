@@ -49,6 +49,23 @@ Pastas relevantes:
 - Node.js/Express (servidor de upload)
 - Multer (upload de arquivos)
 
+## 📋 Banco de Dados
+
+O projeto utiliza um sistema de banco de dados modelo que mantém dados de exemplo no repositório:
+
+- **`db.template.json`** - Arquivo modelo versionado no Git
+- **`db.json`** - Arquivo local criado automaticamente (ignorado pelo Git)
+
+```bash
+# O comando dev:all automaticamente cria db.json do template
+npm run dev:all
+
+# Para resetar dados locais:
+rm db.json && npm run setup:db
+```
+
+📖 **Mais detalhes:** Ver [DATABASE.md](./DATABASE.md)
+
 ## 🚀 Como Executar Localmente
 
 ### Pré-requisitos
