@@ -98,7 +98,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                 Este tipo de arquivo não pode ser visualizado diretamente.
               </p>
               <p className="text-xs text-gray-400">
-                Use os botões acima para baixar ou abrir em nova aba.
+                Use o botão de download para abrir em outra aba.
               </p>
             </div>
           )}

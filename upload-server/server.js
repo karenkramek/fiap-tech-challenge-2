@@ -77,7 +77,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 2 * 1024 * 1024 // 2MB
+    fileSize: 5 * 1024 * 1024 // 5MB
   }
 });
 
@@ -141,7 +141,7 @@ app.get('/health', (req, res) => {
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'Arquivo muito grande. Máximo 2MB.' });
+      return res.status(400).json({ error: 'Arquivo muito grande. Máximo 5MB.' });
     }
   }
 

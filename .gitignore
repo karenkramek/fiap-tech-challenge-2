@@ -47,9 +47,7 @@ Thumbs.db
 *.swp
 *.swo
 
-# Storybook
-storybook-static/
-**/storybook-static/
+
 
 # Misc
 *.log
@@ -73,5 +71,3 @@ storybook-static/
 
 # Ignore upload files, but not the folder
 uploads/*
-
-*storybook.log

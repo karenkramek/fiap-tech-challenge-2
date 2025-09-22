@@ -12,7 +12,7 @@ export class FileUploadService {
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   ];
-  private static readonly MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   /**
    * Valida se o arquivo atende aos critérios de upload
@@ -23,7 +23,7 @@ export class FileUploadService {
     }
 
     if (file.size > this.MAX_FILE_SIZE) {
-      return { isValid: false, error: 'Arquivo muito grande. Máximo permitido: 2MB' };
+      return { isValid: false, error: 'Arquivo muito grande. Máximo permitido: 5MB' };
     }
 
     if (!this.ALLOWED_TYPES.includes(file.type)) {
