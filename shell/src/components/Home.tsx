@@ -23,7 +23,7 @@ const Home: React.FC = () => {
             Crie sua conta Bytebank e aproveite todos os benefícios.
           </p>
         </div>
-      </div>      {/* Features Section */}
+      </div>
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-black mb-12">

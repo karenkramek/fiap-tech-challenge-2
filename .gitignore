@@ -73,3 +73,5 @@ storybook-static/
 
 # Ignore upload files, but not the folder
 uploads/*
+
+*storybook.log

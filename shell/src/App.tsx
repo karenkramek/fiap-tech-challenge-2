@@ -4,6 +4,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'r
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import Home from './components/Home';
+import ScrollToTop from './components/ScrollToTop';
 import Sidebar from './components/Sidebar';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
@@ -20,7 +21,7 @@ const HomeLayout: React.FC = () => {
 
   return (
     <>
-      <Header toggleSidebar={toggleSidebar} />
+      <Header toggleSidebar={toggleSidebar} showAuthButtons={true} />
       <Home />
 
       {/* Overlay da sidebar mobile - backdrop */}
@@ -96,6 +97,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
 const App: React.FC = () => {
   return (
     <Router>
+      <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
         <Toaster position="top-right" />
         <Routes>
