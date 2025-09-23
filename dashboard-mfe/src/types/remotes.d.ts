@@ -14,13 +14,15 @@ declare module 'shared/hooks/useTransactions' {
   export function useTransactions(): {
     transactions: Transaction[];
     loading: boolean;
+    error: Error | null;
+    fetchTransactions: () => Promise<void>;
     addTransaction: (
       type: TransactionType,
       amount: number,
       date: Date,
       description?: string,
       attachmentFile?: File
-    ) => Promise<void>;
+    ) => Promise<Transaction>;
     updateTransaction: (
       id: string,
       type: TransactionType,
@@ -28,17 +30,18 @@ declare module 'shared/hooks/useTransactions' {
       date: Date,
       description?: string,
       attachmentFile?: File
-    ) => Promise<void>;
-    deleteTransaction: (id: string) => Promise<void>;
-    fetchTransactions: () => Promise<void>;
+    ) => Promise<Transaction>;
+    deleteTransaction: (id: string) => Promise<boolean>;
   };
 }
 
 declare module 'shared/hooks/useAccount' {
+  import { Account } from 'shared/models/Account';
   export function useAccount(): {
-    account: { name: string; balance: number } | null;
+    account: Account | null;
     loading: boolean;
-    refreshAccount: () => Promise<void>;
+    error: Error | null;
+    fetchAccount: () => Promise<void>;
   };
 }
 
@@ -47,7 +50,6 @@ declare module 'shared/hooks/useModal' {
     open: boolean;
     openModal: () => void;
     closeModal: () => void;
-    setOpen: (open: boolean) => void;
   };
 }
 

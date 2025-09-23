@@ -28,5 +28,5 @@ export function useAccount() {
     fetchAccount();
   }, [fetchAccount]);
 
-  return { account, loading, error, refreshAccount: fetchAccount };
+  return { account, loading, error, fetchAccount: fetchAccount };
 }

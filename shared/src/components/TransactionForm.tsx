@@ -96,7 +96,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               Salvando...
             </span>
           ) : (
-            'Concluir transação'
+            'Adicionar'
           )}
         </Button>
       </div>

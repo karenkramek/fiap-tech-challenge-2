@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [formLoading, setFormLoading] = useState(false);
 
-  const { account, loading: accountLoading, refreshAccount } = useAccount();
+  const { account, loading: accountLoading, fetchAccount } = useAccount();
   const { loading: transactionsLoading, addTransaction } = useTransactions();
 
   // Logic to add a new transaction.
@@ -54,9 +54,9 @@ const Dashboard: React.FC = () => {
 
       // Atualiza saldo após nova transação
       try {
-        await refreshAccount();
-      } catch (refreshError) {
-        console.error("Erro ao atualizar saldo da conta:", refreshError);
+        await fetchAccount();
+      } catch (fetchError) {
+        console.error("Erro ao atualizar saldo da conta:", fetchError);
       }
 
       setAmount("");

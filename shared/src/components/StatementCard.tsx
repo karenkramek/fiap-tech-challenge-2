@@ -10,14 +10,32 @@ import Card from './Card';
 import ConfirmationModal from './ConfirmationModal';
 import EditTransactionModal from './EditTransactionModal';
 import TransactionBadge from './TransactionBadge';
+import Button from './Button';
+import { TransactionType } from '../types/TransactionType';
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from '../utils/currencyUtils';
+import TransactionForm from './TransactionForm';
 
-const StatementCard: React.FC = () => {
-  const { transactions, deleteTransaction, fetchTransactions } = useTransactions();
+interface StatementCardProps {
+  mode?: 'dashboard' | 'full';
+}
+
+const StatementCard: React.FC<StatementCardProps> = ({ mode = 'dashboard' }) => {
+  const { transactions, deleteTransaction, fetchTransactions, addTransaction } = useTransactions();
   const { grouped, sortedKeys } = useGroupedTransactions(transactions);
   const editModal = useModal();
   const deleteModal = useModal();
   const [transactionToEdit, setTransactionToEdit] = useState<string | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
+  // Estados do formulário de nova transação
+  const [amount, setAmount] = useState<string>("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [transactionType, setTransactionType] = useState<TransactionType>(TransactionType.DEPOSIT);
+  const [description, setDescription] = useState<string>("");
+  const [formLoading, setFormLoading] = useState(false);
+
+  const handleAmountChange = createCurrencyInputHandler(setAmount);
 
   const openEditModal = (id: string) => {
     setTransactionToEdit(id);
@@ -35,15 +53,16 @@ const StatementCard: React.FC = () => {
     deleteModal.closeModal();
     setTransactionToDelete(null);
   };
+  const closeAddModal = () => setAddModalOpen(false);
 
   const handleDelete = async () => {
     if (transactionToDelete) {
       try {
         await deleteTransaction(transactionToDelete);
         closeDeleteModal();
+        await fetchTransactions();
       } catch (error) {
         if (typeof window !== "undefined") {
-          // toast.error('Erro ao excluir transação.');
           console.error("Erro ao excluir transação.");
         }
         console.error(error);
@@ -56,11 +75,110 @@ const StatementCard: React.FC = () => {
     closeEditModal();
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    try {
+      const numericAmount = parseCurrencyStringToNumber(amount);
+      if (numericAmount <= 0) {
+        setFormLoading(false);
+        return;
+      }
+      await addTransaction(
+        transactionType,
+        numericAmount,
+        new Date(),
+        description,
+        attachmentFile || undefined
+      );
+      setAmount("");
+      setDescription("");
+      setAttachmentFile(null);
+      setTransactionType(TransactionType.DEPOSIT);
+      setAddModalOpen(false);
+      await fetchTransactions();
+    } catch (error) {
+      console.error("Erro ao criar transação:", error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  // Classes e elementos dinâmicos
+  const containerClass = mode === 'full' ? 'space-y-6' : 'w-80 space-y-6';
+  const cardTitleClass = 'flex justify-between items-center mb-6';
+  const monthTitleClass = 'text-lg font-semibold text-gray-600 border-b border-gray-200 pb-2';
+
+  // Componente para item de transação
+  const TransactionItem: React.FC<{
+    transaction: any;
+    mode: 'dashboard' | 'full';
+    onEdit: (id: string) => void;
+    onDelete: (id: string) => void;
+    loading?: boolean;
+  }> = ({ transaction, mode, onEdit, onDelete, loading }) => (
+    <div className="bg-white border-b-4 border-gray-200 p-4 shadow-sm rounded-lg">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          <TransactionBadge type={transaction.type} />
+          <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            className="p-1 hover:bg-primary-50 rounded"
+            title="Editar"
+            aria-label="Editar transação"
+            onClick={() => onEdit(transaction.id)}
+            disabled={loading}
+          >
+            <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
+          </button>
+          <button
+            className="p-1 hover:bg-error-50 rounded"
+            title="Excluir"
+            aria-label="Excluir transação"
+            onClick={() => onDelete(transaction.id)}
+            disabled={loading}
+          >
+            <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
+          </button>
+        </div>
+      </div>
+      <div className="flex items-center min-h-[40px]">
+        <p className="text-gray-700 text-sm mb-0 flex-1 truncate">
+          {transaction.description || "Sem descrição"}
+        </p>
+        <span className={`text-lg font-semibold ml-4 ${transaction.isIncome() ? 'text-green-600' : 'text-red-600'}`}>
+          {transaction.isIncome() ? '' : '-'} {formatCurrencyWithSymbol(transaction.amount)}
+        </span>
+      </div>
+      <div className="flex items-center min-h-[32px]">
+        {transaction.attachmentPath ? (
+          <div className="mt-2 flex-1">
+            <AttachmentDisplay
+              attachmentPath={transaction.attachmentPath}
+              transactionType={transaction.type}
+              showLabel={mode === 'full'}
+              className="text-xs"
+            />
+          </div>
+        ) : (
+          <div className="flex-1" />
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="w-80 space-y-6">
+    <div className={containerClass}>
       <Card>
-        <div className="flex justify-between items-center mb-4">
+        <div className={cardTitleClass}>
           <h2 className="transactions-title text-primary-700">Extrato</h2>
+          {mode === 'full' && (
+            <Button variant="primary" onClick={() => setAddModalOpen(true)}>
+              Nova Transação
+            </Button>
+          )}
         </div>
         {transactions.length > 0 ? (
           <div>
@@ -68,59 +186,19 @@ const StatementCard: React.FC = () => {
               const [month, year] = key.split("-");
               return (
                 <div key={key} className="mb-6">
-                  <h3 className="transactions-subtitle font-medium text-primary-700 mb-2">
+                  <h3 className={monthTitleClass}>
                     {getMonthName(month)} {year}
                   </h3>
                   <div className="space-y-2">
                     {grouped[key].map((transaction) => (
-                      <div key={transaction.id} className="flex flex-col border-b py-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <TransactionBadge type={transaction.type} />
-                          </div>
-                          <div className="flex items-center gap-3 flex-shrink-0">
-                            <button
-                              className="p-1 hover:bg-primary-50 rounded"
-                              title="Editar"
-                              onClick={() => openEditModal(transaction.id)}
-                            >
-                              <Edit className="h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer" />
-                            </button>
-                            <button
-                              className="p-1 hover:bg-error-50 rounded"
-                              title="Excluir"
-                              onClick={() => openDeleteModal(transaction.id)}
-                            >
-                              <Trash2 className="h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                          <div className="flex flex-col items-start min-w-0">
-                            <p className="text-xs text-white-800">
-                              {formatDate(transaction.date)}
-                            </p>
-                            <p className="text-xs text-white-800 truncate">
-                              {transaction.description || "Sem descrição"}
-                            </p>
-                            {transaction.attachmentPath && (
-                              <div className="mt-1">
-                                <AttachmentDisplay
-                                  attachmentPath={transaction.attachmentPath}
-                                  transactionType={transaction.type}
-                                  showLabel={false}
-                                  className="text-xs"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-right ml-4">
-                            <p className={`text-sm font-medium ${transaction.isIncome() ? "text-green-600" : "text-red-600"}`}>
-                              {transaction.isIncome() ? "+" : "-"} {formatCurrencyWithSymbol(transaction.amount)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <TransactionItem
+                        key={transaction.id}
+                        transaction={transaction}
+                        mode={mode}
+                        onEdit={openEditModal}
+                        onDelete={openDeleteModal}
+                        loading={formLoading}
+                      />
                     ))}
                   </div>
                 </div>
@@ -131,6 +209,7 @@ const StatementCard: React.FC = () => {
           <p className="text-white-800">Nenhuma transação registrada.</p>
         )}
       </Card>
+
       {/* Modais */}
       <EditTransactionModal
         open={editModal.open}
@@ -148,6 +227,31 @@ const StatementCard: React.FC = () => {
         onCancel={closeDeleteModal}
         loading={false}
       />
+      {mode === 'full' && addModalOpen && (
+        <div className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50">
+          <div className="modal-content relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
+              onClick={closeAddModal}
+              aria-label="Fechar"
+            >
+              ×
+            </button>
+            <TransactionForm
+              amount={amount}
+              transactionType={transactionType}
+              description={description}
+              attachmentFile={attachmentFile}
+              onAmountChange={handleAmountChange}
+              onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+              onDescriptionChange={(e) => setDescription(e.target.value)}
+              onFileSelect={setAttachmentFile}
+              onSubmit={handleSubmit}
+              loading={formLoading}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
