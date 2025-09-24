@@ -15,6 +15,92 @@ import { TransactionType } from '../types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from '../utils/currencyUtils';
 import TransactionForm from './TransactionForm';
 
+// Componente para ações de transação
+const TransactionActions: React.FC<{
+  onEdit: () => void;
+  onDelete: () => void;
+  loading?: boolean;
+}> = React.memo(({ onEdit, onDelete, loading }) => (
+  <div className="flex items-center gap-2">
+    <button
+      className="p-1 hover:bg-primary-50 rounded"
+      title="Editar"
+      aria-label="Editar transação"
+      onClick={onEdit}
+      disabled={loading}
+    >
+      <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
+    </button>
+    <button
+      className="p-1 hover:bg-error-50 rounded"
+      title="Excluir"
+      aria-label="Excluir transação"
+      onClick={onDelete}
+      disabled={loading}
+    >
+      <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
+    </button>
+  </div>
+));
+
+// Componente para detalhes da transação
+const TransactionDetails: React.FC<{
+  description: string;
+  attachmentPath?: string;
+  transactionType: TransactionType;
+  showLabel: boolean;
+}> = React.memo(({ description, attachmentPath, transactionType, showLabel }) => (
+  <div className="flex flex-col flex-1 justify-center">
+    <p className="text-gray-700 text-sm mb-0 truncate">{description || "Sem descrição"}</p>
+    {attachmentPath ? (
+      <div className="mt-1">
+        <AttachmentDisplay
+          attachmentPath={attachmentPath}
+          transactionType={transactionType}
+          showLabel={showLabel}
+          className="text-xs"
+        />
+      </div>
+    ) : null}
+  </div>
+));
+
+// Componente para item de transação
+const TransactionItem: React.FC<{
+  transaction: any;
+  mode: 'dashboard' | 'full';
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  loading?: boolean;
+}> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
+  return (
+    <div className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2">
+          <TransactionBadge type={transaction.type} />
+          <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
+        </div>
+        <TransactionActions
+          onEdit={() => onEdit(transaction.id)}
+          onDelete={() => onDelete(transaction.id)}
+          loading={loading}
+        />
+      </div>
+      <div className="flex items-stretch mb-2 p-1">
+        <TransactionDetails
+          description={transaction.description}
+          attachmentPath={transaction.attachmentPath}
+          transactionType={transaction.type}
+          showLabel={mode === 'full'}
+        />
+        <div className="flex items-center ml-4 min-h-[40px]">
+          <span className={`text-lg font-semibold ${transaction.isIncome() ? 'text-green-600' : 'text-red-600'}`}>{transaction.isIncome() ? '' : '-'} {formatCurrencyWithSymbol(transaction.amount)}</span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface StatementCardProps {
   mode?: 'dashboard' | 'full';
 }
@@ -108,92 +194,6 @@ const StatementCard: React.FC<StatementCardProps> = ({ mode = 'dashboard' }) => 
   const containerClass = mode === 'full' ? 'space-y-6' : 'w-80 space-y-6';
   const cardTitleClass = 'flex justify-between items-center mb-6';
   const monthTitleClass = [mode === 'full' ? 'text-lg' : '', 'font-semibold', 'text-gray-600', 'border-b', 'border-gray-200', 'pb-2'].join(' ');
-
-  // Componente para ações de transação
-  const TransactionActions: React.FC<{
-    onEdit: () => void;
-    onDelete: () => void;
-    loading?: boolean;
-  }> = React.memo(({ onEdit, onDelete, loading }) => (
-    <div className="flex items-center gap-2">
-      <button
-        className="p-1 hover:bg-primary-50 rounded"
-        title="Editar"
-        aria-label="Editar transação"
-        onClick={onEdit}
-        disabled={loading}
-      >
-        <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-      </button>
-      <button
-        className="p-1 hover:bg-error-50 rounded"
-        title="Excluir"
-        aria-label="Excluir transação"
-        onClick={onDelete}
-        disabled={loading}
-      >
-        <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-      </button>
-    </div>
-  ));
-
-  // Componente para detalhes da transação
-  const TransactionDetails: React.FC<{
-    description: string;
-    attachmentPath?: string;
-    transactionType: TransactionType;
-    showLabel: boolean;
-  }> = React.memo(({ description, attachmentPath, transactionType, showLabel }) => (
-    <div className="flex flex-col flex-1 justify-center">
-      <p className="text-gray-700 text-sm mb-0 truncate">{description || "Sem descrição"}</p>
-      {attachmentPath ? (
-        <div className="mt-1">
-          <AttachmentDisplay
-            attachmentPath={attachmentPath}
-            transactionType={transactionType}
-            showLabel={showLabel}
-            className="text-xs"
-          />
-        </div>
-      ) : null}
-    </div>
-  ));
-
-  // Componente para item de transação
-  const TransactionItem: React.FC<{
-    transaction: any;
-    mode: 'dashboard' | 'full';
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
-    loading?: boolean;
-  }> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
-    return (
-      <div className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-2">
-            <TransactionBadge type={transaction.type} />
-            <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
-          </div>
-          <TransactionActions
-            onEdit={() => onEdit(transaction.id)}
-            onDelete={() => onDelete(transaction.id)}
-            loading={loading}
-          />
-        </div>
-        <div className="flex items-stretch mb-2 p-1">
-          <TransactionDetails
-            description={transaction.description}
-            attachmentPath={transaction.attachmentPath}
-            transactionType={transaction.type}
-            showLabel={mode === 'full'}
-          />
-          <div className="flex items-center ml-4 min-h-[40px]">
-            <span className={`text-lg font-semibold ${transaction.isIncome() ? 'text-green-600' : 'text-red-600'}`}>{transaction.isIncome() ? '' : '-'} {formatCurrencyWithSymbol(transaction.amount)}</span>
-          </div>
-        </div>
-      </div>
-    );
-  });
 
   return (
     <div className={containerClass}>

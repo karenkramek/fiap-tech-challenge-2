@@ -50,6 +50,7 @@ declare module 'shared/hooks/useModal' {
     open: boolean;
     openModal: () => void;
     closeModal: () => void;
+    setOpen: (open: boolean) => void;
   };
 }
 
