@@ -40,19 +40,23 @@ module.exports = {
       name: 'shared',
       filename: 'remoteEntry.js',
       exposes: {
-        // Components
-        './components/Button': './src/components/Button',
-        './components/Card': './src/components/Card',
-        './components/TransactionBadge': './src/components/TransactionBadge',
-        './components/ConfirmationModal': './src/components/ConfirmationModal',
-        './components/EditTransactionModal': './src/components/EditTransactionModal',
-        './components/TransactionForm': './src/components/TransactionForm',
-        './components/StatementCard': './src/components/StatementCard',
-        './components/BalanceCard': './src/components/BalanceCard',
-        './components/FileUpload': './src/components/FileUpload',
-        './components/AttachmentDisplay': './src/components/AttachmentDisplay',
-        './components/FilePreviewModal': './src/components/FilePreviewModal',
-        './components/Icon': './src/components/Icon',
+        // Components (UI)
+        './components/ui/Button': './src/components/ui/Button',
+        './components/ui/Card': './src/components/ui/Card',
+        './components/ui/Icon': './src/components/ui/Icon',
+        './components/ui/ConfirmationModal': './src/components/ui/ConfirmationModal',
+        './components/ui/ModalWrapper': './src/components/ui/ModalWrapper',
+        // Components (Domain - Transaction)
+        './components/domain/transaction/TransactionAdd': './src/components/domain/transaction/TransactionAdd',
+        './components/domain/transaction/TransactionTypeBadge': './src/components/domain/transaction/TransactionTypeBadge',
+        './components/domain/transaction/TransactionList': './src/components/domain/transaction/TransactionList',
+        './components/domain/transaction/TransactionEdit': './src/components/domain/transaction/TransactionEdit',
+        // Components (Domain - File)
+        './components/domain/file/AttachmentDisplay': './src/components/domain/file/AttachmentDisplay',
+        './components/domain/file/FilePreviewModal': './src/components/domain/file/FilePreviewModal',
+        './components/domain/file/FileUpload': './src/components/domain/file/FileUpload',
+        // Components (Domain - Outros)
+        './components/domain/BalanceCard': './src/components/domain/BalanceCard',
         // Hooks
         './hooks/useTransactions': './src/hooks/useTransactions',
         './hooks/useAccount': './src/hooks/useAccount',
@@ -76,8 +80,8 @@ module.exports = {
         './types/TransactionType': './src/types/TransactionType'
       },
       shared: {
-        react: { singleton: true },
-        'react-dom': { singleton: true },
+        react: { singleton: true, requiredVersion: '^18.2.0' },
+        'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
         axios: { singleton: true }
       }
     }),

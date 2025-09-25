@@ -1,10 +1,10 @@
 import React from 'react';
-import { TransactionType } from '../types/TransactionType';
-import Button from './Button';
-import Card from './Card';
-import FileUpload from './FileUpload';
+import { TransactionType } from '../../../types/TransactionType';
+import Button from '../../ui/Button';
+import Card from '../../ui/Card';
+import FileUpload from '../file/FileUpload';
 
-interface TransactionFormProps {
+interface TransactionAddProps {
   amount: string;
   transactionType: TransactionType;
   description: string;
@@ -14,10 +14,11 @@ interface TransactionFormProps {
   onDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFileSelect: (file: File | null) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onClose?: () => void;
   loading?: boolean;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({
+const TransactionAdd: React.FC<TransactionAddProps> = ({
   amount,
   transactionType,
   description,
@@ -27,13 +28,17 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   onDescriptionChange,
   onFileSelect,
   onSubmit,
+  onClose,
   loading = false
-}) => (
-  <Card className='bg-white-50 rounded-xl shadow-md'>
-    <h2 className='text-xl font-semibold text-primary-700 mb-5'>
-      Nova transação
-    </h2>
-    <form onSubmit={onSubmit} className='space-y-5'>
+}) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    if (onSubmit) onSubmit(e);
+    // O fechamento deve ser controlado pelo pai após sucesso, mas pode ser chamado aqui se necessário
+    // Exemplo: onClose && onClose();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-5'>
       <div>
         <select
           id='type'
@@ -101,7 +106,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         </Button>
       </div>
     </form>
-  </Card>
-);
+  );
+};
 
-export default TransactionForm;
+export default TransactionAdd;

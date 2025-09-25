@@ -1,8 +1,8 @@
 // Componente de cartão de saldo, exibe o nome do usuário e saldo da conta
 import React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { getCurrentDateFormatted } from '../utils/utils';
-import { formatCurrencyWithSymbol } from '../utils/currencyUtils';
+import { getCurrentDateFormatted } from '../../utils/utils';
+import { formatCurrencyWithSymbol } from '../../utils/currencyUtils';
 
 interface BalanceCardProps {
   accountName?: string;

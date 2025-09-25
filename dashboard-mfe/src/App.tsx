@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import BalanceCard from 'shared/components/BalanceCard';
-import StatementCard from 'shared/components/StatementCard';
-import TransactionForm from 'shared/components/TransactionForm';
+import BalanceCard from 'shared/components/domain/BalanceCard';
+import Card from 'shared/components/ui/Card';
+import TransactionList from 'shared/components/domain/transaction/TransactionList';
+import TransactionAdd from 'shared/components/domain/transaction/TransactionAdd';
 import { useAccount } from 'shared/hooks/useAccount';
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { Transaction } from 'shared/models/Transaction';
@@ -98,22 +99,34 @@ const Dashboard: React.FC = () => {
             />
 
             {/* Nova transação */}
-            <TransactionForm
-              amount={amount}
-              transactionType={transactionType}
-              description={description}
-              attachmentFile={attachmentFile}
-              onAmountChange={handleAmountChange}
-              onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-              onDescriptionChange={(e) => setDescription(e.target.value)}
-              onFileSelect={setAttachmentFile}
-              onSubmit={handleSubmit}
-              loading={formLoading}
-            />
+            <Card className='bg-white-50 rounded-xl shadow-md'>
+              <h2 className='text-xl font-semibold text-primary-700 mb-5'>
+                Nova transação
+              </h2>
+              <TransactionAdd
+                amount={amount}
+                transactionType={transactionType}
+                description={description}
+                attachmentFile={attachmentFile}
+                onAmountChange={handleAmountChange}
+                onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+                onDescriptionChange={(e) => setDescription(e.target.value)}
+                onFileSelect={setAttachmentFile}
+                onSubmit={handleSubmit}
+                loading={formLoading}
+              />
+            </Card>
           </div>
 
           {/* Extrato */}
-          <StatementCard />
+          <div className="w-80 space-y-6">
+            <Card>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="transactions-title text-primary-700">Extrato</h2>
+              </div>
+              <TransactionList />
+            </Card>
+          </div>
         </div>
       </div>
 

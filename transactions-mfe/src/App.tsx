@@ -1,8 +1,87 @@
-import React from "react";
-import StatementCard from "shared/components/StatementCard";
+import React, { useState } from "react";
+import Button from "shared/components/ui/Button";
+import Card from "shared/components/ui/Card";
+import TransactionList from "shared/components/domain/transaction/TransactionList";
+import TransactionAdd from "shared/components/domain/transaction/TransactionAdd";
+import { TransactionType } from "shared/types/TransactionType";
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currencyUtils";
+import { useTransactions } from "shared/hooks/useTransactions";
+import ModalWrapper from "shared/components/ui/ModalWrapper";
 
 const TransactionsPage: React.FC = () => {
-  return <StatementCard mode="full" />;
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [transactionType, setTransactionType] = useState<TransactionType>(TransactionType.DEPOSIT);
+  const [description, setDescription] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const { addTransaction, fetchTransactions } = useTransactions();
+
+  const handleAmountChange = createCurrencyInputHandler(setAmount);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    try {
+      const numericAmount = parseCurrencyStringToNumber(amount);
+      if (numericAmount <= 0) {
+        setFormLoading(false);
+        return;
+      }
+      await addTransaction(
+        transactionType,
+        numericAmount,
+        new Date(),
+        description,
+        attachmentFile || undefined
+      );
+      setAmount("");
+      setDescription("");
+      setAttachmentFile(null);
+      setTransactionType(TransactionType.DEPOSIT);
+      setAddModalOpen(false);
+      await fetchTransactions();
+    } catch (error) {
+      // Aqui você pode adicionar um toast de erro se desejar
+      console.error("Erro ao criar transação:", error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Extrato */}
+      <div className="space-y-6'">
+        <Card>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="transactions-title text-primary-700">Extrato</h2>
+            <Button variant="primary" onClick={() => setAddModalOpen(true)}>
+              Nova Transação
+            </Button>
+          </div>
+          <TransactionList mode="full" />
+        </Card>
+      </div>
+      {addModalOpen && (
+        <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
+          <TransactionAdd
+            amount={amount}
+            transactionType={transactionType}
+            description={description}
+            attachmentFile={attachmentFile}
+            onAmountChange={handleAmountChange}
+            onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+            onDescriptionChange={(e) => setDescription(e.target.value)}
+            onFileSelect={setAttachmentFile}
+            onSubmit={handleSubmit}
+            loading={formLoading}
+            onClose={() => setAddModalOpen(false)}
+          />
+        </ModalWrapper>
+      )}
+    </>
+  );
 };
 
 export default TransactionsPage;

@@ -64,24 +64,25 @@ declare module 'shared/hooks/useGroupedTransactions' {
 
 // COMPONENTES
 
-declare module 'shared/components/Button' {
+declare module 'shared/components/ui/Button' {
   import { ButtonHTMLAttributes } from 'react';
   const Button: React.FC<ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string; size?: string }>;
   export default Button;
 }
 
-declare module 'shared/components/Card' {
+declare module 'shared/components/ui/Card' {
   const Card: React.FC<{ children: React.ReactNode; className?: string }>;
   export default Card;
 }
 
-declare module 'shared/components/TransactionBadge' {
+declare module 'shared/components/ui/Icon' {
   import { TransactionType } from 'shared/types/TransactionType';
-  const TransactionBadge: React.FC<{ type: TransactionType }>;
-  export default TransactionBadge;
+  export function TransactionTypeIcon({ type, className }: { type: TransactionType; className?: string }): JSX.Element;
+  export const Edit: React.FC;
+  export const Trash2: React.FC;
 }
 
-declare module 'shared/components/ConfirmationModal' {
+declare module 'shared/components/ui/ConfirmationModal' {
   interface Props {
     open: boolean;
     title: string;
@@ -96,31 +97,62 @@ declare module 'shared/components/ConfirmationModal' {
   export default ConfirmationModal;
 }
 
-declare module 'shared/components/EditTransactionModal' {
-  interface Props {
+declare module 'shared/components/ui/ModalWrapper' {
+  interface ModalWrapperProps {
     open: boolean;
     onClose: () => void;
-    transactionId: string | null;
-    onSuccess: () => void;
+    title?: string;
+    children: React.ReactNode;
+    className?: string;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
   }
-  const EditTransactionModal: React.FC<Props>;
-  export default EditTransactionModal;
+  const ModalWrapper: React.FC<ModalWrapperProps>;
+  export default ModalWrapper;
 }
 
-declare module 'shared/components/StatementCard' {
-  interface StatementCardProps {
+declare module 'shared/components/domain/transaction/TransactionAdd' {
+  import { TransactionType } from 'shared/types/TransactionType';
+  const TransactionAdd: React.FC<{
+    amount: string;
+    transactionType: TransactionType;
+    description: string;
+    attachmentFile: File | null;
+    onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onTypeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onFileSelect: (file: File | null) => void;
+    onSubmit: (e: React.FormEvent) => void;
+    onClose?: () => void;
+    loading?: boolean;
+  }>;
+  export default TransactionAdd;
+}
+
+declare module 'shared/components/domain/transaction/TransactionTypeBadge' {
+  import { TransactionType } from 'shared/types/TransactionType';
+  const TransactionTypeBadge: React.FC<{ type: TransactionType }>;
+  export default TransactionTypeBadge;
+}
+
+declare module 'shared/components/domain/transaction/TransactionList' {
+  interface TransactionListProps {
     mode?: 'dashboard' | 'full';
   }
-  const StatementCard: React.FC<StatementCardProps>;
-  export default StatementCard;
+  const TransactionList: React.FC<TransactionListProps>;
+  export default TransactionList;
 }
 
-declare module 'shared/components/BalanceCard' {
-  const BalanceCard: React.FC<{ accountName?: string; balance?: number; showBalance?: boolean; onToggleBalance?: () => void }>;
-  export default BalanceCard;
+declare module 'shared/components/domain/transaction/TransactionEdit' {
+  interface Props {
+    onClose: () => void;
+    transactionId: string | null;
+    onSuccess?: () => void;
+  }
+  const TransactionEdit: React.FC<Props>;
+  export default TransactionEdit;
 }
 
-declare module 'shared/components/AttachmentDisplay' {
+declare module 'shared/components/domain/file/AttachmentDisplay' {
   const AttachmentDisplay: React.FC<{
     attachmentPath: string;
     className?: string;
@@ -130,7 +162,7 @@ declare module 'shared/components/AttachmentDisplay' {
   export default AttachmentDisplay;
 }
 
-declare module 'shared/components/FilePreviewModal' {
+declare module 'shared/components/domain/file/FilePreviewModal' {
   const FilePreviewModal: React.FC<{
     open: boolean;
     onClose: () => void;
@@ -139,26 +171,19 @@ declare module 'shared/components/FilePreviewModal' {
   export default FilePreviewModal;
 }
 
-declare module 'shared/components/TransactionForm' {
-  import { TransactionType } from 'shared/types/TransactionType';
-  const TransactionForm: React.FC<{
-    amount: string;
-    transactionType: TransactionType;
-    description: string;
-    onAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onTypeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    onDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: (e: React.FormEvent) => void;
-    loading?: boolean;
+declare module 'shared/components/domain/file/FileUpload' {
+  const FileUpload: React.FC<{
+    onFileSelect: (file: File | null) => void;
+    selectedFile?: File | null;
+    existingFilePath?: string;
+    disabled?: boolean;
   }>;
-  export default TransactionForm;
+  export default FileUpload;
 }
 
-declare module 'shared/components/Icon' {
-  import { TransactionType } from 'shared/types/TransactionType';
-  export function TransactionTypeIcon({ type, className }: { type: TransactionType; className?: string }): JSX.Element;
-  export const Edit: React.FC;
-  export const Trash2: React.FC;
+declare module 'shared/components/domain/BalanceCard' {
+  const BalanceCard: React.FC<{ accountName?: string; balance?: number; showBalance?: boolean; onToggleBalance?: () => void }>;
+  export default BalanceCard;
 }
 
 // MODELS & TYPES

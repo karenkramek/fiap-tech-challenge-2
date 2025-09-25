@@ -7,8 +7,14 @@ Este pacote é um micro front-end (MFE) compartilhado, focado em fornecer compon
 ### 1. Componentes React
 Importe diretamente do remote:
 ```js
-import Button from 'shared/components/Button';
-import Card from 'shared/components/Card';
+import Button from 'shared/components/ui/Button';
+import Card from 'shared/components/ui/Card';
+import ConfirmationModal from 'shared/components/ui/ConfirmationModal';
+import TransactionList from 'shared/components/domain/transaction/TransactionList';
+import TransactionAdd from 'shared/components/domain/transaction/TransactionAdd';
+import TransactionEdit from 'shared/components/domain/transaction/TransactionEdit';
+import { AttachmentDisplay, FilePreviewModal, FileUpload } from 'shared/components/domain/file';
+import BalanceCard from 'shared/components/domain/BalanceCard';
 // ...outros componentes
 ```
 
