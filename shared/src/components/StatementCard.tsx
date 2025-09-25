@@ -113,8 +113,6 @@ const StatementCard: React.FC<StatementCardProps> = ({ mode = 'dashboard' }) => 
   const [transactionToEdit, setTransactionToEdit] = useState<string | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
-
-  // Estados do formulário de nova transação
   const [amount, setAmount] = useState<string>("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [transactionType, setTransactionType] = useState<TransactionType>(TransactionType.DEPOSIT);
@@ -206,6 +204,18 @@ const StatementCard: React.FC<StatementCardProps> = ({ mode = 'dashboard' }) => 
             </Button>
           )}
         </div>
+        {/* Campo de busca */}
+        {/* <div className="flex items-center gap-2 mb-4">
+          <input
+            type="text"
+            placeholder="Buscar por descrição, valor, tipo ou data..."
+            value={search}
+            onChange={e => mode === 'full' ? onSearchChange(e.target.value) : undefined}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-200 text-sm text-gray-700 bg-white-50"
+            style={{ minWidth: 0 }}
+            disabled={mode !== 'full'}
+          />
+        </div> */}
         {transactions.length > 0 ? (
           <div>
             {sortedKeys.map((key, idx) => {
@@ -231,6 +241,8 @@ const StatementCard: React.FC<StatementCardProps> = ({ mode = 'dashboard' }) => 
                 </div>
               );
             })}
+            {/* <div ref={listEndRef} />
+            {loading && <div className="text-center py-2">Carregando mais...</div>} */}
           </div>
         ) : (
           <p className="text-white-800">Nenhuma transação registrada.</p>

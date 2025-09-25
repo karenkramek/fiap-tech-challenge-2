@@ -3,9 +3,9 @@ declare module 'dashboardMFE/Dashboard' {
   export default Dashboard;
 }
 
-declare module 'transactionsMFE/Transactions' {
-  const Transactions: React.ComponentType;
-  export default Transactions;
+declare module 'transactionsMFE/TransactionsPage' {
+  const TransactionsPage: React.ComponentType;
+  export default TransactionsPage;
 }
 
 declare module 'shared/*' {

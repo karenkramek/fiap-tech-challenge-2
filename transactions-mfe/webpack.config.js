@@ -63,7 +63,7 @@ module.exports = {
       name: 'transactionsMFE',
       filename: 'remoteEntry.js',
       exposes: {
-        './Transactions': './src/App.tsx'
+        './TransactionsPage': './src/App.tsx'
       },
       remotes: {
         shared: 'shared@http://localhost:3033/remoteEntry.js'
