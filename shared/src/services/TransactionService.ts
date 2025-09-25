@@ -10,8 +10,12 @@ import { TransactionType } from '../types/TransactionType';
 import { FileUploadService } from './FileUploadService';
 
 export class TransactionService {
-  static async getAllTransactions(): Promise<Transaction[]> {
-    const response = await api.get<TransactionDTO[]>('/transactions');
+  static async getAllTransactions(accountId?: string): Promise<Transaction[]> {
+    let url = '/transactions';
+    if (accountId) {
+      url += `?accountId=${accountId}`;
+    }
+    const response = await api.get<TransactionDTO[]>(url);
     return response.data.map(item => Transaction.fromJSON(item));
   }
 
@@ -21,6 +25,7 @@ export class TransactionService {
   }
 
   static async addTransaction(
+    accountId: string,
     type: TransactionType,
     amount: number,
     date: Date,
@@ -40,9 +45,9 @@ export class TransactionService {
       }
     }
 
-    const newTransaction = new Transaction(transactionId, type, amount, date, description, attachmentPath);
+    const newTransaction = new Transaction(transactionId, accountId, type, amount, date, description, attachmentPath);
     const response = await api.post('/transactions', newTransaction.toJSON());
-    await this.applyTransactionToBalance(newTransaction);
+    await this.applyTransactionToBalance(accountId, newTransaction);
     return Transaction.fromJSON(response.data);
   }
 
@@ -73,7 +78,7 @@ export class TransactionService {
       }
     }
 
-    const updatedTransaction = new Transaction(id, type, amount, date, description, attachmentPath);
+    const updatedTransaction = new Transaction(id, oldTransaction.accountId, type, amount, date, description, attachmentPath);
     const response = await api.put(`/transactions/${id}`, updatedTransaction.toJSON());
 
     // Update account balance based on the difference.
@@ -81,8 +86,8 @@ export class TransactionService {
     const typeChanged = type !== oldTransaction.type;
 
     if (amountDifference !== 0 || typeChanged) {
-      await this.applyTransactionToBalance(oldTransaction, true);
-      await this.applyTransactionToBalance(updatedTransaction);
+      await this.applyTransactionToBalance(oldTransaction.accountId, oldTransaction, true);
+      await this.applyTransactionToBalance(updatedTransaction.accountId, updatedTransaction);
     }
 
     return Transaction.fromJSON(response.data);
@@ -99,7 +104,7 @@ export class TransactionService {
       }
 
       // Update account balance.
-      await this.applyTransactionToBalance(transaction, true);
+      await this.applyTransactionToBalance(transaction.accountId, transaction, true);
 
       return true;
     } catch (error) {
@@ -108,11 +113,11 @@ export class TransactionService {
     }
   }
 
-  private static async applyTransactionToBalance(transaction: Transaction, reverse: boolean = false): Promise<void> {
-    // Fetch latest account data right before update
-    const accountResponse = await api.get<AccountDTO>('/account');
-    const account = accountResponse.data;
-    let newBalance = account.balance;
+  private static async applyTransactionToBalance(accountId: string, transaction: Transaction, reverse: boolean = false): Promise<void> {
+    // Fetch the specific account data
+    const account = await api.get<AccountDTO>(`/accounts/${accountId}`);
+    const accountData = account.data;
+    let newBalance = accountData.balance;
 
     const amount = reverse ? -transaction.amount : transaction.amount;
     if (transaction.isIncome()) {
@@ -122,8 +127,11 @@ export class TransactionService {
     }
 
     try {
-      // Envia o objeto completo da conta para evitar aninhamento
-      await api.put('/account', { id: account.id, name: account.name, balance: newBalance });
+      // Update the specific account balance
+      await api.put(`/accounts/${accountId}`, {
+        ...accountData,
+        balance: newBalance
+      });
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 409) {
         throw new Error('Account balance update conflict. Please retry.');

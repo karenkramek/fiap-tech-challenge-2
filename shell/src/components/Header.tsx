@@ -1,8 +1,15 @@
-import { Menu } from 'lucide-react';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { LogOut, Menu } from 'lucide-react';
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 // @ts-ignore
 import { useAccount } from 'shared/hooks/useAccount';
+// @ts-ignore
+import LoginModal from 'shared/components/LoginModal';
+// @ts-ignore
+import RegisterModal from 'shared/components/RegisterModal';
+// @ts-ignore
+import { AccountService } from 'shared/services/AccountService';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -10,7 +17,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false }) => {
-  const { account, loading } = useAccount();
+  const { account, loading, currentUser, login, logout, isAuthenticated } = useAccount();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Função para gerar iniciais do nome
   const getInitials = (name: string): string => {
@@ -28,12 +38,111 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
     return `${cleanName}@bytebank.com.br`;
   };
 
-  // Informações do usuário baseadas na conta
-  const user = account ? {
+  // Informações do usuário - usa currentUser se estiver logado, senão account padrão
+  const user = currentUser ? {
+    name: currentUser.name,
+    email: currentUser.email,
+    initials: getInitials(currentUser.name)
+  } : (account ? {
     name: account.name,
     email: generateEmail(account.name),
     initials: getInitials(account.name)
-  } : null;
+  } : null);
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const loggedAccount = await login(email, password);
+      console.log('Login successful:', loggedAccount);
+
+      // Redirecionar para dashboard após login bem-sucedido
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000); // Pequeno delay para mostrar o toast
+
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; // Re-lança o erro para o modal tratar
+    }
+  };
+
+  const handleLoginSuccess = (userInfo: { name: string; email: string }) => {
+    toast.success(`Bem-vindo de volta, ${userInfo.name}!`, {
+      duration: 4000,
+      style: {
+        background: '#059669',
+        color: 'white',
+      },
+      iconTheme: {
+        primary: 'white',
+        secondary: '#059669',
+      },
+    });
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logout realizado com sucesso!', {
+      duration: 3000,
+      style: {
+        background: '#0369a1',
+        color: 'white',
+      },
+      iconTheme: {
+        primary: 'white',
+        secondary: '#0369a1',
+      },
+    });
+    // Redirecionar para home após logout
+    navigate('/');
+  };
+
+  const handleEnterClick = () => {
+    // Se já estiver logado, vai direto para o dashboard
+    if (isAuthenticated && currentUser) {
+      navigate('/dashboard');
+    } else {
+      // Senão, abre o modal de login
+      setLoginModalOpen(true);
+    }
+  };
+
+  const handleRegister = async (name: string, email: string, password: string) => {
+    try {
+      const newAccount = await AccountService.createAccount(name, email, password);
+      console.log('Account created successfully:', newAccount);
+
+      // Toast adicional personalizado para cadastro
+      toast.success(`Conta criada para ${name}!`, {
+        duration: 4000,
+        style: {
+          background: '#0d9488',
+          color: 'white',
+        },
+        iconTheme: {
+          primary: 'white',
+          secondary: '#0d9488',
+        },
+      });
+
+    } catch (error) {
+      console.error('Error creating account:', error);
+
+      // Toast de erro personalizado
+      toast.error('Erro ao criar conta. Tente novamente.', {
+        duration: 4000,
+        style: {
+          background: '#dc2626',
+          color: 'white',
+        },
+        iconTheme: {
+          primary: 'white',
+          secondary: '#dc2626',
+        },
+      });
+
+      throw error; // Re-lançar o erro para o modal tratar
+    }
+  };
 
   return (
     <header className='bg-primary-700 text-white-50 shadow-md'>
@@ -53,12 +162,29 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
         {/* Botões de Conta e Login - apenas quando showAuthButtons for true (tela inicial) */}
         {showAuthButtons && (
           <div className='flex items-center space-x-3'>
-            <button className='bg-white text-primary-700 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm'>
-              Crie uma conta
-            </button>
-            <button className='border border-white text-white px-4 py-2 rounded-full hover:bg-white hover:text-primary-700 transition-colors font-medium text-sm'>
-              Entre
-            </button>
+            {!isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => setRegisterModalOpen(true)}
+                  className='bg-white text-primary-700 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors font-medium text-sm'
+                >
+                  Crie uma conta
+                </button>
+                <button
+                  onClick={handleEnterClick}
+                  className='border border-white text-white px-4 py-2 rounded-full hover:bg-white hover:text-primary-700 transition-colors font-medium text-sm'
+                >
+                  Entre
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleEnterClick}
+                className='bg-tertiary-600 hover:bg-tertiary-700 text-white px-4 py-2 rounded-full transition-colors font-medium text-sm'
+              >
+                Ir para Dashboard
+              </button>
+            )}
           </div>
         )}
 
@@ -79,13 +205,25 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
                   <p className='text-sm font-medium'>{user.name}</p>
                   <p className='text-xs text-primary-200'>{user.email}</p>
                 </div>
-                <button
-                  className='flex items-center justify-center w-10 h-10 bg-primary-600 rounded-full border-2 border-white hover:bg-primary-500 transition-colors'
-                  title={`Perfil de ${user.name}`}
-                  onClick={() => console.log('Abrir menu do usuário')}
-                >
-                  <span className='text-sm font-bold text-white'>{user.initials}</span>
-                </button>
+                <div className='flex items-center space-x-2'>
+                  <button
+                    className='flex items-center justify-center w-10 h-10 bg-primary-600 rounded-full border-2 border-white hover:bg-primary-500 transition-colors'
+                    title={`Perfil de ${user.name}`}
+                    onClick={() => console.log('Abrir menu do usuário')}
+                  >
+                    <span className='text-sm font-bold text-white'>{user.initials}</span>
+                  </button>
+                  {/* Botão de Logout - visível apenas quando logado */}
+                  {isAuthenticated && (
+                    <button
+                      onClick={handleLogout}
+                      className='flex items-center justify-center w-10 h-10 bg-red-600 rounded-full border-2 border-white hover:bg-red-500 transition-colors'
+                      title='Fazer logout'
+                    >
+                      <LogOut className='w-4 h-4 text-white' />
+                    </button>
+                  )}
+                </div>
               </>
             ) : (
               <div className='flex items-center space-x-3'>
@@ -101,6 +239,29 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
           </div>
         )}
       </div>
+
+      {/* Modal de Login */}
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={handleLogin}
+        onLoginSuccess={handleLoginSuccess}
+        onSwitchToRegister={() => {
+          setLoginModalOpen(false);
+          setRegisterModalOpen(true);
+        }}
+      />
+
+      {/* Modal de Cadastro */}
+      <RegisterModal
+        open={registerModalOpen}
+        onClose={() => setRegisterModalOpen(false)}
+        onRegister={handleRegister}
+        onSwitchToLogin={() => {
+          setRegisterModalOpen(false);
+          setLoginModalOpen(true);
+        }}
+      />
     </header>
   );
 };

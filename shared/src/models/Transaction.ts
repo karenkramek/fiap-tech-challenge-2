@@ -3,19 +3,21 @@ import { TransactionType } from "../types/TransactionType";
 export class Transaction {
   constructor(
     public id: string,
+    public accountId: string,
     public type: TransactionType,
     public amount: number,
     public date: Date,
     public description?: string,
     public attachmentPath?: string
   ) {
-    if (!id || !type || isNaN(amount) || !(date instanceof Date)) {
+    if (!id || !accountId || !type || isNaN(amount) || !(date instanceof Date)) {
       throw new Error('Dados inválidos para transação');
     }
   }
 
   static fromJSON(json: {
     id: string;
+    accountId: string;
     type: TransactionType;
     amount: number;
     date: string;
@@ -24,6 +26,7 @@ export class Transaction {
   }): Transaction {
     return new Transaction(
       json.id,
+      json.accountId,
       json.type as TransactionType,
       json.amount,
       new Date(json.date),
@@ -35,6 +38,7 @@ export class Transaction {
   toJSON() {
     return {
       id: this.id,
+      accountId: this.accountId,
       type: this.type,
       amount: this.amount,
       date: this.date.toISOString(),
