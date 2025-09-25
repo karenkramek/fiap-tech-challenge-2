@@ -1,11 +1,6 @@
-// Declarações de tipos para módulos remotos do shared
-// O remotes.d.ts é um "contrato" local para o TypeScript saber o que está disponível via Module Federation.
-// Ele não é necessário em tempo de execução, só para o TypeScript.
-// Sempre que adicionar algo novo ao shared e quiser consumir tipado, adicione a declaração correspondente no remotes.d.ts do consumidor.
-
-// Por que preciso declarar tudo manualmente?
-// Porque o TypeScript precisa saber a assinatura das funções, tipos e componentes que você vai consumir do shared.
-// Não existe (ainda) uma integração automática entre o build do shared e o d.ts do consumidor, então é preciso manter esse arquivo atualizado manualmente.
+// Tipos dos módulos remotos do shared para uso com Module Federation.
+// Mantenha este arquivo atualizado para garantir tipagem ao importar do shared.
+// Só é necessário para o TypeScript (não afeta o runtime).
 
 // HOOKS
 
