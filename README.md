@@ -18,6 +18,7 @@ Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP 
 - Transactions MFE (porta 3032) — Microfrontend de Transações
 - Shared Library (porta 3033) — Biblioteca compartilhada (componentes, hooks, utils)
 - API Server (porta 3034) — Backend mock com JSON Server
+- Upload Server (porta 3035) — Servidor para upload de arquivos
 
 Pastas relevantes:
 
@@ -25,12 +26,15 @@ Pastas relevantes:
 - `dashboard-mfe/`
 - `transactions-mfe/`
 - `shared/`
+- `upload-server/`
+- `uploads/`
 
 ## ✨ Funcionalidades
 
 - Dashboard intuitivo com saldo e extrato
 - Listagem de transações com visualização, edição e remoção
 - Adição de novas transações (depósito, transferência, etc.)
+- Upload de arquivos anexos às transações (PDF, imagens, documentos)
 - Edição de transações existentes
 - Design system consistente e responsivo (Tailwind CSS)
 - Tipagem estática com TypeScript
@@ -42,6 +46,25 @@ Pastas relevantes:
 - Webpack 5 Module Federation
 - Tailwind CSS (no `dashboard-mfe` e nos componentes compartilhados conforme aplicável)
 - JSON Server (API mock)
+- Node.js/Express (servidor de upload)
+- Multer (upload de arquivos)
+
+## 📋 Banco de Dados
+
+O projeto utiliza um sistema de banco de dados modelo que mantém dados de exemplo no repositório:
+
+- **`db.template.json`** - Arquivo modelo versionado no Git
+- **`db.json`** - Arquivo local criado automaticamente (ignorado pelo Git)
+
+```bash
+# O comando dev:all automaticamente cria db.json do template
+npm run dev:all
+
+# Para resetar dados locais:
+rm db.json && npm run setup:db
+```
+
+📖 **Mais detalhes:** Ver [DATABASE.md](./DATABASE.md)
 
 ## 🚀 Como Executar Localmente
 
@@ -81,6 +104,7 @@ cd shell && npm install && cd ..
 cd dashboard-mfe && npm install && cd ..
 cd transactions-mfe && npm install && cd ..
 cd shared && npm install && cd ..
+cd upload-server && npm install && cd ..
 ```
 
 ### 🏃‍♂️ Execução
@@ -88,7 +112,7 @@ cd shared && npm install && cd ..
 Após instalar todas as dependências, execute na raiz do repositório:
 
 ```bash
-# Inicie tudo de uma vez (API + Shared + Dashboard + Transactions + Shell)
+# Inicie tudo de uma vez (API + Upload Server + Shared + Dashboard + Transactions + Shell)
 npm run dev:all
 ```
 
@@ -106,6 +130,9 @@ Também é possível iniciar cada serviço individualmente em terminais separado
 ```bash
 # API (JSON Server na porta 3034)
 npm run dev:api
+
+# Upload Server (porta 3035)
+npm run dev:upload
 
 # Biblioteca compartilhada (porta 3033)
 npm run dev:shared
@@ -133,6 +160,7 @@ npm run dev:shell
 | Transactions MFE   | 3032  | [http://localhost:3032](http://localhost:3032) |
 | Shared Library     | 3033  | [http://localhost:3033](http://localhost:3033) |
 | API Server (Mock)  | 3034  | [http://localhost:3034](http://localhost:3034) |
+| Upload Server      | 3035  | [http://localhost:3035](http://localhost:3035) |
 
 ## 📜 Scripts Disponíveis
 

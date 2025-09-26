@@ -1,7 +1,9 @@
+// Retorna uma chave no formato "mês-ano" para agrupar transações
 export const getMonthKey = (date: Date) => {
   return `${date.getMonth()}-${date.getFullYear()}`;
 };
 
+// Retorna o nome do mês por extenso
 export const getMonthName = (month: string | number): string => {
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -10,6 +12,7 @@ export const getMonthName = (month: string | number): string => {
   return months[Number(month)];
 };
 
+// Retorna a data atual formatada (ex: Segunda-feira, 11/09/2025)
 export const getCurrentDateFormatted = (): string => {
   const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
   const today = new Date();
@@ -21,10 +24,11 @@ export const getCurrentDateFormatted = (): string => {
   return `${dayName}, ${day}/${month}/${year}`;
 };
 
+// Formata data para exibição (dd/mm/aaaa)
 export const formatDate = (date: Date | string): string => {
   const toLocalDate = (input: string | Date): Date => {
     if (input instanceof Date) return input;
-    const match = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const match = input.match(/^\d{4}-\d{2}-\d{2}$/);
     return match
       ? new Date(+match[1], +match[2] - 1, +match[3]) // evita bug de fuso horário ao interpretar "yyyy-mm-dd" como UTC
       : new Date(input);
@@ -36,6 +40,7 @@ export const formatDate = (date: Date | string): string => {
   return `${day}/${month}/${d.getFullYear()}`;
 };
 
+// Formata data para input type="date" (aaaa-mm-dd)
 export const formatDateForInput = (date: Date): string => {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
