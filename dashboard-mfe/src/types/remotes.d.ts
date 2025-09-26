@@ -132,7 +132,10 @@ declare module 'shared/components/domain/transaction/TransactionTypeBadge' {
 }
 
 declare module 'shared/components/domain/transaction/TransactionList' {
-  interface TransactionListProps {
+  import { Transaction } from 'shared/models/Transaction';
+  export interface TransactionListProps {
+    transactions?: Transaction[];
+    onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
   }
   const TransactionList: React.FC<TransactionListProps>;
@@ -179,7 +182,12 @@ declare module 'shared/components/domain/file/FileUpload' {
 }
 
 declare module 'shared/components/domain/BalanceCard' {
-  const BalanceCard: React.FC<{ accountName?: string | undefined; balance?: number | undefined; showBalance?: boolean; onToggleBalance?: () => void }>;
+  import { Transaction } from 'shared/models/Transaction';
+  const BalanceCard: React.FC<{
+    transactions: Transaction[];
+    showBalance: boolean;
+    onToggleBalance: () => void;
+  }>;
   export default BalanceCard;
 }
 

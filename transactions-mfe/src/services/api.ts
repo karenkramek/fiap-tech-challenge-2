@@ -46,7 +46,7 @@ class TransactionAPIService {
 
   async getAccount(): Promise<Account | null> {
     try {
-      const response = await this.api.get('/account');
+      const response = await this.api.get('/accounts');
       return response.data;
     } catch (error) {
       console.error('Error fetching account:', error);
@@ -56,7 +56,7 @@ class TransactionAPIService {
 
   async updateAccountBalance(balance: number): Promise<void> {
     try {
-      await this.api.patch('/account', { balance });
+      await this.api.patch('/accounts', { balance });
     } catch (error) {
       console.error('Error updating account balance:', error);
       throw error;

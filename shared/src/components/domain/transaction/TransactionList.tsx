@@ -11,6 +11,7 @@ import TransactionEdit from './TransactionEdit';
 import TransactionTypeBadge from './TransactionTypeBadge';
 import { TransactionType } from '../../../types/TransactionType';
 import ModalWrapper from '../../ui/ModalWrapper';
+import { Transaction } from '../../../models/Transaction';
 
 // Componente para ações de transação
 const TransactionActions: React.FC<{
@@ -80,7 +81,7 @@ const TransactionItem: React.FC<{
         <TransactionActions
           onEdit={() => onEdit(transaction.id)}
           onDelete={() => onDelete(transaction.id)}
-          loading={loading}
+          loading={!!loading}
         />
       </div>
       <div className="flex items-stretch mb-2 p-1">
@@ -98,12 +99,15 @@ const TransactionItem: React.FC<{
   );
 });
 
-interface StatementListProps {
+export interface TransactionListProps {
+  transactions?: Transaction[];
+  onTransactionsChanged?: () => void;
   mode?: 'dashboard' | 'full';
 }
 
-const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard' }) => {
-  const { transactions, deleteTransaction, fetchTransactions } = useTransactions();
+const StatementList: React.FC<TransactionListProps> = ({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard' }) => {
+  const { transactions: hookTransactions, deleteTransaction, fetchTransactions } = useTransactions();
+  const transactions = propTransactions || hookTransactions;
   const { grouped, sortedKeys } = useGroupedTransactions(transactions);
   const editModal = useModal();
   const deleteModal = useModal();
@@ -135,6 +139,7 @@ const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard' }) => 
         await deleteTransaction(transactionToDelete);
         closeDeleteModal();
         await fetchTransactions();
+        if (onTransactionsChanged) onTransactionsChanged();
       } catch (error) {
         if (typeof window !== "undefined") {
           console.error("Erro ao excluir transação.");
@@ -149,6 +154,7 @@ const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard' }) => 
   const handleEditSuccess = () => {
     fetchTransactions();
     closeEditModal();
+    if (onTransactionsChanged) onTransactionsChanged();
   };
 
   const monthTitleClass = [mode === 'full' ? 'text-lg' : '', 'font-semibold', 'text-gray-600', 'border-b', 'border-gray-200', 'pb-2'].join(' ');

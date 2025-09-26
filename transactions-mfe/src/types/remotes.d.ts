@@ -130,7 +130,10 @@ declare module 'shared/components/domain/transaction/TransactionTypeBadge' {
 }
 
 declare module 'shared/components/domain/transaction/TransactionList' {
-  interface TransactionListProps {
+  import { Transaction } from 'shared/models/Transaction';
+  export interface TransactionListProps {
+    transactions?: Transaction[];
+    onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
   }
   const TransactionList: React.FC<TransactionListProps>;

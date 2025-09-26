@@ -78,7 +78,7 @@ export class AccountService extends BaseService {
     } else {
       // Novo método com DTO
       const service = new AccountService();
-      const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/account', nameOrData);
+      const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/accounts', nameOrData);
 
       if (!isAccountDTO(newAccountData)) {
         throw new Error('Dados da conta inválidos recebidos da API');
@@ -90,7 +90,7 @@ export class AccountService extends BaseService {
 
   static async updateAccount(accountId: string, updateData: UpdateAccountDTO): Promise<Account> {
     const service = new AccountService();
-    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/account/${accountId}`, updateData);
+    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
 
     if (!isAccountDTO(updatedAccountData)) {
       throw new Error('Dados da conta inválidos recebidos da API');
@@ -106,7 +106,7 @@ export class AccountService extends BaseService {
 
     const service = new AccountService();
     const updateData: UpdateAccountDTO = { balance: newBalance };
-    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/account/${accountId}`, updateData);
+    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
 
     if (!isAccountDTO(updatedAccountData)) {
       throw new Error('Dados da conta inválidos recebidos da API');

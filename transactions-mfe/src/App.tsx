@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "shared/components/ui/Button";
 import Card from "shared/components/ui/Card";
 import TransactionList from "shared/components/domain/transaction/TransactionList";
@@ -15,7 +15,11 @@ const TransactionsPage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const { addTransaction, fetchTransactions } = useTransactions();
+  const { transactions, addTransaction, fetchTransactions } = useTransactions();
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleAmountChange = createCurrencyInputHandler(setAmount);
 
@@ -60,7 +64,11 @@ const TransactionsPage: React.FC = () => {
               Nova Transação
             </Button>
           </div>
-          <TransactionList mode="full" />
+          <TransactionList
+            transactions={transactions}
+            onTransactionsChanged={fetchTransactions}
+            mode="full"
+          />
         </Card>
       </div>
       {addModalOpen && (
