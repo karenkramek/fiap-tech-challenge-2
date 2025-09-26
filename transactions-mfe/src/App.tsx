@@ -7,6 +7,7 @@ import { TransactionType } from "shared/types/TransactionType";
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currencyUtils";
 import { useTransactions } from "shared/hooks/useTransactions";
 import ModalWrapper from "shared/components/ui/ModalWrapper";
+import { Search } from "lucide-react";
 
 const TransactionsPage: React.FC = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -60,6 +61,16 @@ const TransactionsPage: React.FC = () => {
               Nova Transação
             </Button>
           </div>
+          {/* Input de busca */}
+          {/* <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
+            <Search className="h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar"
+              className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              disabled
+            />
+          </div> */}
           <TransactionList mode="full" />
         </Card>
       </div>
