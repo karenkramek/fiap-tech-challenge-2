@@ -55,6 +55,9 @@ module.exports = {
         './components/domain/file/AttachmentDisplay': './src/components/domain/file/AttachmentDisplay',
         './components/domain/file/FilePreviewModal': './src/components/domain/file/FilePreviewModal',
         './components/domain/file/FileUpload': './src/components/domain/file/FileUpload',
+        // Components (Domain - Login)
+        './components/domain/login/LoginModal': './src/components/domain/login/LoginModal',
+        './components/domain/login/RegisterModal': './src/components/domain/login/RegisterModal',
         // Components (Domain - Outros)
         './components/domain/BalanceCard': './src/components/domain/BalanceCard',
         // Hooks

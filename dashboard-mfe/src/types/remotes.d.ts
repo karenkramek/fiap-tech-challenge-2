@@ -35,8 +35,11 @@ declare module 'shared/hooks/useAccount' {
   export function useAccount(): {
     account: Account | null;
     loading: boolean;
-    error: Error | null;
-    fetchAccount: () => Promise<void>;
+    currentUser: { id: string; name: string; email: string; isAuthenticated: boolean } | null;
+    isAuthenticated: boolean;
+    login: (email: string, password: string) => Promise<any>;
+    logout: () => void;
+    refreshAccount: () => Promise<void>;
   };
 }
 
@@ -176,7 +179,7 @@ declare module 'shared/components/domain/file/FileUpload' {
 }
 
 declare module 'shared/components/domain/BalanceCard' {
-  const BalanceCard: React.FC<{ accountName?: string; balance?: number; showBalance?: boolean; onToggleBalance?: () => void }>;
+  const BalanceCard: React.FC<{ accountName?: string | undefined; balance?: number | undefined; showBalance?: boolean; onToggleBalance?: () => void }>;
   export default BalanceCard;
 }
 

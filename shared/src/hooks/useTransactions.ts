@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Transaction } from '../models/Transaction';
+import { AccountService } from '../services/AccountService';
 import { TransactionService } from '../services/TransactionService';
 import { TransactionType } from '../types/TransactionType';
 
@@ -9,6 +10,7 @@ export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // Ordena por data decrescente, e por id crescente em caso de empate
   const sortTransactions = (txs: Transaction[]) => {
@@ -26,7 +28,18 @@ export function useTransactions() {
   const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await TransactionService.getAllTransactions();
+
+      // Obter o usuário atual para filtrar transações
+      const currentUser = AccountService.getCurrentUser();
+      if (!currentUser) {
+        // Se não há usuário logado, não carregar transações
+        setTransactions([]);
+        setError(null);
+        return;
+      }
+
+      // Buscar apenas transações do usuário atual
+      const data = await TransactionService.getAllTransactions(currentUser.id);
       setTransactions(sortTransactions(data));
       setError(null);
     } catch (err) {
@@ -36,6 +49,47 @@ export function useTransactions() {
     }
   }, []);
 
+  // Função para limpar transações localmente (usada após criar conta)
+  const clearTransactions = useCallback(() => {
+    setTransactions([]);
+  }, []);
+
+  // Detectar mudança de usuário e recarregar transações
+  useEffect(() => {
+    const checkUserChange = () => {
+      const currentUser = AccountService.getCurrentUser();
+      const newUserId = currentUser?.id || null;
+
+      if (newUserId !== currentUserId) {
+        setCurrentUserId(newUserId);
+        fetchTransactions(); // Recarrega transações quando usuário muda
+      }
+    };
+
+    // Escutar evento customizado de limpeza de transações
+    const handleTransactionsCleared = () => {
+      console.log('Evento de limpeza de transações recebido');
+      setTransactions([]); // Limpa transações localmente
+      fetchTransactions(); // E recarrega do servidor
+    };
+
+    checkUserChange();
+
+    // Escutar mudanças no localStorage (quando login/logout acontece)
+    window.addEventListener('storage', checkUserChange);
+    // Escutar evento customizado de limpeza
+    window.addEventListener('transactionsCleared', handleTransactionsCleared);
+
+    // Também escutar mudanças locais no localStorage
+    const interval = setInterval(checkUserChange, 1000);
+
+    return () => {
+      window.removeEventListener('storage', checkUserChange);
+      window.removeEventListener('transactionsCleared', handleTransactionsCleared);
+      clearInterval(interval);
+    };
+  }, [currentUserId, fetchTransactions]);
+
   const addTransaction = useCallback(async (
     type: TransactionType,
     amount: number,
@@ -44,7 +98,20 @@ export function useTransactions() {
     attachmentFile?: File
   ) => {
     try {
-      const newTransaction = await TransactionService.addTransaction(type, amount, date, description, attachmentFile);
+      // Obter o usuário atual para associar a transação
+      const currentUser = AccountService.getCurrentUser();
+      if (!currentUser) {
+        throw new Error('Usuário não está logado');
+      }
+
+      const newTransaction = await TransactionService.addTransaction(
+        currentUser.id, // accountId
+        type,
+        amount,
+        date,
+        description,
+        attachmentFile
+      );
       setTransactions(prevTransactions => sortTransactions([ ...prevTransactions, newTransaction ]));
       return newTransaction;
     } catch (err) {
@@ -94,15 +161,22 @@ export function useTransactions() {
     }
   }, []);
 
+  // Carregamento inicial
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    if (currentUserId === null) {
+      // Primeira execução, definir usuário atual e carregar
+      const currentUser = AccountService.getCurrentUser();
+      setCurrentUserId(currentUser?.id || 'anonymous');
+      fetchTransactions();
+    }
+  }, [fetchTransactions, currentUserId]);
 
   return {
     transactions,
     loading,
     error,
     fetchTransactions,
+    clearTransactions,
     addTransaction,
     updateTransaction,
     deleteTransaction

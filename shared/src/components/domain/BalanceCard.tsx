@@ -5,7 +5,7 @@ import { getCurrentDateFormatted } from '../../utils/utils';
 import { formatCurrencyWithSymbol } from '../../utils/currencyUtils';
 
 interface BalanceCardProps {
-  accountName?: string;
+  accountName?: string | undefined;
   balance?: number;
   showBalance: boolean;
   onToggleBalance: () => void;

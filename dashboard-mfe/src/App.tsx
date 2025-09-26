@@ -6,14 +6,9 @@ import TransactionList from 'shared/components/domain/transaction/TransactionLis
 import TransactionAdd from 'shared/components/domain/transaction/TransactionAdd';
 import { useAccount } from 'shared/hooks/useAccount';
 import { useTransactions } from 'shared/hooks/useTransactions';
-import { Transaction } from 'shared/models/Transaction';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
 
-type GroupedTransactions = {
-  grouped: Record<string, Transaction[]>;
-  sortedKeys: string[];
-};
 
 const Dashboard: React.FC = () => {
   // Estado para exibir ou esconder o saldo
@@ -28,8 +23,11 @@ const Dashboard: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [formLoading, setFormLoading] = useState(false);
 
-  const { account, loading: accountLoading, fetchAccount } = useAccount();
+  const { account, loading: accountLoading, refreshAccount, currentUser } = useAccount();
   const { loading: transactionsLoading, addTransaction } = useTransactions();
+
+  // Usar dados do usuário logado se disponível, senão usar account padrão
+  const userDisplayName = currentUser?.name || account?.name || "";
 
   // Logic to add a new transaction.
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
@@ -55,7 +53,7 @@ const Dashboard: React.FC = () => {
 
       // Atualiza saldo após nova transação
       try {
-        await fetchAccount();
+        await refreshAccount();
       } catch (fetchError) {
         console.error("Erro ao atualizar saldo da conta:", fetchError);
       }
@@ -70,10 +68,6 @@ const Dashboard: React.FC = () => {
     } finally {
       setFormLoading(false);
     }
-  };
-
-  const handleFileSelect = (file: File | null) => {
-    setAttachmentFile(file);
   };
 
   if (accountLoading || transactionsLoading || formLoading) {
@@ -92,7 +86,7 @@ const Dashboard: React.FC = () => {
           <div className="flex-1 space-y-6">
             {/* Saldo e transações recentes */}
             <BalanceCard
-              accountName={account?.name}
+              accountName={userDisplayName}
               balance={account?.balance}
               showBalance={showBalance}
               onToggleBalance={() => setShowBalance((prev) => !prev)}
