@@ -1,6 +1,6 @@
 import { Download, Eye, File, Image } from 'lucide-react';
 import React, { useState } from 'react';
-import { FileUploadService } from '../services/FileUploadService';
+import { FileUploadService } from '../../../services/FileUploadService';
 import FilePreviewModal from './FilePreviewModal';
 
 interface AttachmentDisplayProps {

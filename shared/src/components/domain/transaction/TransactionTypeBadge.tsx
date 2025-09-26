@@ -1,5 +1,5 @@
 import React from "react";
-import { getTransactionTypeLabel, TransactionType } from "../types/TransactionType";
+import { getTransactionTypeLabel, TransactionType } from "../../../types/TransactionType";
 
 // Componente de badge para exibir o tipo da transação
 interface TransactionBadgeProps {

@@ -1,6 +1,6 @@
 import { Download, File } from 'lucide-react';
 import React from 'react';
-import { FileUploadService } from '../services/FileUploadService';
+import { FileUploadService } from '../../../services/FileUploadService';
 
 interface FilePreviewModalProps {
   open: boolean;

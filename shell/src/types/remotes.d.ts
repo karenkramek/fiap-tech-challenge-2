@@ -3,9 +3,9 @@ declare module 'dashboardMFE/Dashboard' {
   export default Dashboard;
 }
 
-declare module 'transactionsMFE/Transactions' {
-  const Transactions: React.ComponentType;
-  export default Transactions;
+declare module 'transactionsMFE/TransactionsPage' {
+  const TransactionsPage: React.ComponentType;
+  export default TransactionsPage;
 }
 
 declare module 'shared/hooks/useAccount' {
@@ -18,6 +18,17 @@ declare module 'shared/hooks/useAccount' {
     logout: () => void;
     refreshAccount: () => Promise<void>;
   };
+}
+
+declare module 'shared/services/AccountService' {
+  const AccountService: {
+    createAccount: (
+      name: string,
+      email: string,
+      password: string
+    ) => Promise<any>;
+  };
+  export default AccountService;
 }
 
 declare module 'shared/*' {

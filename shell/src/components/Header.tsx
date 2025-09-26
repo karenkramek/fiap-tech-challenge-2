@@ -2,14 +2,10 @@ import { LogOut, Menu } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-// @ts-ignore
 import { useAccount } from 'shared/hooks/useAccount';
-// @ts-ignore
-import LoginModal from 'shared/components/LoginModal';
-// @ts-ignore
-import RegisterModal from 'shared/components/RegisterModal';
-// @ts-ignore
-import { AccountService } from 'shared/services/AccountService';
+import LoginModal from 'shared/components/domain/login/LoginModal';
+import RegisterModal from 'shared/components/domain/login/RegisterModal';
+import AccountService from 'shared/services/AccountService';
 
 interface HeaderProps {
   toggleSidebar: () => void;

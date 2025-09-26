@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BaseService } from './BaseService';
-import { AccountDTO, isAccountDTO } from '../dtos/Account.dto';
+import { AccountDTO } from '../dtos/Account.dto';
 import { TransactionDTO, isTransactionDTO } from '../dtos/Transaction.dto';
 import { Transaction } from '../models/Transaction';
 import { TransactionType } from '../types/TransactionType';
@@ -240,17 +240,13 @@ export class TransactionService extends BaseService {
     }
 
     try {
-      // Try new BaseService approach first
+      // Busca todas as contas e seleciona a correta
       const service = new TransactionService();
-      const accountData = await service.get<AccountDTO>('/account');
+      const accountsData = await service.get<AccountDTO[]>('/accounts');
+      const account = accountsData.find(acc => acc.id === accountId);
+      if (!account) throw new Error('Conta não encontrada');
 
-      if (!isAccountDTO(accountData)) {
-        throw new Error('Dados da conta inválidos recebidos da API');
-      }
-
-      const account = accountData;
       let newBalance = account.balance;
-
       const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
       if (transactionToProcess.isIncome()) {
         newBalance += amount;
@@ -263,7 +259,7 @@ export class TransactionService extends BaseService {
         name: account.name,
         balance: newBalance
       };
-      await service.put<AccountDTO, AccountDTO>('/account', updateData);
+      await service.put<AccountDTO, AccountDTO>(`/accounts/${account.id}`, updateData);
     } catch (error) {
       // Fallback to legacy API with specific account ID
       console.warn('Falling back to legacy API for balance update');

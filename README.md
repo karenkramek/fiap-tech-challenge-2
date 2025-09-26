@@ -213,7 +213,24 @@ npm run install:all
 npm cache clean --force
 ```
 
+Se precisar remover todos os node_modules, dist e package-lock.json de todos os projetos, utilize `clean-all.sh` (Linux/macOS) ou `clean-all.bat` (Windows) na raiz do projeto para uma limpeza completa do ambiente.
+
 **5. Problemas com Node.js:**
 
 - Use Node.js versão 18+
 - Considere usar nvm: `nvm use 18`
+
+## 🧹 Limpeza do Ambiente (Clean All)
+
+Se precisar remover todos os `node_modules`, `dist` e `package-lock.json` de todos os projetos (raiz, MFEs, shared, shell), utilize um dos scripts de limpeza:
+
+- **Linux/macOS:**
+  ```bash
+  ./clean-all.sh
+  ```
+- **Windows:**
+  ```bat
+  clean-all.bat
+  ```
+
+Esses scripts também limpam o cache do npm em cada projeto. Após rodar, execute `npm install` novamente para reinstalar as dependências.

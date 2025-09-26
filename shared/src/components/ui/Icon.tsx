@@ -1,6 +1,6 @@
 import React from 'react';
 import { BanknoteArrowDown, BanknoteArrowUp, Edit, Trash2 } from 'lucide-react';
-import { TransactionType } from '../types/TransactionType';
+import { TransactionType } from '../../types/TransactionType';
 
 export function TransactionTypeIcon({ type, className = '' }: { type: TransactionType, className?: string }) {
   if (type === TransactionType.DEPOSIT || type === TransactionType.TRANSFER) {
@@ -9,4 +9,4 @@ export function TransactionTypeIcon({ type, className = '' }: { type: Transactio
   return <BanknoteArrowUp className={className} />;
 }
 
-export { Edit, Trash2 };
+export default { Edit, Trash2 };

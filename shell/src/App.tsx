@@ -9,7 +9,7 @@ import Sidebar from './components/Sidebar';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
-const Transactions = React.lazy(() => import('transactionsMFE/Transactions'));
+const TransactionsPage = React.lazy(() => import('transactionsMFE/TransactionsPage'));
 
 // Layout wrapper for home page
 const HomeLayout: React.FC = () => {
@@ -119,7 +119,7 @@ const App: React.FC = () => {
             element={
               <AuthenticatedLayout>
                 <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
-                  <Transactions />
+                  <TransactionsPage />
                 </Suspense>
               </AuthenticatedLayout>
             }
