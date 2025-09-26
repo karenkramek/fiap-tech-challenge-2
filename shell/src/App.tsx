@@ -10,6 +10,7 @@ import './styles/global.css';
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
 const Transactions = React.lazy(() => import('transactionsMFE/Transactions'));
+const Investments = React.lazy(() => import('investmentsMFE/Investments'));
 
 // Layout wrapper for authenticated routes
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -84,6 +85,16 @@ const App: React.FC = () => {
                 <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
                   <Transactions />
                 </Suspense>
+              </AuthenticatedLayout>
+            }
+          />
+          <Route
+            path="/investments"
+            element={
+              <AuthenticatedLayout>
+                <React.Suspense fallback={<div>Carregando...</div>}>
+                  <Investments />
+                </React.Suspense>
               </AuthenticatedLayout>
             }
           />

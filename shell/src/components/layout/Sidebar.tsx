@@ -62,9 +62,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </li>
           <li>
-            <span className='block py-2 px-4 text-white-800 cursor-not-allowed opacity-60'>
+            <button onClick={() => handleNavigation('/investments')} className={`block py-2 px-4 transition-colors w-full text-left ${isActive('/transactions')
+                ? 'text-primary-700 font-bold bg-white-50 border-l-4 border-primary-700'
+                : 'text-primary-700 hover:text-primary-700 hover:bg-white-50'}`}
+            >
               Investimentos
-            </span>
+            </button>
           </li>
           <li>
             <span className='block py-2 px-4 text-white-800 cursor-not-allowed opacity-60'>
