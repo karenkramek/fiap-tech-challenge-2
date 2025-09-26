@@ -16,6 +16,7 @@ const TransactionsPage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [search, setSearch] = useState(""); // Novo estado para busca
   const { addTransaction, fetchTransactions } = useTransactions();
 
   const handleAmountChange = createCurrencyInputHandler(setAmount);
@@ -68,9 +69,11 @@ const TransactionsPage: React.FC = () => {
               type="text"
               placeholder="Buscar"
               className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
-              disabled
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
           </div> */}
+          {/* <TransactionList mode="full" search={search} /> */}
           <TransactionList mode="full" />
         </Card>
       </div>
