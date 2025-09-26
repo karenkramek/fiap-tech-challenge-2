@@ -27,8 +27,11 @@ const Dashboard: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [formLoading, setFormLoading] = useState(false);
 
-  const { account, loading: accountLoading, refreshAccount } = useAccount();
+  const { account, loading: accountLoading, refreshAccount, currentUser } = useAccount();
   const { loading: transactionsLoading, addTransaction } = useTransactions();
+
+  // Usar dados do usuário logado se disponível, senão usar account padrão
+  const userDisplayName = currentUser?.name || account?.name;
 
   // Logic to add a new transaction.
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
@@ -91,7 +94,7 @@ const Dashboard: React.FC = () => {
           <div className="flex-1 space-y-6">
             {/* Saldo e transações recentes */}
             <BalanceCard
-              accountName={account?.name}
+              accountName={userDisplayName}
               balance={account?.balance}
               showBalance={showBalance}
               onToggleBalance={() => setShowBalance((prev) => !prev)}

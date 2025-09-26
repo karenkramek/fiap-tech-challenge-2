@@ -2,6 +2,7 @@ import { TransactionType } from '../types/TransactionType';
 
 export interface TransactionDTO {
   readonly id: string;
+  accountId: string;
   type: TransactionType;
   amount: number;
   date: string; // geralmente string (ISO) em APIs

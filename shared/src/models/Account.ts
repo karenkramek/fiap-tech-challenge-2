@@ -4,7 +4,9 @@ export class Account {
   constructor(
     public readonly id: string,
     public name: string,
-    public balance: number
+    public balance: number,
+    public email?: string,
+    public password?: string
   ) {
     this.validateAccount();
   }
@@ -21,7 +23,13 @@ export class Account {
     }
   }
 
-  static fromJSON(json: AccountDTO): Account {
+  static fromJSON(json: {
+    id: string;
+    name: string;
+    balance: number;
+    email?: string;
+    password?: string;
+  }): Account {
     if (!json) {
       throw new Error('Dados da conta não fornecidos');
     }
@@ -29,7 +37,9 @@ export class Account {
     return new Account(
       json.id,
       json.name,
-      json.balance
+      json.balance,
+      json.email,
+      json.password
     );
   }
 

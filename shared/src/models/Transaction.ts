@@ -4,6 +4,7 @@ import { TransactionDTO } from '../dtos/Transaction.dto';
 export class Transaction {
   constructor(
     public readonly id: string,
+    public accountId: string,
     public type: TransactionType,
     public amount: number,
     public date: Date,
@@ -39,13 +40,22 @@ export class Transaction {
     }
   }
 
-  static fromJSON(json: TransactionDTO): Transaction {
+  static fromJSON(json: {
+    id: string;
+    accountId: string;
+    type: TransactionType;
+    amount: number;
+    date: string;
+    description?: string;
+    attachmentPath?: string;
+  }): Transaction {
     if (!json) {
       throw new Error('Dados da transação não fornecidos');
     }
 
     return new Transaction(
       json.id,
+      json.accountId,
       json.type as TransactionType,
       json.amount,
       new Date(json.date),
@@ -57,6 +67,7 @@ export class Transaction {
   toJSON(): TransactionDTO {
     const result: TransactionDTO = {
       id: this.id,
+      accountId: this.accountId,
       type: this.type,
       amount: this.amount,
       date: this.date.toISOString()

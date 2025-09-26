@@ -2,6 +2,7 @@
   "transactions": [
     {
       "id": "1",
+      "accountId": "acc001",
       "type": "DEPOSIT",
       "amount": 3000,
       "date": "2025-07-01T09:30:00Z",
@@ -9,6 +10,7 @@
     },
     {
       "id": "2",
+      "accountId": "acc001",
       "type": "PAYMENT",
       "amount": 500,
       "date": "2025-07-05T14:15:00Z",
@@ -16,6 +18,7 @@
     },
     {
       "id": "3",
+      "accountId": "acc001",
       "type": "TRANSFER",
       "amount": 300,
       "date": "2025-07-10T16:45:00Z",
@@ -23,15 +26,20 @@
     },
     {
       "id": "4",
+      "accountId": "acc001",
       "type": "WITHDRAWAL",
       "amount": 200,
       "date": "2025-07-20T03:00:00.000Z",
       "description": "Saque no caixa eletrônico"
     }
   ],
-  "account": {
-    "id": "acc001",
-    "name": "Fulana de Tal",
-    "balance": 2530
-  }
+  "accounts": [
+    {
+      "id": "acc001",
+      "name": "Fulana de Tal",
+      "email": "fulana@email.com",
+      "password": "senha123",
+      "balance": 2530
+    }
+  ]
 }

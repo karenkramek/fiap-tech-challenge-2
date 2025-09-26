@@ -8,16 +8,23 @@ import { Transaction } from '../models/Transaction';
 import { TransactionType } from '../types/TransactionType';
 import { FileUploadService } from './FileUploadService';
 import { TransactionFilters } from '../types/api.types';
+import api from './api';
 
 export class TransactionService extends BaseService {
   constructor() {
     super('');
   }
 
-  static async getAllTransactions(filters?: TransactionFilters): Promise<Transaction[]> {
+  static async getAllTransactions(accountId?: string, filters?: TransactionFilters): Promise<Transaction[]> {
     const service = new TransactionService();
     const queryParams = new URLSearchParams();
 
+    // Add accountId if provided (for compatibility with legacy code)
+    if (accountId) {
+      queryParams.append('accountId', accountId);
+    }
+
+    // Add other filters
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -29,11 +36,21 @@ export class TransactionService extends BaseService {
     const queryString = queryParams.toString();
     const endpoint = queryString ? `/transactions?${queryString}` : '/transactions';
 
-    const transactionsData = await service.get<TransactionDTO[]>(endpoint);
-
-    return transactionsData
-      .filter(item => isTransactionDTO(item))
-      .map(item => Transaction.fromJSON(item));
+    try {
+      const transactionsData = await service.get<TransactionDTO[]>(endpoint);
+      return transactionsData
+        .filter(item => isTransactionDTO(item))
+        .map(item => Transaction.fromJSON(item));
+    } catch (error) {
+      // Fallback to legacy API if new BaseService fails
+      console.warn('Falling back to legacy API for getAllTransactions');
+      let url = '/transactions';
+      if (accountId) {
+        url += `?accountId=${accountId}`;
+      }
+      const response = await api.get<TransactionDTO[]>(url);
+      return response.data.map(item => Transaction.fromJSON(item));
+    }
   }
 
   static async getTransactionById(id: string): Promise<Transaction> {
@@ -52,6 +69,7 @@ export class TransactionService extends BaseService {
   }
 
   static async addTransaction(
+    accountId: string,
     type: TransactionType,
     amount: number,
     date: Date,
@@ -74,17 +92,26 @@ export class TransactionService extends BaseService {
       }
     }
 
-    const newTransaction = new Transaction(transactionId, type, amount, date, description, attachmentPath);
+    const newTransaction = new Transaction(transactionId, accountId, type, amount, date, description, attachmentPath);
 
-    const service = new TransactionService();
-    const createdTransactionData = await service.post<TransactionDTO, TransactionDTO>('/transactions', newTransaction.toJSON());
+    try {
+      // Try new BaseService approach first
+      const service = new TransactionService();
+      const createdTransactionData = await service.post<TransactionDTO, TransactionDTO>('/transactions', newTransaction.toJSON());
 
-    if (!isTransactionDTO(createdTransactionData)) {
-      throw new Error('Dados da transação inválidos recebidos da API');
+      if (!isTransactionDTO(createdTransactionData)) {
+        throw new Error('Dados da transação inválidos recebidos da API');
+      }
+
+      await this.applyTransactionToBalance(accountId, newTransaction);
+      return Transaction.fromJSON(createdTransactionData);
+    } catch (error) {
+      // Fallback to legacy API
+      console.warn('Falling back to legacy API for addTransaction');
+      const response = await api.post('/transactions', newTransaction.toJSON());
+      await this.applyTransactionToBalance(accountId, newTransaction);
+      return Transaction.fromJSON(response.data);
     }
-
-    await this.applyTransactionToBalance(newTransaction);
-    return Transaction.fromJSON(createdTransactionData);
   }
 
   static async updateTransaction(
@@ -119,25 +146,43 @@ export class TransactionService extends BaseService {
       }
     }
 
-    const updatedTransaction = new Transaction(id, type, amount, date, description, attachmentPath);
+    const updatedTransaction = new Transaction(id, oldTransaction.accountId, type, amount, date, description, attachmentPath);
 
-    const service = new TransactionService();
-    const updatedTransactionData = await service.put<TransactionDTO, TransactionDTO>(`/transactions/${id}`, updatedTransaction.toJSON());
+    try {
+      // Try new BaseService approach first
+      const service = new TransactionService();
+      const updatedTransactionData = await service.put<TransactionDTO, TransactionDTO>(`/transactions/${id}`, updatedTransaction.toJSON());
 
-    if (!isTransactionDTO(updatedTransactionData)) {
-      throw new Error('Dados da transação inválidos recebidos da API');
+      if (!isTransactionDTO(updatedTransactionData)) {
+        throw new Error('Dados da transação inválidos recebidos da API');
+      }
+
+      // Update account balance based on the difference.
+      const amountDifference = amount - oldTransaction.amount;
+      const typeChanged = type !== oldTransaction.type;
+
+      if (amountDifference !== 0 || typeChanged) {
+        await this.applyTransactionToBalance(oldTransaction.accountId, oldTransaction, true);
+        await this.applyTransactionToBalance(updatedTransaction.accountId, updatedTransaction);
+      }
+
+      return Transaction.fromJSON(updatedTransactionData);
+    } catch (error) {
+      // Fallback to legacy API
+      console.warn('Falling back to legacy API for updateTransaction');
+      const response = await api.put(`/transactions/${id}`, updatedTransaction.toJSON());
+      
+      // Update account balance based on the difference.
+      const amountDifference = amount - oldTransaction.amount;
+      const typeChanged = type !== oldTransaction.type;
+
+      if (amountDifference !== 0 || typeChanged) {
+        await this.applyTransactionToBalance(oldTransaction.accountId, oldTransaction, true);
+        await this.applyTransactionToBalance(updatedTransaction.accountId, updatedTransaction);
+      }
+
+      return Transaction.fromJSON(response.data);
     }
-
-    // Update account balance based on the difference.
-    const amountDifference = amount - oldTransaction.amount;
-    const typeChanged = type !== oldTransaction.type;
-
-    if (amountDifference !== 0 || typeChanged) {
-      await this.applyTransactionToBalance(oldTransaction, true);
-      await this.applyTransactionToBalance(updatedTransaction);
-    }
-
-    return Transaction.fromJSON(updatedTransactionData);
   }
 
   static async deleteTransaction(id: string): Promise<boolean> {
@@ -157,7 +202,7 @@ export class TransactionService extends BaseService {
       }
 
       // Update account balance.
-      await this.applyTransactionToBalance(transaction, true);
+      await this.applyTransactionToBalance(transaction.accountId, transaction, true);
 
       return true;
     } catch (error) {
@@ -180,28 +225,39 @@ export class TransactionService extends BaseService {
     }
   }
 
-  private static async applyTransactionToBalance(transaction: Transaction, reverse: boolean = false): Promise<void> {
-    const service = new TransactionService();
+  private static async applyTransactionToBalance(accountIdOrTransaction: string | Transaction, transaction?: Transaction, reverse: boolean = false): Promise<void> {
+    let accountId: string;
+    let transactionToProcess: Transaction;
 
-    // Fetch latest account data right before update
-    const accountData = await service.get<AccountDTO>('/account');
-
-    if (!isAccountDTO(accountData)) {
-      throw new Error('Dados da conta inválidos recebidos da API');
-    }
-
-    const account = accountData;
-    let newBalance = account.balance;
-
-    const amount = reverse ? -transaction.amount : transaction.amount;
-    if (transaction.isIncome()) {
-      newBalance += amount;
+    if (typeof accountIdOrTransaction === 'string') {
+      // Legacy signature: applyTransactionToBalance(accountId, transaction, reverse)
+      accountId = accountIdOrTransaction;
+      transactionToProcess = transaction!;
     } else {
-      newBalance -= amount;
+      // New signature: applyTransactionToBalance(transaction, reverse)
+      transactionToProcess = accountIdOrTransaction;
+      accountId = transactionToProcess.accountId;
     }
 
     try {
-      // Envia o objeto completo da conta para evitar aninhamento
+      // Try new BaseService approach first
+      const service = new TransactionService();
+      const accountData = await service.get<AccountDTO>('/account');
+
+      if (!isAccountDTO(accountData)) {
+        throw new Error('Dados da conta inválidos recebidos da API');
+      }
+
+      const account = accountData;
+      let newBalance = account.balance;
+
+      const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
+      if (transactionToProcess.isIncome()) {
+        newBalance += amount;
+      } else {
+        newBalance -= amount;
+      }
+
       const updateData: AccountDTO = {
         id: account.id,
         name: account.name,
@@ -209,10 +265,27 @@ export class TransactionService extends BaseService {
       };
       await service.put<AccountDTO, AccountDTO>('/account', updateData);
     } catch (error) {
+      // Fallback to legacy API with specific account ID
+      console.warn('Falling back to legacy API for balance update');
+      const account = await api.get<AccountDTO>(`/accounts/${accountId}`);
+      const accountData = account.data;
+      let newBalance = accountData.balance;
+
+      const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
+      if (transactionToProcess.isIncome()) {
+        newBalance += amount;
+      } else {
+        newBalance -= amount;
+      }
+
+      await api.put(`/accounts/${accountId}`, {
+        ...accountData,
+        balance: newBalance
+      });
+
       if (error instanceof AxiosError && error.response?.status === 409) {
         throw new Error('Account balance update conflict. Please retry.');
       }
-      throw error;
     }
   }
 }

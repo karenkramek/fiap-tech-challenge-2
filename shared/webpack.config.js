@@ -52,6 +52,8 @@ module.exports = {
         './components/FileUpload': './src/components/FileUpload',
         './components/AttachmentDisplay': './src/components/AttachmentDisplay',
         './components/FilePreviewModal': './src/components/FilePreviewModal',
+        './components/LoginModal': './src/components/LoginModal',
+        './components/RegisterModal': './src/components/RegisterModal',
         './components/Icon': './src/components/Icon',
         // Hooks
         './hooks/useTransactions': './src/hooks/useTransactions',
