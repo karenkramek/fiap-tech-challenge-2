@@ -62,11 +62,7 @@ const Dashboard: React.FC = () => {
   };
 
   if (transactionsLoading || formLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner size={48} />
-      </div>
-    );
+    return <LoadingSpinner size={48} />;
   }
 
   return (
