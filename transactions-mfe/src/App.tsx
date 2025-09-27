@@ -60,35 +60,33 @@ const TransactionsPage: React.FC = () => {
     <>
       <FeedbackProvider />
       {/* Extrato */}
-      <div className="space-y-6">
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="transactions-title text-primary-700">Extrato</h2>
-            <Button variant="primary" onClick={() => setAddModalOpen(true)}>
-              Nova Transação
-            </Button>
-          </div>
-          <ErrorBoundary>
-            {/* Input de busca */}
-            {/* <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
-              <Search className="h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Buscar"
-                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div> */}
-            <TransactionList
-              transactions={transactions}
-              onTransactionsChanged={fetchTransactions}
-              mode="full"
-              // search={search}
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="transactions-title text-primary-700">Extrato</h2>
+          <Button variant="primary" onClick={() => setAddModalOpen(true)}>
+            Nova Transação
+          </Button>
+        </div>
+        <ErrorBoundary>
+          {/* Input de busca */}
+          {/* <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
+            <Search className="h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar"
+              className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
             />
-          </ErrorBoundary>
-        </Card>
-      </div>
+          </div> */}
+          <TransactionList
+            transactions={transactions}
+            onTransactionsChanged={fetchTransactions}
+            mode="full"
+            // search={search}
+          />
+        </ErrorBoundary>
+      </Card>
       {addModalOpen && (
         <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
           <ErrorBoundary>
