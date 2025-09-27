@@ -1,7 +1,9 @@
 import React, { Suspense, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
-import ErrorBoundary from './components/ErrorBoundary';
+import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
+import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import Header from './components/Header';
 import Home from './components/Home';
 import ScrollToTop from './components/ScrollToTop';
@@ -66,7 +68,7 @@ const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children
         </div>
 
         {/* Conteúdo principal */}
-        <main className="flex-1 space-y-6">
+        <main className="flex-1">
           {children}
         </main>
       </div>
@@ -131,4 +133,17 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+const ShellApp: React.FC = () => {
+  return (
+    <>
+      <FeedbackProvider />
+      <Suspense fallback={<LoadingSpinner />}>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </Suspense>
+    </>
+  );
+};
+
+export default ShellApp;

@@ -1,6 +1,6 @@
 import { BaseService } from './BaseService';
 import { Account } from '../models/Account';
-import { AccountDTO, CreateAccountDTO, UpdateAccountDTO, isAccountDTO } from '../dtos/Account.dto';
+import { AccountDTO, CreateAccountDTO, UpdateAccountDTO } from '../dtos/Account.dto';
 import api from './api';
 
 export class AccountService extends BaseService {
@@ -80,10 +80,6 @@ export class AccountService extends BaseService {
       const service = new AccountService();
       const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/accounts', nameOrData);
 
-      if (!isAccountDTO(newAccountData)) {
-        throw new Error('Dados da conta inválidos recebidos da API');
-      }
-
       return Account.fromJSON(newAccountData);
     }
   }
@@ -91,10 +87,6 @@ export class AccountService extends BaseService {
   static async updateAccount(accountId: string, updateData: UpdateAccountDTO): Promise<Account> {
     const service = new AccountService();
     const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
-
-    if (!isAccountDTO(updatedAccountData)) {
-      throw new Error('Dados da conta inválidos recebidos da API');
-    }
 
     return Account.fromJSON(updatedAccountData);
   }
@@ -107,10 +99,6 @@ export class AccountService extends BaseService {
     const service = new AccountService();
     const updateData: UpdateAccountDTO = { balance: newBalance };
     const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
-
-    if (!isAccountDTO(updatedAccountData)) {
-      throw new Error('Dados da conta inválidos recebidos da API');
-    }
 
     return Account.fromJSON(updatedAccountData);
   }

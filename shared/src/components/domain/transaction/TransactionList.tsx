@@ -105,7 +105,7 @@ export interface TransactionListProps {
   mode?: 'dashboard' | 'full';
 }
 
-const StatementList: React.FC<TransactionListProps> = ({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard' }) => {
+const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard' }) => {
   const { transactions: hookTransactions, deleteTransaction, fetchTransactions } = useTransactions();
   const transactions = propTransactions || hookTransactions;
   const { grouped, sortedKeys } = useGroupedTransactions(transactions);
@@ -211,6 +211,6 @@ const StatementList: React.FC<TransactionListProps> = ({ transactions: propTrans
       />
     </div>
   );
-};
+});
 
-export default StatementList;
+export default TransactionList;
