@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "shared/components/ui/Button";
 import Card from "shared/components/ui/Card";
 import TransactionList from "shared/components/domain/transaction/TransactionList";
@@ -17,7 +17,11 @@ const TransactionsPage: React.FC = () => {
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [search, setSearch] = useState(""); // Novo estado para busca
-  const { addTransaction, fetchTransactions } = useTransactions();
+  const { transactions, addTransaction, fetchTransactions } = useTransactions();
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleAmountChange = createCurrencyInputHandler(setAmount);
 
@@ -62,7 +66,7 @@ const TransactionsPage: React.FC = () => {
               Nova Transação
             </Button>
           </div>
-          {/* Input de busca */}
+                    {/* Input de busca */}
           {/* <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
             <Search className="h-5 w-5 text-gray-400" />
             <input
@@ -73,8 +77,12 @@ const TransactionsPage: React.FC = () => {
               onChange={e => setSearch(e.target.value)}
             />
           </div> */}
-          {/* <TransactionList mode="full" search={search} /> */}
-          <TransactionList mode="full" />
+          <TransactionList
+            transactions={transactions}
+            onTransactionsChanged={fetchTransactions}
+            mode="full"
+            // search={search}
+          />
         </Card>
       </div>
       {addModalOpen && (

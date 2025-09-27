@@ -11,6 +11,7 @@ import TransactionEdit from './TransactionEdit';
 import TransactionTypeBadge from './TransactionTypeBadge';
 import { TransactionType } from '../../../types/TransactionType';
 import ModalWrapper from '../../ui/ModalWrapper';
+import { Transaction } from '../../../models/Transaction';
 
 // Componente para ações de transação
 const TransactionActions: React.FC<{
@@ -80,7 +81,7 @@ const TransactionItem: React.FC<{
         <TransactionActions
           onEdit={() => onEdit(transaction.id)}
           onDelete={() => onDelete(transaction.id)}
-          loading={loading}
+          loading={!!loading}
         />
       </div>
       <div className="flex items-stretch mb-2 p-1">
@@ -98,40 +99,16 @@ const TransactionItem: React.FC<{
   );
 });
 
-interface StatementListProps {
+export interface TransactionListProps {
+  transactions?: Transaction[];
+  onTransactionsChanged?: () => void;
   mode?: 'dashboard' | 'full';
-  search?: string; // Adiciona prop de busca
 }
 
-const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard', search = '' }) => {
-  const { transactions, deleteTransaction, fetchTransactions } = useTransactions();
-  // Filtra as transações de acordo com a busca
-  const filteredTransactions = React.useMemo(() => {
-    if (!search.trim()) return transactions;
-    const lower = search.toLowerCase();
-    return transactions.filter(tx => {
-      // Busca por mês (nome ou número)
-      const date = new Date(tx.date);
-      const monthName = getMonthName(date.getMonth()).toLowerCase();
-      const monthNumber = String(date.getMonth() + 1).padStart(2, '0');
-      const year = String(date.getFullYear());
-      // Busca por tipo
-      const typeLabel = (tx.type || '').toString().toLowerCase();
-      // Busca por valor
-      const amount = formatCurrencyWithSymbol(tx.amount).replace(/[^\d,\.]/g, '').replace(',', '.');;
-      // Busca por data completa
-      const dateStr = formatDate(tx.date);
-      return (
-        monthName.includes(lower) ||
-        monthNumber.includes(lower) ||
-        year.includes(lower) ||
-        typeLabel.includes(lower) ||
-        amount.includes(lower) ||
-        dateStr.includes(lower)
-      );
-    });
-  }, [transactions, search]);
-  const { grouped, sortedKeys } = useGroupedTransactions(filteredTransactions);
+const StatementList: React.FC<TransactionListProps> = ({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard' }) => {
+  const { transactions: hookTransactions, deleteTransaction, fetchTransactions } = useTransactions();
+  const transactions = propTransactions || hookTransactions;
+  const { grouped, sortedKeys } = useGroupedTransactions(transactions);
   const editModal = useModal();
   const deleteModal = useModal();
   const [transactionToEdit, setTransactionToEdit] = useState<string | null>(null);
@@ -162,6 +139,7 @@ const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard', searc
         await deleteTransaction(transactionToDelete);
         closeDeleteModal();
         await fetchTransactions();
+        if (onTransactionsChanged) onTransactionsChanged();
       } catch (error) {
         if (typeof window !== "undefined") {
           console.error("Erro ao excluir transação.");
@@ -176,6 +154,7 @@ const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard', searc
   const handleEditSuccess = () => {
     fetchTransactions();
     closeEditModal();
+    if (onTransactionsChanged) onTransactionsChanged();
   };
 
   const monthTitleClass = [mode === 'full' ? 'text-lg' : '', 'font-semibold', 'text-gray-600', 'border-b', 'border-gray-200', 'pb-2'].join(' ');
@@ -234,7 +213,4 @@ const StatementList: React.FC<StatementListProps> = ({ mode = 'dashboard', searc
   );
 };
 
-// Para compatibilidade, exporta StatementList também como TransactionList
-export type TransactionListProps = StatementListProps;
-const TransactionList = StatementList;
-export default TransactionList;
+export default StatementList;

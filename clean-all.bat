@@ -31,4 +31,4 @@ for %%f in (%folders%) do (
 )
 
 echo ✅ Limpeza finalizada!
-echo 💡 Dica: Execute 'npm install' novamente para reinstalar as dependências.
+echo 💡 Dica: Execute 'npm run install:all' novamente para reinstalar as dependencias.

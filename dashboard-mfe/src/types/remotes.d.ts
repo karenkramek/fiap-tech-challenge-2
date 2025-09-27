@@ -35,8 +35,11 @@ declare module 'shared/hooks/useAccount' {
   export function useAccount(): {
     account: Account | null;
     loading: boolean;
-    error: Error | null;
-    fetchAccount: () => Promise<void>;
+    currentUser: { id: string; name: string; email: string; isAuthenticated: boolean } | null;
+    isAuthenticated: boolean;
+    login: (email: string, password: string) => Promise<any>;
+    logout: () => void;
+    refreshAccount: () => Promise<void>;
   };
 }
 
@@ -129,7 +132,10 @@ declare module 'shared/components/domain/transaction/TransactionTypeBadge' {
 }
 
 declare module 'shared/components/domain/transaction/TransactionList' {
-  interface TransactionListProps {
+  import { Transaction } from 'shared/models/Transaction';
+  export interface TransactionListProps {
+    transactions?: Transaction[];
+    onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
   }
   const TransactionList: React.FC<TransactionListProps>;
@@ -176,7 +182,12 @@ declare module 'shared/components/domain/file/FileUpload' {
 }
 
 declare module 'shared/components/domain/BalanceCard' {
-  const BalanceCard: React.FC<{ accountName?: string; balance?: number; showBalance?: boolean; onToggleBalance?: () => void }>;
+  import { Transaction } from 'shared/models/Transaction';
+  const BalanceCard: React.FC<{
+    transactions: Transaction[];
+    showBalance: boolean;
+    onToggleBalance: () => void;
+  }>;
   export default BalanceCard;
 }
 
