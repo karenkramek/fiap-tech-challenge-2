@@ -3,7 +3,7 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const { DefinePlugin } = require('webpack');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/app/index.tsx',
   mode: 'development',
   devServer: {
     port: 3031,
@@ -24,7 +24,9 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              '@babel/preset-react',
+              ['@babel/preset-react', {
+                runtime: 'automatic'
+              }],
               '@babel/preset-typescript'
             ]
           }
@@ -54,14 +56,14 @@ module.exports = {
   },
   plugins: [
     new DefinePlugin({
-      'process.env.REACT_APP_API_BASE_URL': JSON.stringify('http://localhost:3034'),
-      'process.env.NODE_ENV': JSON.stringify('development')
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
     }),
     new ModuleFederationPlugin({
       name: 'dashboardMFE',
       filename: 'remoteEntry.js',
       exposes: {
-        './Dashboard': './src/Dashboard'
+        './Dashboard': './src/App.tsx'
       },
       remotes: {
         shared: 'shared@http://localhost:3033/remoteEntry.js'

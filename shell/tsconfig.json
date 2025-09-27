@@ -11,6 +11,12 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -21,7 +27,7 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src/**/*"
+    "src/**/*", "src/app/index.tsx", "src/app/bootstrap.tsx",
   ],
   "exclude": [
     "node_modules"

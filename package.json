@@ -4,13 +4,15 @@
   "description": "ByteBank Microfrontend Architecture",
   "main": "index.js",
   "scripts": {
-    "install:all": "npm install && cd shell && npm install && cd ../dashboard-mfe && npm install && cd ../transactions-mfe && npm install && cd ../shared && npm install && cd ..",
+    "install:all": "npm install && cd shell && npm install && cd ../dashboard-mfe && npm install && cd ../transactions-mfe && npm install && cd ../shared && npm install && cd ../upload-server && npm install && cd ..",
+    "setup:db": "node -e \"const fs=require('fs'); if(!fs.existsSync('db.json')){fs.copyFileSync('db.template.json','db.json');console.log('✅ db.json criado do template');}else{console.log('ℹ️ db.json já existe');}\"",
     "dev:shell": "cd shell && npm run dev",
     "dev:dashboard": "cd dashboard-mfe && npm run dev",
     "dev:transactions": "cd transactions-mfe && npx webpack serve --mode development --port 3032",
     "dev:shared": "cd shared && npm run dev",
     "dev:api": "json-server --watch db.json --port 3034",
-    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
+    "dev:upload": "cd upload-server && npm start",
+    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -23,8 +25,13 @@
   "type": "commonjs",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
+    "@types/history": "^4.7.11",
     "concurrently": "^9.2.1",
     "json-server": "^1.0.0-beta.3"
+  },
+  "dependencies": {
+    "lucide-react": "^0.544.0",
+    "tailwind-merge": "^3.3.1"
   }
   
 }
