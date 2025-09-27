@@ -7,6 +7,8 @@ import { TransactionType } from "shared/types/TransactionType";
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currencyUtils";
 import { useTransactions } from "shared/hooks/useTransactions";
 import ModalWrapper from "shared/components/ui/ModalWrapper";
+import FeedbackProvider from "shared/components/ui/FeedbackProvider";
+import ErrorBoundary from "shared/components/ui/ErrorBoundary";
 
 const TransactionsPage: React.FC = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -46,7 +48,6 @@ const TransactionsPage: React.FC = () => {
       setAddModalOpen(false);
       await fetchTransactions();
     } catch (error) {
-      // Aqui você pode adicionar um toast de erro se desejar
       console.error("Erro ao criar transação:", error);
     } finally {
       setFormLoading(false);
@@ -55,37 +56,40 @@ const TransactionsPage: React.FC = () => {
 
   return (
     <>
+      <FeedbackProvider />
       {/* Extrato */}
-      <div className="space-y-6'">
-        <Card>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="transactions-title text-primary-700">Extrato</h2>
-            <Button variant="primary" onClick={() => setAddModalOpen(true)}>
-              Nova Transação
-            </Button>
-          </div>
+      <Card>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="transactions-title text-primary-700">Extrato</h2>
+          <Button variant="primary" onClick={() => setAddModalOpen(true)}>
+            Nova Transação
+          </Button>
+        </div>
+        <ErrorBoundary>
           <TransactionList
             transactions={transactions}
             onTransactionsChanged={fetchTransactions}
             mode="full"
           />
-        </Card>
-      </div>
+        </ErrorBoundary>
+      </Card>
       {addModalOpen && (
         <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
-          <TransactionAdd
-            amount={amount}
-            transactionType={transactionType}
-            description={description}
-            attachmentFile={attachmentFile}
-            onAmountChange={handleAmountChange}
-            onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-            onDescriptionChange={(e) => setDescription(e.target.value)}
-            onFileSelect={setAttachmentFile}
-            onSubmit={handleSubmit}
-            loading={formLoading}
-            onClose={() => setAddModalOpen(false)}
-          />
+          <ErrorBoundary>
+            <TransactionAdd
+              amount={amount}
+              transactionType={transactionType}
+              description={description}
+              attachmentFile={attachmentFile}
+              onAmountChange={handleAmountChange}
+              onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+              onDescriptionChange={(e) => setDescription(e.target.value)}
+              onFileSelect={setAttachmentFile}
+              onSubmit={handleSubmit}
+              loading={formLoading}
+              onClose={() => setAddModalOpen(false)}
+            />
+          </ErrorBoundary>
         </ModalWrapper>
       )}
     </>

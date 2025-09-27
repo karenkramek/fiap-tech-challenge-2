@@ -191,6 +191,20 @@ declare module 'shared/components/domain/BalanceCard' {
   export default BalanceCard;
 }
 
+declare module 'shared/components/ui/FeedbackProvider' {
+  const FeedbackProvider: React.ComponentType;
+  export default FeedbackProvider;
+}
+declare module 'shared/components/ui/ErrorBoundary' {
+  import { ReactNode } from 'react';
+  const ErrorBoundary: React.ComponentType<{ children: ReactNode; fallback?: ReactNode }>;
+  export default ErrorBoundary;
+}
+declare module 'shared/components/ui/LoadingSpinner' {
+  const LoadingSpinner: React.ComponentType<{ size?: number }>;
+  export default LoadingSpinner;
+}
+
 // MODELS & TYPES
 
 declare module 'shared/models/Transaction' {

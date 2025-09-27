@@ -35,3 +35,17 @@ declare module 'shared/*' {
   const component: any;
   export default component;
 }
+
+declare module 'shared/components/ui/FeedbackProvider' {
+  const FeedbackProvider: React.ComponentType;
+  export default FeedbackProvider;
+}
+declare module 'shared/components/ui/ErrorBoundary' {
+  import { ReactNode } from 'react';
+  const ErrorBoundary: React.ComponentType<{ children: ReactNode; fallback?: ReactNode }>;
+  export default ErrorBoundary;
+}
+declare module 'shared/components/ui/LoadingSpinner' {
+  const LoadingSpinner: React.ComponentType<{ size?: number }>;
+  export default LoadingSpinner;
+}

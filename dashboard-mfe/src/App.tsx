@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import BalanceCard from 'shared/components/domain/BalanceCard';
 import Card from 'shared/components/ui/Card';
-import TransactionList from 'shared/components/domain/transaction/TransactionList';
-import TransactionAdd from 'shared/components/domain/transaction/TransactionAdd';
+const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
+const TransactionAdd = React.lazy(() => import('shared/components/domain/transaction/TransactionAdd'));
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
+import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
+import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 
 const TRANSACTION_SUCCESS_MSG = 'Transação adicionada com sucesso!';
 const TRANSACTION_ERROR_MSG = 'Erro ao adicionar transação.';
 const INVALID_AMOUNT_MSG = 'Por favor, insira um valor válido.';
-const LOADING_MSG = 'Carregando...';
 
 const Dashboard: React.FC = () => {
   const [showBalance, setShowBalance] = useState(false);
@@ -21,9 +23,9 @@ const Dashboard: React.FC = () => {
   const [description, setDescription] = useState("");
   const [formLoading, setFormLoading] = useState(false);
 
-  const handleAmountChange = createCurrencyInputHandler(setAmount);
-
   const { transactions, loading: transactionsLoading, addTransaction, fetchTransactions } = useTransactions();
+
+  const handleAmountChange = createCurrencyInputHandler(setAmount);
 
   // Atualiza transações após editar/excluir
   const handleTransactionsChanged = async () => {
@@ -62,59 +64,65 @@ const Dashboard: React.FC = () => {
   if (transactionsLoading || formLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p>{LOADING_MSG}</p>
+        <LoadingSpinner size={48} />
       </div>
     );
   }
 
   return (
     <>
+      <FeedbackProvider />
       <div className="container mx-auto px-4 space-y-8">
         <div className="flex gap-6">
           {/* Conteúdo principal */}
           <main className="flex-1 space-y-6">
-
             {/* Saldo */}
             <BalanceCard
               transactions={transactions}
               showBalance={showBalance}
               onToggleBalance={() => setShowBalance((prev) => !prev)}
             />
-
             {/* Nova Transação */}
             <Card className="bg-white-50 rounded-xl shadow-md">
               <h2 className="text-xl font-semibold text-primary-700 mb-5">Nova transação</h2>
-              <TransactionAdd
-                amount={amount}
-                transactionType={transactionType}
-                description={description}
-                attachmentFile={attachmentFile}
-                onAmountChange={handleAmountChange}
-                onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-                onDescriptionChange={(e) => setDescription(e.target.value)}
-                onFileSelect={setAttachmentFile}
-                onSubmit={handleAddTransaction}
-                loading={formLoading}
-              />
+              <ErrorBoundary fallback={<div>Erro ao carregar componente!</div>}>
+                <Suspense fallback={<LoadingSpinner size={32} />}>
+                  <TransactionAdd
+                    amount={amount}
+                    transactionType={transactionType}
+                    description={description}
+                    attachmentFile={attachmentFile}
+                    onAmountChange={handleAmountChange}
+                    onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+                    onDescriptionChange={(e) => setDescription(e.target.value)}
+                    onFileSelect={setAttachmentFile}
+                    onSubmit={handleAddTransaction}
+                    loading={formLoading}
+                  />
+                </Suspense>
+              </ErrorBoundary>
             </Card>
           </main>
-
           {/* Extrato */}
-          <aside className="w-80 space-y-6">
+          <aside className="w-80">
             <Card>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="transactions-title text-primary-700">Extrato</h2>
               </div>
-              <TransactionList
-                transactions={transactions}
-                onTransactionsChanged={handleTransactionsChanged}
-                mode="dashboard"
-              />
+              <ErrorBoundary fallback={<div>Erro ao carregar lista!</div>}>
+                <Suspense fallback={<LoadingSpinner size={32} />}>
+                  <TransactionList
+                    transactions={transactions}
+                    onTransactionsChanged={handleTransactionsChanged}
+                    mode="dashboard"
+                  />
+                </Suspense>
+              </ErrorBoundary>
             </Card>
           </aside>
         </div>
       </div>
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 };
