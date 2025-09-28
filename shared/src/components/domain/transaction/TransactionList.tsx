@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useGroupedTransactions } from "../../../hooks/useGroupedTransactions";
 import { useModal } from '../../../hooks/useModal';
 import { useTransactions } from '../../../hooks/useTransactions';
-import { formatCurrencyWithSymbol } from '../../../utils/currencyUtils';
-import { formatDate, getMonthName } from '../../../utils/utils';
+import { formatCurrencyWithSymbol } from '../../../utils/currency';
+import { formatDate, getMonthName } from '../../../utils/date';
 import AttachmentDisplay from '../file/AttachmentDisplay';
 import ConfirmationModal from '../../ui/ConfirmationModal';
 import TransactionEdit from './TransactionEdit';
@@ -12,6 +12,7 @@ import TransactionTypeBadge from './TransactionTypeBadge';
 import { TransactionType } from '../../../types/TransactionType';
 import ModalWrapper from '../../ui/ModalWrapper';
 import { Transaction } from '../../../models/Transaction';
+import { filterTransactions } from '../../../utils/transactionFilter';
 
 // Componente para ações de transação
 const TransactionActions: React.FC<{
@@ -103,12 +104,14 @@ export interface TransactionListProps {
   transactions?: Transaction[];
   onTransactionsChanged?: () => void;
   mode?: 'dashboard' | 'full';
+  search?: string;
 }
 
-const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard' }) => {
-  const { transactions: hookTransactions, deleteTransaction, fetchTransactions } = useTransactions();
+const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard', search = '' }) => {
+  const { transactions: hookTransactions, deleteTransaction, fetchTransactions, loading } = useTransactions();
   const transactions = propTransactions || hookTransactions;
-  const { grouped, sortedKeys } = useGroupedTransactions(transactions);
+  const filteredTransactions = filterTransactions(transactions, search);
+  const { grouped, sortedKeys } = useGroupedTransactions(filteredTransactions);
   const editModal = useModal();
   const deleteModal = useModal();
   const [transactionToEdit, setTransactionToEdit] = useState<string | null>(null);
@@ -119,14 +122,17 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
     setTransactionToEdit(id);
     editModal.openModal();
   };
+  
   const closeEditModal = () => {
     editModal.closeModal();
     setTransactionToEdit(null);
   };
+  
   const openDeleteModal = (id: string) => {
     setTransactionToDelete(id);
     deleteModal.openModal();
   };
+
   const closeDeleteModal = () => {
     deleteModal.closeModal();
     setTransactionToDelete(null);
@@ -159,10 +165,39 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
 
   const monthTitleClass = [mode === 'full' ? 'text-lg' : '', 'font-semibold', 'text-gray-600', 'border-b', 'border-gray-200', 'pb-2'].join(' ');
 
+  const isLoading = loading;
+
   return (
     <div>
+      {/* Skeleton Loader */}
+      {isLoading && (
+        <div className="space-y-2 mt-1 animate-pulse">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex flex-col border-b py-2 px-2">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-40 bg-gray-300 rounded" /> {/* badge e date skeleton */}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-5 bg-gray-300 rounded" />
+                  <div className="h-5 w-5 bg-gray-300 rounded" />
+                </div>
+              </div>
+              <div className="flex items-stretch mb-2 p-1">
+                <div className="flex flex-col flex-1 justify-center gap-2">
+                  <div className="h-4 w-32 bg-gray-300 rounded" /> {/* description skeleton */}
+                  <div className="h-3 w-20 bg-gray-200 rounded" /> {/* attachment skeleton */}
+                </div>
+                <div className="flex items-center ml-4 min-h-[40px]">
+                  <div className="h-6 w-16 bg-gray-300 rounded" /> {/* amount skeleton */}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Lista de transações agrupadas por mês/ano */}
-      {transactions.length > 0 ? (
+      {!isLoading && filteredTransactions.length > 0 ? (
         <div>
           {sortedKeys.map((key, idx) => {
             const [month, year] = key.split("-");
@@ -188,9 +223,9 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
             );
           })}
         </div>
-      ) : (
-        <p className="text-white-800">Nenhuma transação registrada.</p>
-      )}
+      ) : !isLoading ? (
+        <p className="text-white-800">Nenhuma transação encontrada.</p>
+      ) : null}
 
       {/* Modais de editar e excluir */}
       <ModalWrapper open={editModal.open} onClose={closeEditModal} title="Editar Transação" size="md">
@@ -199,6 +234,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
           onSuccess={handleEditSuccess}
         />
       </ModalWrapper>
+
       <ConfirmationModal
         open={deleteModal.open}
         title="Confirmar exclusão"

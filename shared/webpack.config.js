@@ -80,8 +80,8 @@ module.exports = {
         './services/FileUploadService': './src/services/FileUploadService',
         './services/api': './src/services/api',
         // Utils
-        './utils/currencyUtils': './src/utils/currencyUtils',
-        './utils/utils': './src/utils/utils',
+        './utils/currency': './src/utils/currency',
+        './utils/date': './src/utils/date',
         // Types
         './types/TransactionType': './src/types/TransactionType'
       },

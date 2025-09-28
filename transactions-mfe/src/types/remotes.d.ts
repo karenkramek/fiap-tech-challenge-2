@@ -135,6 +135,7 @@ declare module 'shared/components/domain/transaction/TransactionList' {
     transactions?: Transaction[];
     onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
+    search?: string;
   }
   const TransactionList: React.FC<TransactionListProps>;
   export default TransactionList;
@@ -225,7 +226,7 @@ declare module 'shared/types/TransactionType' {
 
 // UTILS
 
-declare module 'shared/utils/utils' {
+declare module 'shared/utils/date' {
   export function formatDate(date: Date | string): string;
   export function formatDateForInput(date: Date): string;
   export function getMonthKey(date: Date): string;
@@ -233,7 +234,7 @@ declare module 'shared/utils/utils' {
   export function getCurrentDateFormatted(): string;
 }
 
-declare module 'shared/utils/currencyUtils' {
+declare module 'shared/utils/currency' {
   export function formatCurrencyWithSymbol(value: number): string;
   export function formatCurrencyWithoutSymbol(value: number): string;
   export function createCurrencyInputHandler(setAmount: (value: string) => void): (e: React.ChangeEvent<HTMLInputElement>) => void;

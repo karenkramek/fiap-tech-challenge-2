@@ -4,7 +4,7 @@ import Card from "shared/components/ui/Card";
 import TransactionList from "shared/components/domain/transaction/TransactionList";
 import TransactionAdd from "shared/components/domain/transaction/TransactionAdd";
 import { TransactionType } from "shared/types/TransactionType";
-import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currencyUtils";
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currency";
 import { useTransactions } from "shared/hooks/useTransactions";
 import ModalWrapper from "shared/components/ui/ModalWrapper";
 import { Search } from "lucide-react";
@@ -69,21 +69,21 @@ const TransactionsPage: React.FC = () => {
         </div>
         <ErrorBoundary>
           {/* Input de busca */}
-          {/* <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
+          <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
             <Search className="h-5 w-5 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar"
-              className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
-          </div> */}
+          </div>
           <TransactionList
             transactions={transactions}
             onTransactionsChanged={fetchTransactions}
             mode="full"
-            // search={search}
+            search={search}
           />
         </ErrorBoundary>
       </Card>

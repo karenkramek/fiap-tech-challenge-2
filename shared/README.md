@@ -38,7 +38,7 @@ import { TransactionDTO } from 'shared/dtos/Transaction.dto';
 
 ### 5. Utils
 ```js
-import { formatCurrencyWithSymbol } from 'shared/utils/currencyUtils';
+import { formatCurrencyWithSymbol } from 'shared/utils/currency';
 ```
 
 ### 6. Tokens & Preset do Tailwind

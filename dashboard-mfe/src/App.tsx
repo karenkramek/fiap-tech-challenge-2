@@ -6,7 +6,7 @@ const TransactionList = React.lazy(() => import('shared/components/domain/transa
 const TransactionAdd = React.lazy(() => import('shared/components/domain/transaction/TransactionAdd'));
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { TransactionType } from 'shared/types/TransactionType';
-import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';

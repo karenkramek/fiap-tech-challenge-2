@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useTransactions } from '../../../hooks/useTransactions';
 import { TransactionService } from '../../../services/TransactionService';
 import { TransactionType } from '../../../types/TransactionType';
-import { createCurrencyInputHandler, formatCurrencyWithoutSymbol, parseCurrencyStringToNumber } from '../../../utils/currencyUtils';
-import { formatDateForInput } from '../../../utils/utils';
+import { createCurrencyInputHandler, formatCurrencyWithoutSymbol, parseCurrencyStringToNumber } from '../../../utils/currency';
+import { formatDateForInput } from '../../../utils/date';
 import Button from '../../ui/Button';
 import FileUpload from '../file/FileUpload';
 
@@ -150,7 +150,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
           <FileUpload
             onFileSelect={setAttachmentFile}
             selectedFile={attachmentFile}
-            existingFilePath={existingAttachmentPath}
+            existingFilePath={existingAttachmentPath ?? ''}
             disabled={loading}
           />
           <div className="flex gap-4 pt-4">
