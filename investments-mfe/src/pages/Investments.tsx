@@ -18,6 +18,7 @@ export default function Investments() {
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [investmentDesc, setInvestmentDesc] = useState('');
   const [accountBalance, setAccountBalance] = useState<number | null>(null);
+  const [showInsufficientFunds, setShowInsufficientFunds] = useState(false);
 
   // Defina o id da conta logada (ajuste conforme sua lógica de autenticação)
   const accountId = 'acc001';
@@ -138,25 +139,33 @@ export default function Investments() {
   // Cadastrar novo investimento no array da conta
   const handleInvestmentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Busca a conta atual
     const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
     const account = res.data && res.data[0];
     if (!account) return;
 
-    // Gera um id simples para o investimento
+    const investmentValue = Number(investmentAmount);
+
+    if (account.balance < investmentValue) {
+      setShowInsufficientFunds(true);
+      return;
+    }
+
+    // Gera um novo investimento
     const newInvestment = {
       id: Math.random().toString(36).substring(2, 9),
       type: investmentType,
-      amount: Number(investmentAmount),
+      amount: investmentValue,
       description: investmentDesc,
       date: new Date().toISOString()
     };
 
-    // Atualiza o array de investimentos da conta
+    // Atualiza saldo e investimentos
     const updatedInvestments = [...(account.investments || []), newInvestment];
+    const updatedBalance = account.balance - investmentValue;
 
     await axios.patch(`http://localhost:3034/accounts/${account.id}`, {
-      investments: updatedInvestments
+      investments: updatedInvestments,
+      balance: updatedBalance
     });
 
     setShowModal(false);
@@ -361,6 +370,31 @@ export default function Investments() {
                   Cadastrar investimento
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {showInsufficientFunds && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm relative flex flex-col items-center">
+              <button
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+                onClick={() => setShowInsufficientFunds(false)}
+                aria-label="Fechar"
+              >
+                &times;
+              </button>
+              <div className="text-3xl mb-2 text-red-500">!</div>
+              <h3 className="text-xl font-bold mb-2 text-primary-700">Saldo insuficiente</h3>
+              <p className="text-gray-700 text-center mb-4">
+                Você não possui saldo suficiente para realizar este investimento.
+              </p>
+              <button
+                className="bg-primary-700 text-white-50 px-6 py-2 rounded-lg font-semibold shadow hover:bg-primary-800 transition"
+                onClick={() => setShowInsufficientFunds(false)}
+              >
+                Fechar
+              </button>
             </div>
           </div>
         )}

@@ -33,13 +33,29 @@
       "description": "Saque no caixa eletrônico"
     }
   ],
-  "accounts": [
+ "accounts": [
     {
       "id": "acc001",
       "name": "Fulana de Tal",
       "email": "fulana@email.com",
       "password": "senha123",
-      "balance": 2530
+      "balance": 2530,
+      "investments": [
+        {
+          "id": "o6fgpzu",
+          "type": "FUNDOS",
+          "amount": 100,
+          "description": "",
+          "date": "2025-09-27T04:18:08.092Z"
+        },
+        {
+          "id": "855ws9r",
+          "type": "BOLSA",
+          "amount": 700,
+          "description": "",
+          "date": "2025-09-27T04:18:19.175Z"
+        }
+      ]
     }
   ]
 }
