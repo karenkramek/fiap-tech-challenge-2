@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Transaction } from '../models/Transaction';
-import { getMonthKey } from '../utils/utils';
+import { getMonthKey } from '../utils/date';
 
 export function useGroupedTransactions(transactions: Transaction[]) {
   return useMemo(() => {

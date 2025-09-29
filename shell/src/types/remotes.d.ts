@@ -3,9 +3,9 @@ declare module 'dashboardMFE/Dashboard' {
   export default Dashboard;
 }
 
-declare module 'transactionsMFE/Transactions' {
-  const Transactions: React.ComponentType;
-  export default Transactions;
+declare module 'transactionsMFE/TransactionsPage' {
+  const TransactionsPage: React.ComponentType;
+  export default TransactionsPage;
 }
 
 declare module 'shared/hooks/useAccount' {
@@ -20,7 +20,32 @@ declare module 'shared/hooks/useAccount' {
   };
 }
 
+declare module 'shared/services/AccountService' {
+  const AccountService: {
+    createAccount: (
+      name: string,
+      email: string,
+      password: string
+    ) => Promise<any>;
+  };
+  export default AccountService;
+}
+
 declare module 'shared/*' {
   const component: any;
   export default component;
+}
+
+declare module 'shared/components/ui/FeedbackProvider' {
+  const FeedbackProvider: React.ComponentType;
+  export default FeedbackProvider;
+}
+declare module 'shared/components/ui/ErrorBoundary' {
+  import { ReactNode } from 'react';
+  const ErrorBoundary: React.ComponentType<{ children: ReactNode; fallback?: ReactNode }>;
+  export default ErrorBoundary;
+}
+declare module 'shared/components/ui/LoadingSpinner' {
+  const LoadingSpinner: React.ComponentType<{ size?: number }>;
+  export default LoadingSpinner;
 }

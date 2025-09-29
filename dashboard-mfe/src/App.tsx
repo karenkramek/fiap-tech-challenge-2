@@ -1,51 +1,46 @@
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import BalanceCard from 'shared/components/BalanceCard';
-import StatementCard from 'shared/components/StatementCard';
-import TransactionForm from 'shared/components/TransactionForm';
-import { useAccount } from 'shared/hooks/useAccount';
+import BalanceCard from 'shared/components/domain/BalanceCard';
+import Card from 'shared/components/ui/Card';
+const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
+const TransactionAdd = React.lazy(() => import('shared/components/domain/transaction/TransactionAdd'));
 import { useTransactions } from 'shared/hooks/useTransactions';
-import { Transaction } from 'shared/models/Transaction';
 import { TransactionType } from 'shared/types/TransactionType';
-import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currencyUtils';
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
+import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
+import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 
-type GroupedTransactions = {
-  grouped: Record<string, Transaction[]>;
-  sortedKeys: string[];
-};
+const TRANSACTION_SUCCESS_MSG = 'Transação adicionada com sucesso!';
+const TRANSACTION_ERROR_MSG = 'Erro ao adicionar transação.';
+const INVALID_AMOUNT_MSG = 'Por favor, insira um valor válido.';
 
 const Dashboard: React.FC = () => {
-  // Estado para exibir ou esconder o saldo
-  const [showBalance, setShowBalance] = useState<boolean>(false);
-  const [amount, setAmount] = useState<string>("");
+  const [showBalance, setShowBalance] = useState(false);
+  const [amount, setAmount] = useState("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
-
-  // Handler reutilizável para campo de valor monetário
-  const handleAmountChange = createCurrencyInputHandler(setAmount);
-
   const [transactionType, setTransactionType] = useState<TransactionType>(TransactionType.DEPOSIT);
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState("");
   const [formLoading, setFormLoading] = useState(false);
 
-  const { account, loading: accountLoading, refreshAccount, currentUser } = useAccount();
-  const { loading: transactionsLoading, addTransaction } = useTransactions();
+  const { transactions, loading: transactionsLoading, addTransaction, fetchTransactions } = useTransactions();
 
-  // Usar dados do usuário logado se disponível, senão usar account padrão
-  const userDisplayName = currentUser?.name || account?.name;
+  const handleAmountChange = createCurrencyInputHandler(setAmount);
 
-  // Logic to add a new transaction.
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  // Atualiza transações após editar/excluir
+  const handleTransactionsChanged = async () => {
+    await fetchTransactions();
+  };
+
+  const handleAddTransaction = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setFormLoading(true);
-
     const normalizedAmount = parseCurrencyStringToNumber(amount);
-
     if (!amount || isNaN(normalizedAmount) || normalizedAmount <= 0) {
-      toast.error("Por favor, insira um valor válido.");
+      toast.error(INVALID_AMOUNT_MSG);
       setFormLoading(false);
       return;
     }
-
     try {
       await addTransaction(
         transactionType,
@@ -54,73 +49,76 @@ const Dashboard: React.FC = () => {
         description,
         attachmentFile || undefined
       );
-
-      // Atualiza saldo após nova transação
-      try {
-        await refreshAccount();
-      } catch (refreshError) {
-        console.error("Erro ao atualizar saldo da conta:", refreshError);
-      }
-
       setAmount("");
       setDescription("");
       setAttachmentFile(null);
-      toast.success("Transação adicionada com sucesso!");
+      toast.success(TRANSACTION_SUCCESS_MSG);
     } catch (error) {
-      toast.error("Erro ao adicionar transação.");
+      toast.error(TRANSACTION_ERROR_MSG);
       console.error(error);
     } finally {
       setFormLoading(false);
     }
   };
 
-  const handleFileSelect = (file: File | null) => {
-    setAttachmentFile(file);
-  };
-
-  if (accountLoading || transactionsLoading || formLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <p>Carregando...</p>
-      </div>
-    );
+  if (transactionsLoading || formLoading) {
+    return <LoadingSpinner size={48} />;
   }
 
   return (
     <>
+      <FeedbackProvider />
       <div className="container mx-auto px-4 space-y-8">
         <div className="flex gap-6">
           {/* Conteúdo principal */}
-          <div className="flex-1 space-y-6">
-            {/* Saldo e transações recentes */}
+          <main className="flex-1 space-y-6">
+            {/* Saldo */}
             <BalanceCard
-              accountName={userDisplayName}
-              balance={account?.balance}
+              transactions={transactions}
               showBalance={showBalance}
               onToggleBalance={() => setShowBalance((prev) => !prev)}
             />
-
-            {/* Nova transação */}
-            <TransactionForm
-              amount={amount}
-              transactionType={transactionType}
-              description={description}
-              attachmentFile={attachmentFile}
-              onAmountChange={handleAmountChange}
-              onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
-              onDescriptionChange={(e) => setDescription(e.target.value)}
-              onFileSelect={setAttachmentFile}
-              onSubmit={handleSubmit}
-              loading={formLoading}
-            />
-          </div>
-
+            {/* Nova Transação */}
+            <Card className="bg-white-50 rounded-xl shadow-md">
+              <h2 className="text-xl font-semibold text-primary-700 mb-5">Nova transação</h2>
+              <ErrorBoundary fallback={<div>Erro ao carregar componente!</div>}>
+                <Suspense fallback={<LoadingSpinner size={32} />}>
+                  <TransactionAdd
+                    amount={amount}
+                    transactionType={transactionType}
+                    description={description}
+                    attachmentFile={attachmentFile}
+                    onAmountChange={handleAmountChange}
+                    onTypeChange={(e) => setTransactionType(e.target.value as TransactionType)}
+                    onDescriptionChange={(e) => setDescription(e.target.value)}
+                    onFileSelect={setAttachmentFile}
+                    onSubmit={handleAddTransaction}
+                    loading={formLoading}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            </Card>
+          </main>
           {/* Extrato */}
-          <StatementCard />
+          <aside className="w-80">
+            <Card>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="transactions-title text-primary-700">Extrato</h2>
+              </div>
+              <ErrorBoundary fallback={<div>Erro ao carregar lista!</div>}>
+                <Suspense fallback={<LoadingSpinner size={32} />}>
+                  <TransactionList
+                    transactions={transactions}
+                    onTransactionsChanged={handleTransactionsChanged}
+                    mode="dashboard"
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            </Card>
+          </aside>
         </div>
       </div>
-
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 };

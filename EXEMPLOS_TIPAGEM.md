@@ -20,7 +20,7 @@ Este documento fornece exemplos práticos de como usar as melhorias de tipagem i
 ### ✅ Validando uma transação antes de enviar
 
 ```typescript
-import { validateObject, ValidationSchemas } from 'shared/utils/validation.utils';
+import { validateObject, ValidationSchemas } from 'shared/utils/validation';
 import { TransactionType } from 'shared/types/TransactionType';
 
 // Dados do formulário
@@ -48,7 +48,7 @@ if (!isValid) {
 ### ✅ Validação de conta
 
 ```typescript
-import { ValidationSchemas } from 'shared/utils/validation.utils';
+import { ValidationSchemas } from 'shared/utils/validation';
 
 const accountData = {
   name: 'Conta Corrente',
@@ -70,7 +70,7 @@ if (validation.isValid) {
 ### ✅ Validações personalizadas
 
 ```typescript
-import { ValidationUtils } from 'shared/utils/validation.utils';
+import { ValidationUtils } from 'shared/utils/validation';
 
 // Validação de email
 const email = 'usuario@exemplo.com';
@@ -586,7 +586,7 @@ export default TransactionCard;
 ```typescript
 import React, { useState } from 'react';
 import { TransactionType } from 'shared/types/TransactionType';
-import { validateObject, ValidationSchemas } from 'shared/utils/validation.utils';
+import { validateObject, ValidationSchemas } from 'shared/utils/validation';
 
 interface TransactionFormData {
   amount: number;

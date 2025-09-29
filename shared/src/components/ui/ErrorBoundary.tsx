@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -27,7 +27,7 @@ class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback || (
         <div style={{ padding: '2rem', background: '#fee', border: '1px solid #f00' }}>
-          <h2>Something went wrong loading the microfrontend!</h2>
+          <h2>Ocorreu um erro ao carregar o microfrontend!</h2>
           <details>
             <pre>{this.state.error?.message}</pre>
             <pre>{this.state.error?.stack}</pre>
@@ -35,7 +35,6 @@ class ErrorBoundary extends Component<Props, State> {
         </div>
       );
     }
-
     return this.props.children;
   }
 }

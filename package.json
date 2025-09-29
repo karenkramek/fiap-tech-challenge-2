@@ -27,10 +27,13 @@
     "@tailwindcss/postcss": "^4.1.13",
     "@types/history": "^4.7.11",
     "concurrently": "^9.2.1",
-    "json-server": "^1.0.0-beta.3"
+    "json-server": "^1.0.0-beta.3",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "lucide-react": "^0.544.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "tailwind-merge": "^3.3.1"
   }
 }

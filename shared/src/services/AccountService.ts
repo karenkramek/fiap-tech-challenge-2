@@ -1,6 +1,6 @@
 import { BaseService } from './BaseService';
 import { Account } from '../models/Account';
-import { AccountDTO, CreateAccountDTO, UpdateAccountDTO, isAccountDTO } from '../dtos/Account.dto';
+import { AccountDTO, CreateAccountDTO, UpdateAccountDTO } from '../dtos/Account.dto';
 import api from './api';
 
 export class AccountService extends BaseService {
@@ -78,11 +78,7 @@ export class AccountService extends BaseService {
     } else {
       // Novo método com DTO
       const service = new AccountService();
-      const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/account', nameOrData);
-
-      if (!isAccountDTO(newAccountData)) {
-        throw new Error('Dados da conta inválidos recebidos da API');
-      }
+      const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/accounts', nameOrData);
 
       return Account.fromJSON(newAccountData);
     }
@@ -90,11 +86,7 @@ export class AccountService extends BaseService {
 
   static async updateAccount(accountId: string, updateData: UpdateAccountDTO): Promise<Account> {
     const service = new AccountService();
-    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/account/${accountId}`, updateData);
-
-    if (!isAccountDTO(updatedAccountData)) {
-      throw new Error('Dados da conta inválidos recebidos da API');
-    }
+    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
 
     return Account.fromJSON(updatedAccountData);
   }
@@ -106,11 +98,7 @@ export class AccountService extends BaseService {
 
     const service = new AccountService();
     const updateData: UpdateAccountDTO = { balance: newBalance };
-    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/account/${accountId}`, updateData);
-
-    if (!isAccountDTO(updatedAccountData)) {
-      throw new Error('Dados da conta inválidos recebidos da API');
-    }
+    const updatedAccountData = await service.put<AccountDTO, UpdateAccountDTO>(`/accounts/${accountId}`, updateData);
 
     return Account.fromJSON(updatedAccountData);
   }
@@ -136,7 +124,7 @@ export class AccountService extends BaseService {
   static async login(email: string, password: string): Promise<Account> {
     // Buscar conta pelo email
     const account = await AccountService.getAccountByEmail(email);
-
+    console.log('🔎 Conta retornada para login:', account);
     if (!account) {
       throw new Error('Conta não encontrada');
     }
@@ -170,3 +158,5 @@ export class AccountService extends BaseService {
     return user ? user.isAuthenticated : false;
   }
 }
+
+export default AccountService;

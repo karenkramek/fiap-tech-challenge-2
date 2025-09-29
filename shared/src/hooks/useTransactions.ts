@@ -97,15 +97,15 @@ export function useTransactions() {
     description?: string,
     attachmentFile?: File
   ) => {
+    setLoading(true);
     try {
-      // Obter o usuário atual para associar a transação
       const currentUser = AccountService.getCurrentUser();
       if (!currentUser) {
         throw new Error('Usuário não está logado');
       }
 
       const newTransaction = await TransactionService.addTransaction(
-        currentUser.id, // accountId
+        currentUser.id,
         type,
         amount,
         date,
@@ -116,6 +116,8 @@ export function useTransactions() {
       return newTransaction;
     } catch (err) {
       throw err instanceof Error ? err : new Error('Failed to add transaction');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -127,11 +129,11 @@ export function useTransactions() {
     description?: string,
     attachmentFile?: File
   ) => {
+    setLoading(true);
     try {
       const updatedTransaction = await TransactionService.updateTransaction(id, type, amount, date, description, attachmentFile);
       setTransactions(prevTransactions => {
         const oldTx = prevTransactions.find(t => t.id === id);
-        // Se a data mudou, reordena; se não, só substitui mantendo a ordem
         if (oldTx && new Date(oldTx.date).getTime() !== new Date(date).getTime()) {
           return sortTransactions(prevTransactions.map(t => t.id === id ? updatedTransaction : t));
         } else {
@@ -141,15 +143,17 @@ export function useTransactions() {
       return updatedTransaction;
     } catch (err) {
       throw err instanceof Error ? err : new Error('Failed to update transaction');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   const deleteTransaction = useCallback(async (id: string) => {
+    setLoading(true);
     try {
       const success = await TransactionService.deleteTransaction(id);
 
       if (success) {
-        // Remove the transaction from local state immediately.
         setTransactions(prevTransactions =>
           prevTransactions.filter(t => t.id !== id)
         );
@@ -158,6 +162,8 @@ export function useTransactions() {
       return success;
     } catch (err) {
       throw err instanceof Error ? err : new Error('Failed to delete transaction');
+    } finally {
+      setLoading(false);
     }
   }, []);
 

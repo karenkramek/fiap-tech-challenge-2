@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import Button from './Button';
+import Button from '../../ui/Button';
 
 interface LoginModalProps {
   open: boolean;
@@ -93,7 +93,7 @@ export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister,
         >
           ×
         </button>
-        <h2 className="modal-title">Entrar na sua conta</h2>
+        <h2 className="modal-title">Entrar</h2>
         <p className="modal-text mb-6">Acesse sua conta ByteBank</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -162,10 +162,10 @@ export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister,
               type="button"
               className="text-primary-600 hover:text-primary-700 font-medium focus:outline-none"
               onClick={() => {
-                handleClose();
                 if (onSwitchToRegister) {
                   onSwitchToRegister();
                 }
+                handleClose();
               }}
             >
               Criar conta
