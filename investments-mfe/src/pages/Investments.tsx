@@ -26,8 +26,8 @@ export default function Investments() {
   const [goalDeadline, setGoalDeadline] = useState('');
   const [goals, setGoals] = useState<{ name: string; value: number; deadline?: string; saved: number }[]>([]);
   const [widgetMessage, setWidgetMessage] = useState('');
-  const [depositValue, setDepositValue] = useState('');
-  const [withdrawValue, setWithdrawValue] = useState('');
+  const [depositValues, setDepositValues] = useState<string[]>([]);
+  const [withdrawValues, setWithdrawValues] = useState<string[]>([]);
   const depositInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [goalToDelete, setGoalToDelete] = useState<number | null>(null);
@@ -302,8 +302,9 @@ export default function Investments() {
   };
 
   const handleDeposit = async (idx: number) => {
-    if (!depositValue || Number(depositValue) <= 0) return;
-    const depositAmount = Number(depositValue);
+    const value = depositValues[idx];
+    if (!value || Number(value) <= 0) return;
+    const depositAmount = Number(value);
 
     const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
     const account = res.data && res.data[0];
@@ -334,14 +335,19 @@ export default function Investments() {
           : g
       )
     );
-    setDepositValue('');
+    setDepositValues(values => {
+      const arr = [...values];
+      arr[idx] = '';
+      return arr;
+    });
     depositInputRef.current?.focus();
     fetchInvestmentsAndTransactions();
   };
 
   const handleWithdraw = async (idx: number) => {
-    if (!withdrawValue || Number(withdrawValue) <= 0) return;
-    const withdrawAmount = Number(withdrawValue);
+    const value = withdrawValues[idx];
+    if (!value || Number(value) <= 0) return;
+    const withdrawAmount = Number(value);
 
     if (withdrawAmount > goals[idx].saved) {
       setWidgetMessage('Você não pode sacar mais do que o valor poupado na meta!');
@@ -374,7 +380,11 @@ export default function Investments() {
           : g
       )
     );
-    setWithdrawValue('');
+    setWithdrawValues(values => {
+      const arr = [...values];
+      arr[idx] = '';
+      return arr;
+    });
     depositInputRef.current?.focus();
     fetchInvestmentsAndTransactions();
   };
@@ -730,12 +740,12 @@ export default function Investments() {
               <h2 className="text-lg font-bold text-primary-700 mb-4 text-center">Metas</h2>
               <div className="w-full flex flex-col gap-4">
                 <form
-                  className="bg-blue-50 rounded p-4 flex flex-col sm:flex-row gap-2 items-stretch sm:items-end"
+                  className="bg-green-50 rounded p-4 flex flex-col sm:flex-row gap-2 items-stretch sm:items-end"
                   onSubmit={e => { e.preventDefault(); handleSaveGoal(); }}
                   aria-label="Nova Meta de Economia"
                 >
                   <div className="flex-1 flex flex-col">
-                    <label htmlFor="meta-valor" className="text-blue-800 font-semibold mb-1">Valor da Meta</label>
+                    <label htmlFor="meta-valor" className="text-green-800 font-semibold mb-1">Valor da Meta</label>
                     <input
                       id="meta-valor"
                       type="number"
@@ -749,7 +759,7 @@ export default function Investments() {
                   </div>
                   <button
                     type="submit"
-                    className="bg-blue-600 text-white rounded px-4 py-2 font-semibold mt-2 sm:mt-0 sm:ml-2 hover:bg-blue-700 transition"
+                    className="bg-green-600 text-white rounded px-4 py-2 font-semibold mt-2 sm:mt-0 sm:ml-2 hover:bg-green-700 transition"
                   >
                     Salvar Meta
                   </button>
@@ -810,8 +820,12 @@ export default function Investments() {
                             min={1}
                             className="border rounded px-2 py-2 w-full sm:w-1/2 text-base"
                             placeholder="Depositar"
-                            value={depositValue}
-                            onChange={e => setDepositValue(e.target.value)}
+                            value={depositValues[idx] || ''}
+                            onChange={e => setDepositValues(values => {
+                              const arr = [...values];
+                              arr[idx] = e.target.value;
+                              return arr;
+                            })}
                             aria-label={`Depositar na meta ${goal.name}`}
                           />
                           <button
@@ -826,8 +840,12 @@ export default function Investments() {
                             min={1}
                             className="border rounded px-2 py-2 w-full sm:w-1/2 text-base"
                             placeholder="Sacar"
-                            value={withdrawValue}
-                            onChange={e => setWithdrawValue(e.target.value)}
+                            value={withdrawValues[idx] || ''}
+                            onChange={e => setWithdrawValues(values => {
+                              const arr = [...values];
+                              arr[idx] = e.target.value;
+                              return arr;
+                            })}
                             aria-label={`Sacar da meta ${goal.name}`}
                           />
                           <button
