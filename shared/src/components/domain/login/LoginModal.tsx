@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
 import Button from '../../ui/Button';
 import ModalCloseButton from '../../ui/ModalCloseButton';
 
@@ -8,10 +7,9 @@ interface LoginModalProps {
   onClose: () => void;
   onLogin?: (email: string, password: string) => Promise<any>;
   onSwitchToRegister?: () => void;
-  onLoginSuccess?: (userInfo: { name: string; email: string }) => void;
 }
 
-export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister, onLoginSuccess }: LoginModalProps) {
+export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister }: LoginModalProps) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -43,25 +41,6 @@ export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister,
       let loggedAccount = null;
       if (onLogin) {
         loggedAccount = await onLogin(email, password);
-      }
-
-      // Exibir toast de sucesso
-      toast.success('Login realizado com sucesso!', {
-        duration: 3000,
-        style: {
-          background: '#10b981',
-          color: 'white',
-        },
-        iconTheme: {
-          primary: 'white',
-          secondary: '#10b981',
-        },
-      });
-
-      // Callback para informações do usuário se fornecido
-      if (onLoginSuccess) {
-        const userName = loggedAccount?.name || 'Usuário';
-        onLoginSuccess({ name: userName, email });
       }
 
       // Limpar formulário após login bem-sucedido

@@ -84,12 +84,18 @@ module.exports = {
         './utils/currency': './src/utils/currency',
         './utils/date': './src/utils/date',
         // Types
-        './types/TransactionType': './src/types/TransactionType'
+        './types/TransactionType': './src/types/TransactionType',
+        // Constants
+        './constants/toast': './src/constants/toast',
+        './constants/routes': './src/constants/routes',
+        // Hooks (Auth)
+        './hooks/useAuthProtection': './src/hooks/useAuthProtection'
       },
       shared: {
         react: { singleton: true, requiredVersion: '^18.2.0' },
         'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
-        axios: { singleton: true }
+        axios: { singleton: true },
+        'react-hot-toast': { singleton: true, requiredVersion: '^2.5.0' }
       }
     }),
     new webpack.DefinePlugin({
