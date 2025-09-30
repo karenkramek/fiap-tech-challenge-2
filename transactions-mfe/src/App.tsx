@@ -110,7 +110,10 @@ const TransactionsPage: React.FC = () => {
         <div className="min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h2 className="transactions-title text-primary-700">Extrato</h2>
-          <Button variant="primary" onClick={() => setAddModalOpen(true)}>
+          <Button 
+            onClick={() => setAddModalOpen(true)}
+            className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+          >
             Nova Transação
           </Button>
         </div>
