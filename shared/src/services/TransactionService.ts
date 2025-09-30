@@ -8,6 +8,7 @@ import { Transaction } from '../models/Transaction';
 import { TransactionType } from '../types/TransactionType';
 import { FileUploadService } from './FileUploadService';
 import { TransactionFilters } from '../types/api.types';
+import { AccountService } from './AccountService';
 import api from './api';
 
 export class TransactionService extends BaseService {
@@ -103,13 +104,13 @@ export class TransactionService extends BaseService {
         throw new Error('Dados da transação inválidos recebidos da API');
       }
 
-      await this.applyTransactionToBalance(accountId, newTransaction);
+      await this.applyTransactionToBalance(newTransaction);
       return Transaction.fromJSON(createdTransactionData);
     } catch (error) {
       // Fallback to legacy API
       console.warn('Falling back to legacy API for addTransaction');
       const response = await api.post('/transactions', newTransaction.toJSON());
-      await this.applyTransactionToBalance(accountId, newTransaction);
+      await this.applyTransactionToBalance(newTransaction);
       return Transaction.fromJSON(response.data);
     }
   }
@@ -162,8 +163,7 @@ export class TransactionService extends BaseService {
       const typeChanged = type !== oldTransaction.type;
 
       if (amountDifference !== 0 || typeChanged) {
-        await this.applyTransactionToBalance(oldTransaction.accountId, oldTransaction, true);
-        await this.applyTransactionToBalance(updatedTransaction.accountId, updatedTransaction);
+        await this.applyBalanceUpdate(oldTransaction, updatedTransaction);
       }
 
       return Transaction.fromJSON(updatedTransactionData);
@@ -171,14 +171,13 @@ export class TransactionService extends BaseService {
       // Fallback to legacy API
       console.warn('Falling back to legacy API for updateTransaction');
       const response = await api.put(`/transactions/${id}`, updatedTransaction.toJSON());
-      
+
       // Update account balance based on the difference.
       const amountDifference = amount - oldTransaction.amount;
       const typeChanged = type !== oldTransaction.type;
 
       if (amountDifference !== 0 || typeChanged) {
-        await this.applyTransactionToBalance(oldTransaction.accountId, oldTransaction, true);
-        await this.applyTransactionToBalance(updatedTransaction.accountId, updatedTransaction);
+        await this.applyBalanceUpdate(oldTransaction, updatedTransaction);
       }
 
       return Transaction.fromJSON(response.data);
@@ -202,7 +201,7 @@ export class TransactionService extends BaseService {
       }
 
       // Update account balance.
-      await this.applyTransactionToBalance(transaction.accountId, transaction, true);
+      await this.applyTransactionToBalance(transaction, true);
 
       return true;
     } catch (error) {
@@ -225,20 +224,34 @@ export class TransactionService extends BaseService {
     }
   }
 
-  private static async applyTransactionToBalance(accountIdOrTransaction: string | Transaction, transaction?: Transaction, reverse: boolean = false): Promise<void> {
-    let accountId: string;
-    let transactionToProcess: Transaction;
+  /**
+   * Método auxiliar para atualizar o balance considerando transação antiga e nova
+   */
+  private static async applyBalanceUpdate(oldTransaction: Transaction, newTransaction: Transaction): Promise<void> {
+    // Calcular a diferença líquida entre as transações
+    const oldEffect = oldTransaction.isIncome() ? oldTransaction.amount : -oldTransaction.amount;
+    const newEffect = newTransaction.isIncome() ? newTransaction.amount : -newTransaction.amount;
+    const netChange = newEffect - oldEffect;
 
-    if (typeof accountIdOrTransaction === 'string') {
-      // Legacy signature: applyTransactionToBalance(accountId, transaction, reverse)
-      accountId = accountIdOrTransaction;
-      transactionToProcess = transaction!;
-    } else {
-      // New signature: applyTransactionToBalance(transaction, reverse)
-      transactionToProcess = accountIdOrTransaction;
-      accountId = transactionToProcess.accountId;
+    if (netChange !== 0) {
+      await this.updateAccountBalance(oldTransaction.accountId, netChange);
     }
+  }
 
+  private static async applyTransactionToBalance(transaction: Transaction, reverse: boolean = false): Promise<void> {
+    const transactionToProcess = transaction;
+    const accountId = transactionToProcess.accountId;
+
+    const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
+    const balanceChange = transactionToProcess.isIncome() ? amount : -amount;
+
+    await this.updateAccountBalance(accountId, balanceChange);
+  }
+
+  /**
+   * Atualiza o saldo da conta com o valor especificado
+   */
+  private static async updateAccountBalance(accountId: string, balanceChange: number): Promise<void> {
     try {
       // Busca todas as contas e seleciona a correta
       const service = new TransactionService();
@@ -246,33 +259,26 @@ export class TransactionService extends BaseService {
       const account = accountsData.find(acc => acc.id === accountId);
       if (!account) throw new Error('Conta não encontrada');
 
-      let newBalance = account.balance;
-      const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
-      if (transactionToProcess.isIncome()) {
-        newBalance += amount;
-      } else {
-        newBalance -= amount;
-      }
+      const newBalance = account.balance + balanceChange;
 
-      const updateData: AccountDTO = {
-        id: account.id,
-        name: account.name,
-        balance: newBalance
+      // Buscar a conta completa com todos os campos
+      const fullAccount = await AccountService.getAccountById(accountId);
+
+      // Preservar todos os campos da conta, incluindo email e password
+      const updateData = {
+        id: fullAccount.id,
+        name: fullAccount.name,
+        balance: newBalance,
+        email: fullAccount.email,
+        password: fullAccount.password
       };
-      await service.put<AccountDTO, AccountDTO>(`/accounts/${account.id}`, updateData);
+      await service.put(`/accounts/${fullAccount.id}`, updateData);
     } catch (error) {
       // Fallback to legacy API with specific account ID
       console.warn('Falling back to legacy API for balance update');
       const account = await api.get<AccountDTO>(`/accounts/${accountId}`);
       const accountData = account.data;
-      let newBalance = accountData.balance;
-
-      const amount = reverse ? -transactionToProcess.amount : transactionToProcess.amount;
-      if (transactionToProcess.isIncome()) {
-        newBalance += amount;
-      } else {
-        newBalance -= amount;
-      }
+      const newBalance = accountData.balance + balanceChange;
 
       await api.put(`/accounts/${accountId}`, {
         ...accountData,
