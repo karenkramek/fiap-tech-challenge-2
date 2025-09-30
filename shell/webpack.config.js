@@ -66,6 +66,11 @@ module.exports = {
           requiredVersion: "^18.2.0",
           eager: true,
         },
+        "react-hot-toast": {
+          singleton: true,
+          requiredVersion: "^2.5.0",
+          eager: true,
+        },
       },
     }),
     new HtmlWebpackPlugin({

@@ -5,9 +5,31 @@ import {
   Star
 } from 'lucide-react';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAccount } from 'shared/hooks/useAccount';
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAccount();
+
+  const handleDashboardClick = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      // A proteção de rota irá interceptar e mostrar o modal de login
+      navigate('/dashboard');
+    }
+  };
+
+  const handleTransactionsClick = () => {
+    if (isAuthenticated) {
+      navigate('/transactions');
+    } else {
+      // A proteção de rota irá interceptar e mostrar o modal de login
+      navigate('/transactions');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -41,12 +63,12 @@ const Home: React.FC = () => {
               <p className="text-black-400 mb-6 text-sm leading-relaxed">
                 Visualize seu saldo atual, adicione novas transações e acompanhe suas finanças.
               </p>
-              <Link
-                to="/dashboard"
-                className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+              <button
+                onClick={handleDashboardClick}
+                className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium cursor-pointer"
               >
                 Ir para Dashboard
-              </Link>
+              </button>
             </div>
             <div className="bg-black text-black rounded-lg p-8 transition-colors shadow">
               <div className="mb-6">
@@ -58,12 +80,12 @@ const Home: React.FC = () => {
               <p className="text-black-400 mb-6 text-sm leading-relaxed">
                 Gerencie todas suas transações, visualize o extrato completo e edite registros.
               </p>
-              <Link
-                to="/transactions"
-                className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+              <button
+                onClick={handleTransactionsClick}
+                className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium cursor-pointer"
               >
                 Ver Transações
-              </Link>
+              </button>
             </div>
 
             <div className="bg-black text-black rounded-lg p-8 transition-colors shadow">

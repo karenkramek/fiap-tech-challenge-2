@@ -195,6 +195,12 @@ declare module 'shared/components/domain/BalanceCard' {
 declare module 'shared/components/ui/FeedbackProvider' {
   const FeedbackProvider: React.ComponentType;
   export default FeedbackProvider;
+
+  // Toast functions
+  export function showSuccess(msg: string, duration?: number): void;
+  export function showError(msg: string, duration?: number): void;
+  export function showLoading(msg: string): void;
+  export function dismissLoading(): void;
 }
 declare module 'shared/components/ui/ErrorBoundary' {
   import { ReactNode } from 'react';
