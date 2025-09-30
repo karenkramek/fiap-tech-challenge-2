@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import Button from '../../ui/Button';
+import ModalCloseButton from '../../ui/ModalCloseButton';
 
 interface RegisterModalProps {
   open: boolean;
@@ -106,13 +107,7 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
   return (
     <div className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50">
       <div className="modal-content relative max-h-[90vh] overflow-y-auto">
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
-          onClick={handleClose}
-          aria-label="Fechar"
-        >
-          ×
-        </button>
+        <ModalCloseButton onClick={onClose} />
         <h2 className="modal-title">Criar nova conta</h2>
         <p className="modal-text mb-4">Crie sua conta ByteBank gratuitamente</p>
         <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6 text-sm">

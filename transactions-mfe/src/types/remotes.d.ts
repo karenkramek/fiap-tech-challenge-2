@@ -186,6 +186,15 @@ declare module 'shared/components/domain/BalanceCard' {
   export default BalanceCard;
 }
 
+declare module 'shared/components/ui/ModalCloseButton' {
+  const ModalCloseButton: React.FC<{
+    onClick: () => void;
+    className?: string;
+    ariaLabel?: string;
+  }>;
+  export default ModalCloseButton;
+}
+
 // MODELS & TYPES
 
 declare module 'shared/models/Transaction' {

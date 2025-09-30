@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import ModalCloseButton from './ModalCloseButton';
 
 interface ModalWrapperProps {
   open: boolean;
@@ -46,13 +47,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
         ref={modalRef}
         className={`relative bg-white-50 rounded-xl shadow-lg w-full ${sizeClasses[size]} mx-4 ${className} p-6`}
       >
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
-          onClick={onClose}
-          aria-label="Fechar"
-        >
-          ×
-        </button>
+        <ModalCloseButton onClick={onClose} />
         {title && <h2 className="text-xl font-semibold text-primary-700 mb-4 pr-8">{title}</h2>}
         <div>{children}</div>
       </div>
