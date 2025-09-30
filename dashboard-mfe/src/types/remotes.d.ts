@@ -138,6 +138,7 @@ declare module 'shared/components/domain/transaction/TransactionList' {
     onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
     search?: string;
+    totalTransactions?: number;
   }
   const TransactionList: React.FC<TransactionListProps>;
   export default TransactionList;
@@ -210,6 +211,15 @@ declare module 'shared/components/ui/ErrorBoundary' {
 declare module 'shared/components/ui/LoadingSpinner' {
   const LoadingSpinner: React.ComponentType<{ size?: number }>;
   export default LoadingSpinner;
+}
+
+declare module 'shared/components/ui/ModalCloseButton' {
+  const ModalCloseButton: React.FC<{
+    onClick: () => void;
+    className?: string;
+    ariaLabel?: string;
+  }>;
+  export default ModalCloseButton;
 }
 
 // MODELS & TYPES

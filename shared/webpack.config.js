@@ -46,6 +46,7 @@ module.exports = {
         './components/ui/Icon': './src/components/ui/Icon',
         './components/ui/ConfirmationModal': './src/components/ui/ConfirmationModal',
         './components/ui/ModalWrapper': './src/components/ui/ModalWrapper',
+        './components/ui/ModalCloseButton': './src/components/ui/ModalCloseButton',
         './components/ui/FeedbackProvider': './src/components/ui/FeedbackProvider',
         './components/ui/ErrorBoundary': './src/components/ui/ErrorBoundary',
         './components/ui/LoadingSpinner': './src/components/ui/LoadingSpinner',

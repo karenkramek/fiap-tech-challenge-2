@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../ui/Button';
+import ModalCloseButton from '../../ui/ModalCloseButton';
 
 interface LoginModalProps {
   open: boolean;
@@ -65,13 +66,7 @@ export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister 
   return (
     <div className="fixed inset-0 !m-0 modal-overlay flex items-center justify-center z-50">
       <div className="modal-content relative">
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
-          onClick={handleClose}
-          aria-label="Fechar"
-        >
-          ×
-        </button>
+        <ModalCloseButton onClick={onClose} />
         <h2 className="modal-title">Entrar</h2>
         <p className="modal-text mb-6">Acesse sua conta ByteBank</p>
 
