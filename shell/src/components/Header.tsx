@@ -1,11 +1,16 @@
 import { LogOut, Menu } from 'lucide-react';
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, Location as RouterLocation } from 'react-router-dom';
 import { useAccount } from 'shared/hooks/useAccount';
+import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
+import { TOAST_DURATION, TOAST_MESSAGES } from 'shared/constants/toast';
 import LoginModal from 'shared/components/domain/login/LoginModal';
 import RegisterModal from 'shared/components/domain/login/RegisterModal';
 import AccountService from 'shared/services/AccountService';
+
+// Constantes para timing de UI
+const MODAL_AUTO_OPEN_DELAY = 500; // ms para abrir modal após redirecionamento
+const NAVIGATE_DELAY = 1000; // ms para aguardar toast antes de navegar
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -17,6 +22,25 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Verificar se foi redirecionado de uma rota protegida e abrir modal automaticamente
+  useEffect(() => {
+    const state = location.state as { from?: RouterLocation } | null;
+    if (state?.from && showAuthButtons && !isAuthenticated) {
+      // Pequeno delay para garantir que o toast da ProtectedRoute já apareceu
+      const timer = setTimeout(() => {
+        setLoginModalOpen(true);
+      }, MODAL_AUTO_OPEN_DELAY);
+
+      // Limpar o state para evitar abrir o modal novamente
+      navigate(location.pathname, { replace: true, state: {} });
+
+      return () => clearTimeout(timer);
+    }
+
+    return () => {}; // Cleanup function para quando não há timer
+  }, [location.state, showAuthButtons, isAuthenticated, navigate, location.pathname]);
 
   // Função para gerar iniciais do nome
   const getInitials = (name: string): string => {
@@ -50,10 +74,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
       const loggedAccount = await login(email, password);
       console.log('Login successful:', loggedAccount);
 
+      // Toast de boas-vindas
+      showSuccess(`Bem-vindo(a), ${loggedAccount?.name || 'Usuário'}!`);
+
       // Redirecionar para dashboard após login bem-sucedido
       setTimeout(() => {
         navigate('/dashboard');
-      }, 1000); // Pequeno delay para mostrar o toast
+      }, NAVIGATE_DELAY); // Pequeno delay para mostrar o toast
 
     } catch (error) {
       console.error('Login failed:', error);
@@ -61,33 +88,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
     }
   };
 
-  const handleLoginSuccess = (userInfo: { name: string; email: string }) => {
-    toast.success(`Bem-vindo de volta, ${userInfo.name}!`, {
-      duration: 4000,
-      style: {
-        background: '#059669',
-        color: 'white',
-      },
-      iconTheme: {
-        primary: 'white',
-        secondary: '#059669',
-      },
-    });
-  };
-
   const handleLogout = () => {
     logout();
-    toast.success('Logout realizado com sucesso!', {
-      duration: 3000,
-      style: {
-        background: '#0369a1',
-        color: 'white',
-      },
-      iconTheme: {
-        primary: 'white',
-        secondary: '#0369a1',
-      },
-    });
+    showSuccess(TOAST_MESSAGES.LOGOUT_SUCCESS, TOAST_DURATION.SHORT);
     // Redirecionar para home após logout
     navigate('/');
   };
@@ -107,34 +110,14 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
       const newAccount = await AccountService.createAccount(name, email, password);
       console.log('Account created successfully:', newAccount);
 
-      // Toast adicional personalizado para cadastro
-      toast.success(`Conta criada para ${name}!`, {
-        duration: 4000,
-        style: {
-          background: '#0d9488',
-          color: 'white',
-        },
-        iconTheme: {
-          primary: 'white',
-          secondary: '#0d9488',
-        },
-      });
+      // Toast para cadastro
+      showSuccess(`Conta criada para ${name}!`);
 
     } catch (error) {
       console.error('Error creating account:', error);
 
-      // Toast de erro personalizado
-      toast.error('Erro ao criar conta. Tente novamente.', {
-        duration: 4000,
-        style: {
-          background: '#dc2626',
-          color: 'white',
-        },
-        iconTheme: {
-          primary: 'white',
-          secondary: '#dc2626',
-        },
-      });
+      // Toast de erro
+      showError(TOAST_MESSAGES.REGISTER_ERROR);
 
       throw error; // Re-lançar o erro para o modal tratar
     }
@@ -202,33 +185,25 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
                   <p className='text-xs text-primary-200'>{user.email}</p>
                 </div>
                 <div className='flex items-center space-x-2'>
+                  <div className='w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-bold'>
+                    {user.initials}
+                  </div>
                   <button
-                    className='flex items-center justify-center w-10 h-10 bg-primary-600 rounded-full border-2 border-white hover:bg-primary-500 transition-colors'
-                    title={`Perfil de ${user.name}`}
-                    onClick={() => console.log('Abrir menu do usuário')}
+                    onClick={handleLogout}
+                    className='text-primary-200 hover:text-white transition-colors'
+                    title='Logout'
                   >
-                    <span className='text-sm font-bold text-white'>{user.initials}</span>
+                    <LogOut className='h-5 w-5' />
                   </button>
-                  {/* Botão de Logout - visível apenas quando logado */}
-                  {isAuthenticated && (
-                    <button
-                      onClick={handleLogout}
-                      className='flex items-center justify-center w-10 h-10 bg-red-600 rounded-full border-2 border-white hover:bg-red-500 transition-colors'
-                      title='Fazer logout'
-                    >
-                      <LogOut className='w-4 h-4 text-white' />
-                    </button>
-                  )}
                 </div>
               </>
             ) : (
               <div className='flex items-center space-x-3'>
                 <div className='hidden md:block text-right'>
-                  <p className='text-sm font-medium'>Usuário</p>
-                  <p className='text-xs text-primary-200'>Carregando...</p>
+                  <p className='text-sm text-primary-200'>Não autenticado</p>
                 </div>
-                <div className='w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center'>
-                  <span className='text-sm font-bold text-white'>?</span>
+                <div className='w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-bold'>
+                  ?
                 </div>
               </div>
             )}
@@ -241,7 +216,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
         open={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onLogin={handleLogin}
-        onLoginSuccess={handleLoginSuccess}
         onSwitchToRegister={() => {
           setLoginModalOpen(false);
           setRegisterModalOpen(true);

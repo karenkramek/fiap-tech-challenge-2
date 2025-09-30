@@ -1,5 +1,4 @@
 import React, { Suspense, useState } from 'react';
-import { toast, Toaster } from 'react-hot-toast';
 import BalanceCard from 'shared/components/domain/BalanceCard';
 import Card from 'shared/components/ui/Card';
 const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
@@ -7,13 +6,10 @@ const TransactionAdd = React.lazy(() => import('shared/components/domain/transac
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
-import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
+import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
-
-const TRANSACTION_SUCCESS_MSG = 'Transação adicionada com sucesso!';
-const TRANSACTION_ERROR_MSG = 'Erro ao adicionar transação.';
-const INVALID_AMOUNT_MSG = 'Por favor, insira um valor válido.';
+import { TOAST_MESSAGES } from 'shared/constants/toast';
 
 const Dashboard: React.FC = () => {
   const [showBalance, setShowBalance] = useState(false);
@@ -37,7 +33,7 @@ const Dashboard: React.FC = () => {
     setFormLoading(true);
     const normalizedAmount = parseCurrencyStringToNumber(amount);
     if (!amount || isNaN(normalizedAmount) || normalizedAmount <= 0) {
-      toast.error(INVALID_AMOUNT_MSG);
+      showError(TOAST_MESSAGES.INVALID_AMOUNT);
       setFormLoading(false);
       return;
     }
@@ -52,9 +48,9 @@ const Dashboard: React.FC = () => {
       setAmount("");
       setDescription("");
       setAttachmentFile(null);
-      toast.success(TRANSACTION_SUCCESS_MSG);
+      showSuccess(TOAST_MESSAGES.TRANSACTION_SUCCESS);
     } catch (error) {
-      toast.error(TRANSACTION_ERROR_MSG);
+      showError(TOAST_MESSAGES.TRANSACTION_ERROR);
       console.error(error);
     } finally {
       setFormLoading(false);
@@ -67,7 +63,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <FeedbackProvider />
       <div className="container mx-auto px-4 space-y-8">
         <div className="flex gap-6">
           {/* Conteúdo principal */}
@@ -126,7 +121,6 @@ const Dashboard: React.FC = () => {
           </aside>
         </div>
       </div>
-      <Toaster position="top-right" />
     </>
   );
 };

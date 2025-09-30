@@ -1,11 +1,11 @@
 import React, { Suspense, useState } from 'react';
-import { Toaster } from 'react-hot-toast';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import Header from './components/Header';
 import Home from './components/Home';
+import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import Sidebar from './components/Sidebar';
 
@@ -101,33 +101,34 @@ const App: React.FC = () => {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/" element={<HomeLayout />} />
-          <Route
-            path="/dashboard"
-            element={
-              <AuthenticatedLayout>
-                <ErrorBoundary>
-                  <Suspense fallback={<div>Loading Dashboard...</div>}>
-                    <Dashboard />
+        <ProtectedRoute>
+          <Routes>
+            <Route path="/" element={<HomeLayout />} />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div>Loading Dashboard...</div>}>
+                      <Dashboard />
+                    </Suspense>
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              }
+            />
+            <Route
+              path="/transactions/*"
+              element={
+                <AuthenticatedLayout>
+                  <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
+                    <TransactionsPage />
                   </Suspense>
-                </ErrorBoundary>
-              </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/transactions/*"
-            element={
-              <AuthenticatedLayout>
-                <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
-                  <TransactionsPage />
-                </Suspense>
-              </AuthenticatedLayout>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+                </AuthenticatedLayout>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </ProtectedRoute>
       </div>
     </Router>
   );

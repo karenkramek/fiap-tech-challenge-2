@@ -80,6 +80,11 @@ module.exports = {
           singleton: true,
           requiredVersion: '^18.2.0',
           eager: false
+        },
+        'react-hot-toast': {
+          singleton: true,
+          requiredVersion: '^2.5.0',
+          eager: false
         }
       }
     }),

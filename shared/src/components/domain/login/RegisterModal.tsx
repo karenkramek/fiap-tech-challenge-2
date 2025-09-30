@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
 import Button from '../../ui/Button';
 import ModalCloseButton from '../../ui/ModalCloseButton';
 
@@ -62,19 +61,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
       if (onRegister) {
         await onRegister(name.trim(), email, password);
       }
-
-      // Exibir toast de sucesso
-      toast.success('Conta criada com sucesso!', {
-        duration: 4000,
-        style: {
-          background: '#10b981',
-          color: 'white',
-        },
-        iconTheme: {
-          primary: 'white',
-          secondary: '#10b981',
-        },
-      });
 
       // Limpar formulário após sucesso
       setTimeout(() => {
