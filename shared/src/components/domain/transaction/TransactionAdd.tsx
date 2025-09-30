@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TransactionType, getTransactionTypeLabel } from '../../../types/TransactionType';
 import Button from '../../ui/Button';
 import FileUpload from '../file/FileUpload';
+import BadgeSuggestions from '../../ui/BadgeSuggestions';
+import { TRANSACTION_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
 
 interface TransactionAddProps {
   amount: string;
@@ -30,6 +32,25 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
   onClose,
   loading = false
 }) => {
+  
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
+
+  // Função utilitária para normalizar strings (remove acentos e deixa minúsculo)
+  function normalizeString(str: string) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  const filteredSuggestions = description.length > 0
+    ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+        normalizeString(suggestion).startsWith(normalizeString(description)) && normalizeString(suggestion) !== normalizeString(description)
+      )
+    : TRANSACTION_DESCRIPTION_SUGGESTIONS;
+
+  const handleSuggestionClick = (suggestion: string) => {
+    onDescriptionChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>);
+    descriptionInputRef.current?.focus();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     if (onSubmit) onSubmit(e);
     // O fechamento deve ser controlado pelo pai após sucesso, mas pode ser chamado aqui se necessário
@@ -77,10 +98,12 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
           type='text'
           value={description}
           onChange={onDescriptionChange}
+          ref={descriptionInputRef}
           placeholder='Descrição da transação'
           className='w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700'
           disabled={loading}
         />
+        <BadgeSuggestions suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
       </div>
       <FileUpload
         onFileSelect={onFileSelect}
