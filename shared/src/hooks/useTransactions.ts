@@ -62,7 +62,12 @@ export function useTransactions() {
 
       if (newUserId !== currentUserId) {
         setCurrentUserId(newUserId);
-        fetchTransactions(); // Recarrega transações quando usuário muda
+        // Chamar fetchTransactions diretamente sem dependência
+        if (newUserId) {
+          fetchTransactions();
+        } else {
+          setTransactions([]);
+        }
       }
     };
 
@@ -88,7 +93,7 @@ export function useTransactions() {
       window.removeEventListener('transactionsCleared', handleTransactionsCleared);
       clearInterval(interval);
     };
-  }, [currentUserId, fetchTransactions]);
+  }, [currentUserId]); // Removido fetchTransactions das dependências
 
   const addTransaction = useCallback(async (
     type: TransactionType,
@@ -169,13 +174,17 @@ export function useTransactions() {
 
   // Carregamento inicial
   useEffect(() => {
+    const currentUser = AccountService.getCurrentUser();
+    const userId = currentUser?.id || 'anonymous';
+
     if (currentUserId === null) {
       // Primeira execução, definir usuário atual e carregar
-      const currentUser = AccountService.getCurrentUser();
-      setCurrentUserId(currentUser?.id || 'anonymous');
-      fetchTransactions();
+      setCurrentUserId(userId);
+      if (currentUser) {
+        fetchTransactions();
+      }
     }
-  }, [fetchTransactions, currentUserId]);
+  }, []); // Array vazio para executar apenas uma vez
 
   return {
     transactions,

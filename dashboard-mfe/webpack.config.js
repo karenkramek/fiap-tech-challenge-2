@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { DefinePlugin } = require('webpack');
 
 module.exports = {
@@ -11,6 +12,12 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    static: [
+      {
+        directory: "./public",
+        publicPath: "/",
+      },
+    ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
@@ -84,7 +91,19 @@ module.exports = {
       }
     }),
     new HtmlWebpackPlugin({
-      template: './public/index.html'
-    })
+      template: './public/index.html',
+      favicon: "./public/favicon.ico",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: "./public",
+          to: "./",
+          globOptions: {
+            ignore: ["**/index.html"],
+          },
+        },
+      ],
+    }),
   ]
 };

@@ -2,9 +2,9 @@ import { LogOut, Menu } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAccount } from 'shared/hooks/useAccount';
 import LoginModal from 'shared/components/domain/login/LoginModal';
 import RegisterModal from 'shared/components/domain/login/RegisterModal';
+import { useAccount } from 'shared/hooks/useAccount';
 import AccountService from 'shared/services/AccountService';
 
 interface HeaderProps {
@@ -142,18 +142,19 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
 
   return (
     <header className='bg-primary-700 text-white-50 shadow-md'>
-      <div className='container mx-auto px-4 py-3 flex justify-between items-center'>
-        <div className='flex items-center space-x-4'>
-          <button onClick={toggleSidebar} className='xl:hidden lg:block hover:bg-primary-600 p-1 rounded'>
-            <Menu className='h-6 w-6 header-icon' />
-          </button>
-          <Link
-            to="/"
-            className='text-xl font-bold transition-colors header-link'
-          >
-            ByteBank
-          </Link>
-        </div>
+      <div className='container mx-auto px-0 py-3 max-w-7xl'>
+        <div className='flex justify-between items-center'>
+          <div className='flex items-center space-x-4'>
+            <button onClick={toggleSidebar} className='xl:hidden lg:block hover:bg-primary-600 p-1 rounded'>
+              <Menu className='h-6 w-6 header-icon' />
+            </button>
+            <Link
+              to="/"
+              className='text-xl font-bold transition-colors header-link py-0 !ml-0'
+            >
+              ByteBank
+            </Link>
+          </div>
 
         {/* Botões de Conta e Login - apenas quando showAuthButtons for true (tela inicial) */}
         {showAuthButtons && (
@@ -234,6 +235,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
             )}
           </div>
         )}
+        </div>
       </div>
 
       {/* Modal de Login */}
