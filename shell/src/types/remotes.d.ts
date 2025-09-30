@@ -49,3 +49,11 @@ declare module 'shared/components/ui/LoadingSpinner' {
   const LoadingSpinner: React.ComponentType<{ size?: number }>;
   export default LoadingSpinner;
 }
+declare module 'shared/components/ui/ModalCloseButton' {
+  const ModalCloseButton: React.FC<{
+    onClick: () => void;
+    className?: string;
+    ariaLabel?: string;
+  }>;
+  export default ModalCloseButton;
+}

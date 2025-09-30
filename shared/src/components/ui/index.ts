@@ -1,4 +1,9 @@
 export { default as Button } from './Button';
 export { default as Card } from './Card';
-export { default as Icon } from './Icon';
 export { default as ConfirmationModal } from './ConfirmationModal';
+export { default as ErrorBoundary } from './ErrorBoundary';
+export { default as FeedbackProvider } from './FeedbackProvider';
+export { default as Icon } from './Icon';
+export { default as LoadingSpinner } from './LoadingSpinner';
+export { default as ModalCloseButton } from './ModalCloseButton';
+export { default as ModalWrapper } from './ModalWrapper';

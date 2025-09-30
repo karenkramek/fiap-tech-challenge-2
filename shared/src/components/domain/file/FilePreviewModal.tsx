@@ -1,6 +1,7 @@
 import { Download, File } from 'lucide-react';
 import React from 'react';
 import { FileUploadService } from '../../../services/FileUploadService';
+import ModalCloseButton from '../../ui/ModalCloseButton';
 
 interface FilePreviewModalProps {
   open: boolean;
@@ -36,14 +37,7 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
       onClick={handleOverlayClick}
     >
       <div className="modal-content max-w-4xl max-h-[90vh] overflow-hidden relative">
-        {/* Botão X no canto superior direito */}
-        <button
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none z-10"
-          onClick={onClose}
-          aria-label="Fechar"
-        >
-          ×
-        </button>
+        <ModalCloseButton onClick={onClose} />
 
         {/* Header com título */}
         <div className="mb-4 pr-8">
