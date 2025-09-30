@@ -1,7 +1,6 @@
 import React from 'react';
-import { TransactionType } from '../../../types/TransactionType';
+import { TransactionType, getTransactionTypeLabel } from '../../../types/TransactionType';
 import Button from '../../ui/Button';
-import Card from '../../ui/Card';
 import FileUpload from '../file/FileUpload';
 
 interface TransactionAddProps {
@@ -38,8 +37,11 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-5'>
+    <form onSubmit={handleSubmit} className='space-y-5 mt-4'>
       <div>
+        <label className='block text-lg font-bold text-primary-700 mb-1'>
+          Tipo
+        </label>
         <select
           id='type'
           value={transactionType}
@@ -47,10 +49,9 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
           className='w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700 bg-white-50'
           disabled={loading}
         >
-          <option value={TransactionType.DEPOSIT}>Depósito</option>
-          <option value={TransactionType.WITHDRAWAL}>Saque</option>
-          <option value={TransactionType.TRANSFER}>Transferência</option>
-          <option value={TransactionType.PAYMENT}>Pagamento</option>
+          {Object.values(TransactionType).map((type) => (
+            <option key={type} value={type}>{getTransactionTypeLabel(type)}</option>
+          ))}
         </select>
       </div>
       <div>
