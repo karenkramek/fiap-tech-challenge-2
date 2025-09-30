@@ -112,6 +112,14 @@ const Dashboard: React.FC = () => {
                     onTransactionsChanged={handleTransactionsChanged}
                     mode="dashboard"
                   />
+                  <div className="w-full flex justify-center mt-4">
+                    <a
+                      href="/transactions"
+                      className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium text-center"
+                    >
+                      Ver Transações
+                    </a>
+                  </div>
                 </Suspense>
               </ErrorBoundary>
             </Card>
