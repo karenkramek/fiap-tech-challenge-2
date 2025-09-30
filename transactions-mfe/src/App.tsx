@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "shared/components/ui/Button";
 import Card from "shared/components/ui/Card";
 import TransactionList from "shared/components/domain/transaction/TransactionList";
@@ -18,12 +18,24 @@ const TransactionsPage: React.FC = () => {
   const [description, setDescription] = useState("");
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [search, setSearch] = useState(""); // Novo estado para busca
+  const [search, setSearch] = useState("");
+  const lastSearchRef = useRef("");
+
   const { transactions, addTransaction, fetchTransactions } = useTransactions();
 
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (search !== lastSearchRef.current) {
+        lastSearchRef.current = search;
+        fetchTransactions();
+      }
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search, fetchTransactions]);
 
   const handleAmountChange = createCurrencyInputHandler(setAmount);
 
@@ -56,20 +68,56 @@ const TransactionsPage: React.FC = () => {
     }
   };
 
+  const ITEMS_PER_PAGE = 5;
+  const [page, setPage] = useState(1);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  const filteredTransactions = transactions.filter(
+    t =>
+      t.description?.toLowerCase().includes(search.toLowerCase()) ||
+      t.amount?.toString().includes(search)
+  );
+
+  const paginatedTransactions = filteredTransactions.slice(0, page * ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!hasScrolled && window.scrollY > 0) setHasScrolled(true);
+      if (
+        hasScrolled &&
+        Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100 &&
+        paginatedTransactions.length < filteredTransactions.length
+      ) {
+        setPage(prev => prev + 1);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [paginatedTransactions.length, filteredTransactions.length, hasScrolled]);
+
+  // Resetar página ao buscar
+  useEffect(() => {
+    setPage(1);
+    setHasScrolled(false);
+  }, [search]);
+
   return (
     <>
       <FeedbackProvider />
+      
       {/* Extrato */}
       <Card>
+        <div className="min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h2 className="transactions-title text-primary-700">Extrato</h2>
           <Button variant="primary" onClick={() => setAddModalOpen(true)}>
             Nova Transação
           </Button>
         </div>
+
         <ErrorBoundary>
           {/* Input de busca */}
-          <div className="flex items-center gap-2 mb-4 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
+          <div className="flex items-center gap-2 mb-6 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
             <Search className="h-5 w-5 text-gray-400" />
             <input
               type="text"
@@ -80,13 +128,16 @@ const TransactionsPage: React.FC = () => {
             />
           </div>
           <TransactionList
-            transactions={transactions}
+            transactions={paginatedTransactions}
             onTransactionsChanged={fetchTransactions}
             mode="full"
             search={search}
+            totalTransactions={transactions.length}
           />
         </ErrorBoundary>
+        </div>
       </Card>
+
       {addModalOpen && (
         <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
           <ErrorBoundary>

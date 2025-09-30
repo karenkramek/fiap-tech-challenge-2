@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from 'lucide-react';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useGroupedTransactions } from "../../../hooks/useGroupedTransactions";
 import { useModal } from '../../../hooks/useModal';
 import { useTransactions } from '../../../hooks/useTransactions';
@@ -100,18 +100,58 @@ const TransactionItem: React.FC<{
   );
 });
 
+const ITEMS_PER_PAGE = 5;
+
 export interface TransactionListProps {
   transactions?: Transaction[];
   onTransactionsChanged?: () => void;
   mode?: 'dashboard' | 'full';
   search?: string;
+  totalTransactions?: number;
 }
 
-const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard', search = '' }) => {
+const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard', search = '', totalTransactions }) => {
   const { transactions: hookTransactions, deleteTransaction, fetchTransactions, loading } = useTransactions();
   const transactions = propTransactions || hookTransactions;
   const filteredTransactions = filterTransactions(transactions, search);
-  const { grouped, sortedKeys } = useGroupedTransactions(filteredTransactions);
+
+  // Limitar para dashboard: mostrar só as 5 mais recentes
+  const displayedTransactions =
+    mode === 'dashboard'
+      ? [...filteredTransactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+      : filteredTransactions;
+
+  // Scroll infinito para modo full
+  const [page, setPage] = useState(1);
+  const [infiniteTransactions, setInfiniteTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    if (mode === 'full') {
+      setInfiniteTransactions(displayedTransactions.slice(0, page * ITEMS_PER_PAGE));
+    }
+  }, [displayedTransactions, page, mode]);
+
+  const transactionsToRender = mode === 'full' ? infiniteTransactions : displayedTransactions;
+
+  // Scroll infinito e mensagem só no modo full
+  let showAllRecordsMessage = false;
+  if (mode === 'full' && typeof totalTransactions === 'number' && transactionsToRender.length >= totalTransactions && totalTransactions > 0) {
+    showAllRecordsMessage = true;
+  }
+
+  useEffect(() => {
+    if (mode !== 'full') return;
+    const handleScroll = () => {
+      const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100;
+      if (bottom && infiniteTransactions.length < displayedTransactions.length) {
+        setPage(prev => prev + 1);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [infiniteTransactions.length, displayedTransactions.length, mode]);
+
+  const { grouped, sortedKeys } = useGroupedTransactions(transactionsToRender);
   const editModal = useModal();
   const deleteModal = useModal();
   const [transactionToEdit, setTransactionToEdit] = useState<string | null>(null);
@@ -168,7 +208,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
   const isLoading = loading;
 
   return (
-    <div>
+    <>
       {/* Skeleton Loader */}
       {isLoading && (
         <div className="space-y-2 mt-1 animate-pulse">
@@ -196,6 +236,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
           ))}
         </div>
       )}
+      
       {/* Lista de transações agrupadas por mês/ano */}
       {!isLoading && filteredTransactions.length > 0 ? (
         <div>
@@ -208,16 +249,35 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                   {getMonthName(month)} {year}
                 </h3>
                 <div className="space-y-2 mt-1">
-                  {grouped[key].map((transaction) => (
-                    <TransactionItem
-                      key={transaction.id}
-                      transaction={transaction}
-                      mode={mode}
-                      onEdit={openEditModal}
-                      onDelete={openDeleteModal}
-                      loading={formLoading}
-                    />
-                  ))}
+                  {grouped[key].map((transaction, tIdx) => {
+                    const isLastGroup = idx === sortedKeys.length - 1;
+                    const isLastItem = tIdx === grouped[key].length - 1;
+                    const isFullMode = mode === 'full';
+                    const showGradient = isFullMode && isLastGroup && isLastItem && !showAllRecordsMessage;
+                    return (
+                      <React.Fragment key={transaction.id}>
+                        <div style={showGradient ? {
+                          position: 'relative',
+                          zIndex: 0,
+                          WebkitMaskImage: 'linear-gradient(to bottom,black 10%,transparent 80%)',
+                          maskImage: 'linear-gradient(to bottom,black 10%,transparent 80%)',
+                        } : {}}>
+                          <TransactionItem
+                            transaction={transaction}
+                            mode={mode}
+                            onEdit={openEditModal}
+                            onDelete={openDeleteModal}
+                            loading={formLoading}
+                          />
+                        </div>
+                        {isFullMode && isLastGroup && isLastItem && showAllRecordsMessage && (
+                          <div className="w-full flex justify-center py-4">
+                            <span className="text-gray-500 text-sm">Todos os registros foram exibidos.</span>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -245,7 +305,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
         onCancel={closeDeleteModal}
         loading={formLoading}
       />
-    </div>
+    </>
   );
 });
 

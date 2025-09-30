@@ -138,6 +138,7 @@ declare module 'shared/components/domain/transaction/TransactionList' {
     onTransactionsChanged?: () => void;
     mode?: 'dashboard' | 'full';
     search?: string;
+    totalTransactions?: number;
   }
   const TransactionList: React.FC<TransactionListProps>;
   export default TransactionList;
