@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTransactions } from '../../../hooks/useTransactions';
 import { TransactionService } from '../../../services/TransactionService';
 import { TransactionType, getTransactionTypeLabel } from '../../../types/TransactionType';
@@ -6,6 +6,8 @@ import { createCurrencyInputHandler, formatCurrencyWithoutSymbol, parseCurrencyS
 import { formatDateForInput } from '../../../utils/date';
 import Button from '../../ui/Button';
 import FileUpload from '../file/FileUpload';
+import BadgeSuggestions from '../../ui/BadgeSuggestions';
+import { TRANSACTION_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
 
 interface TransactionEditProps {
   transactionId: string | null;
@@ -25,6 +27,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
+  const descriptionInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!open || !transactionId) return;
@@ -78,6 +81,17 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
       setError('Erro ao atualizar transação. Tente novamente.');
       setLoading(false);
     }
+  };
+
+  const filteredSuggestions = description.length > 0
+    ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+        suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
+      )
+    : TRANSACTION_DESCRIPTION_SUGGESTIONS;
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setDescription(suggestion);
+    descriptionInputRef.current?.focus();
   };
 
   if (!open) return null;
@@ -147,10 +161,12 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
               id="description"
               value={description}
               onChange={e => setDescription(e.target.value)}
+              ref={descriptionInputRef}
               placeholder="Descrição da transação"
               className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
               disabled={loading}
             />
+            <BadgeSuggestions suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
           </div>
           <FileUpload
             onFileSelect={setAttachmentFile}
