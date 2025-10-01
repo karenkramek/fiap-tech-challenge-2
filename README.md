@@ -20,14 +20,26 @@ Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP 
 - API Server (porta 3034) — Backend mock com JSON Server
 - Upload Server (porta 3035) — Servidor para upload de arquivos
 
-Pastas relevantes:
+### Componentes e responsabilidades
 
-- `shell/`
-- `dashboard-mfe/`
-- `transactions-mfe/`
-- `shared/`
-- `upload-server/`
-- `uploads/`
+| Camada                | Função principal                                                                 | Destaques técnicos |
+|-----------------------|-----------------------------------------------------------------------------------|--------------------|
+| `shell/`              | Orquestra layout, roteamento e consumo dos remotes via Module Federation.        | Webpack host expõe `dashboardMFE`, `transactionsMFE`, `shared`. |
+| `dashboard-mfe/`      | Entrega o dashboard de saldo, gráficos e cartões informativos.                   | Exposto como `dashboardMFE/Dashboard`. |
+| `transactions-mfe/`   | Lista, filtra e cria transações, delegando componentes de domínio à `shared`.    | Exposto como `transactionsMFE/TransactionsPage`. |
+| `shared/`             | Biblioteca federada com componentes UI, hooks, serviços, DTOs e utilidades.      | Compartilhamento de estado/serviços entre MFEs. |
+| `upload-server/`      | API Express dedicada a upload/remoção de anexos (persistidos em `uploads/`).     | Usa Multer, expõe `/api/upload` e `/uploads`. |
+| `db.json` + JSON API  | Mock persistido do domínio (contas, transações) servido pelo `json-server`.       | Endpoint base `http://localhost:3034`. |
+
+### Fluxo entre os módulos
+
+1. `shared` publica remotes de componentes e serviços reutilizáveis (`shared@.../remoteEntry.js`).
+2. `dashboard-mfe` e `transactions-mfe` consomem `shared` e expõem suas páginas como remotes próprios.
+3. O `shell` carrega esses remotes dinamicamente e renderiza o conteúdo dentro do layout host.
+4. Tanto os MFEs quanto o `shell` chamam o `json-server` para dados do domínio e o `upload-server` para anexos.
+5. Os arquivos enviados ficam disponíveis via `/uploads`, servidos diretamente pelo servidor de upload.
+
+Essa separação permite evoluir os MFEs e a lib compartilhada de forma independente, mantendo contratos via DTOs/serviços, e já antecipa uma implantação distribuída (por exemplo, buckets S3 + CloudFront para MFEs e ECS/Fargate para APIs) — tópico que podemos detalhar na próxima etapa.
 
 ## ✨ Funcionalidades
 
@@ -48,6 +60,7 @@ Pastas relevantes:
 - JSON Server (API mock)
 - Node.js/Express (servidor de upload)
 - Multer (upload de arquivos)
+- Docker & Docker Compose (ambiente containerizado para desenvolvimento)
 
 ## 📋 Banco de Dados
 
@@ -64,11 +77,11 @@ npm run dev:all
 rm db.json && npm run setup:db
 ```
 
-📖 **Mais detalhes:** Ver [DATABASE.md](./DATABASE.md)
+📖 **Guia completo:** Ver [JSON Server Guide](./docs/json-server-guide.md)
 
 ## 🚀 Como Executar Localmente
 
-### Pré-requisitos
+### Pré-requisitos (Docker)
 
 - Node.js (versão 18+ recomendada)
 - npm ou yarn
@@ -151,6 +164,61 @@ npm run dev:shell
 
 **🌐 Acesso:** Quando todos estiverem rodando, acesse: [http://localhost:3030](http://localhost:3030)
 
+## 🐳 Ambiente com Docker
+
+Para facilitar o desenvolvimento isolado ou integrado, adicionamos uma estrutura Docker pensada em hot reload e isolamento por serviço.
+
+### Estrutura gerada
+
+- `docker/Dockerfile.frontend` — base Node 22 + webpack dev server para os MFEs e o Shell.
+- `docker/Dockerfile.node` — imagem Node 22 para o servidor de upload.
+- `docker/Dockerfile.jsonserver` + `docker/scripts/api-entrypoint.sh` — `json-server` com setup automático do `db.json` a partir do template.
+- `docker/docker-compose.dev.yml` — orquestra shell, MFEs, shared, API mock e upload server.
+
+### Pré-requisitos
+
+- Docker Desktop (ou engine) >= 24 com Compose V2.
+- Porta 3030-3035 liberadas no host.
+- (Opcional) Execute `npm run setup:db` uma vez para garantir a presença de `db.json` antes do primeiro build; se não existir, o entrypoint da API cria a partir do template.
+
+### Subir apenas um serviço
+
+Você pode abrir um único serviço e suas dependências básicas em modo interativo:
+
+```bash
+docker compose -f docker/docker-compose.dev.yml up shell
+```
+
+Esse comando inicia `shared`, `dashboard`, `transactions`, `api` e `upload` automaticamente por causa do `depends_on`, além do próprio Shell.
+
+Para iniciar outro MFE em isolamento, aponte para o serviço correspondente. Exemplo para o dashboard:
+
+```bash
+docker compose -f docker/docker-compose.dev.yml up dashboard shared api upload
+```
+
+### Subir toda a stack de uma vez
+
+```bash
+docker compose -f docker/docker-compose.dev.yml up
+```
+
+Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker compose down` com o mesmo arquivo.
+
+### Hot reload e volumes
+
+- O código-fonte de cada pacote é montado como volume (`./<pacote>:/app`), permitindo que alterações locais reflitam instantaneamente nos containers.
+- `node_modules` fica dentro do container via volume anônimo (`/app/node_modules`) para evitar conflito com as máquinas host.
+- O diretório `uploads/` é montado em `/uploads` dentro do container, preservando anexos enviados.
+- O `json-server` utiliza o volume nomeado `docker_db-data`, evitando travamentos de I/O com o host. O conteúdo inicial é carregado a partir de `db.template.json`.
+
+### Leituras complementares
+
+- [Fluxos de Trabalho no Docker](./docs/docker-workflow.md) — Rebuild de imagens, checklist pós-`git pull` e passo a passo por sistema operacional.
+- [JSON Server Guide](./docs/json-server-guide.md) — Dicas para inspeção de volume, exportação e reset do `db.json`.
+- [Troubleshooting](./docs/troubleshooting.md) — Diagnóstico rápido para erros comuns em desenvolvimento.
+- [Limpeza do Ambiente](./docs/environment-cleanup.md) — Scripts e boas práticas para limpeza completa dos pacotes.
+
 ## 🔌 Portas
 
 | Serviço            | Porta | URL                       |
@@ -185,52 +253,8 @@ Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodan
 
 ## 🔧 Troubleshooting
 
-### Problemas Comuns
-
-**1. Erro "Module not found" ou problemas de Module Federation:**
-
-- Certifique-se de que todos os MFEs estão rodando antes do Shell
-- Verifique se as portas estão livres (3030-3034)
-- Execute `npm run dev:shared` primeiro, depois os demais MFEs
-
-**2. Dependências não instaladas:**
-
-```bash
-# Execute este comando para instalar tudo de uma vez
-npm run install:all
-```
-
-**3. Conflitos de porta:**
-
-- Verifique se as portas 3030-3034 estão livres
-- No macOS/Linux: `lsof -i :3030` para verificar o uso da porta
-- No Windows: `netstat -an | findstr :3030`
-
-**4. Cache de módulos:**
-
-```bash
-# Limpe o cache do npm se houver problemas
-npm cache clean --force
-```
-
-Se precisar remover todos os node_modules, dist e package-lock.json de todos os projetos, utilize `clean-all.sh` (Linux/macOS) ou `clean-all.bat` (Windows) na raiz do projeto para uma limpeza completa do ambiente.
-
-**5. Problemas com Node.js:**
-
-- Use Node.js versão 18+
-- Considere usar nvm: `nvm use 18`
+Consulte o documento [Troubleshooting](./docs/troubleshooting.md) para um checklist rápido de erros comuns, comandos úteis e links para guias complementares.
 
 ## 🧹 Limpeza do Ambiente (Clean All)
 
-Se precisar remover todos os `node_modules`, `dist` e `package-lock.json` de todos os projetos (raiz, MFEs, shared, shell), utilize um dos scripts de limpeza:
-
-- **Linux/macOS:**
-  ```bash
-  ./clean-all.sh
-  ```
-- **Windows:**
-  ```bat
-  clean-all.bat
-  ```
-
-Esses scripts também limpam o cache do npm em cada projeto. Após rodar, execute `npm install` novamente para reinstalar as dependências.
+Veja [Limpeza do Ambiente](./docs/environment-cleanup.md) para detalhes dos scripts disponíveis e orientações sobre quando utilizá-los.
