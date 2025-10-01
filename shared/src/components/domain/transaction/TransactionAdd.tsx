@@ -37,7 +37,7 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
 
   const filteredSuggestions = description.length > 0
     ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
-        suggestion.startsWith(description) && suggestion !== description
+        suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
       )
     : TRANSACTION_DESCRIPTION_SUGGESTIONS;
 
