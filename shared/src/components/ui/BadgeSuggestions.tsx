@@ -8,7 +8,7 @@ interface BadgeSuggestionsProps {
 const BadgeSuggestions: React.FC<BadgeSuggestionsProps> = ({ suggestions, onSelect }) => {
   if (!suggestions.length) return null;
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
+    <div className="flex flex-wrap gap-2 mt-4">
       {suggestions.map((suggestion) => (
         <button
           key={suggestion}
