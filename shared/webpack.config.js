@@ -64,6 +64,8 @@ module.exports = {
         './components/domain/login/RegisterModal': './src/components/domain/login/RegisterModal',
         // Components (Domain - Outros)
         './components/domain/BalanceCard': './src/components/domain/BalanceCard',
+        // Redux Store
+        './store': './src/store/index.ts',
         // Hooks
         './hooks/useTransactions': './src/hooks/useTransactions',
         './hooks/useAccount': './src/hooks/useAccount',

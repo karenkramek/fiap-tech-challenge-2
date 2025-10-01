@@ -1,81 +1,53 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '../../ui/Button';
 import ModalCloseButton from '../../ui/ModalCloseButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerAccount, resetRegister } from '../../../store/registerSlice';
+import { RootState, AppDispatch } from '../../../store/index';
 
 interface RegisterModalProps {
   open: boolean;
   onClose: () => void;
-  onRegister?: (name: string, email: string, password: string) => void;
   onSwitchToLogin?: () => void;
+  onRegisterSuccess?: () => void;
 }
 
-export default function RegisterModal({ open, onClose, onRegister, onSwitchToLogin }: RegisterModalProps) {
+export default function RegisterModal({ open, onClose, onSwitchToLogin, onRegisterSuccess }: RegisterModalProps) {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error, success } = useSelector((state: RootState) => state.register);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (success && open) {
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      dispatch(resetRegister());
+      onClose();
+      if (onRegisterSuccess) onRegisterSuccess();
+    }
+  }, [success, open, onClose, dispatch, onRegisterSuccess]);
+
+  useEffect(() => {
+    if (!open) {
+      dispatch(resetRegister());
+    }
+  }, [open, dispatch]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    // Validações
-    if (!name.trim()) {
-      setError('Por favor, insira seu nome completo.');
-      return;
-    }
-
-    if (!email) {
-      setError('Por favor, insira seu email.');
-      return;
-    }
-
-    // Validação básica de email
+    if (!name.trim()) return;
+    if (!email) return;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Por favor, insira um email válido.');
-      return;
-    }
-
-    if (!password) {
-      setError('Por favor, insira sua senha.');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('As senhas não coincidem.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (onRegister) {
-        await onRegister(name.trim(), email, password);
-      }
-
-      // Limpar formulário após sucesso
-      setTimeout(() => {
-        setName('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setSuccess(null);
-        onClose();
-      }, 1000); // Reduzido para 1 segundo já que o toast já dá feedback
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
+    if (!emailRegex.test(email)) return;
+    if (!password) return;
+    if (password.length < 6) return;
+    if (password !== confirmPassword) return;
+    dispatch(registerAccount({ name: name.trim(), email, password }));
   };
 
   const handleClose = () => {
@@ -83,8 +55,7 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
     setEmail('');
     setPassword('');
     setConfirmPassword('');
-    setError(null);
-    setSuccess(null);
+    dispatch(resetRegister());
     onClose();
   };
 
@@ -106,13 +77,11 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
               {error}
             </div>
           )}
-
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-              {success}
+              Conta criada com sucesso!
             </div>
           )}
-
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-primary-700 mb-1">
               Nome Completo*
@@ -128,7 +97,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
               disabled={loading}
             />
           </div>
-
           <div>
             <label htmlFor="register-email" className="block text-sm font-medium text-primary-700 mb-1">
               Email*
@@ -144,7 +112,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
               disabled={loading}
             />
           </div>
-
           <div>
             <label htmlFor="register-password" className="block text-sm font-medium text-primary-700 mb-1">
               Senha*
@@ -161,7 +128,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
               minLength={6}
             />
           </div>
-
           <div>
             <label htmlFor="confirm-password" className="block text-sm font-medium text-primary-700 mb-1">
               Confirmar Senha*
@@ -177,7 +143,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
               disabled={loading}
             />
           </div>
-
           <div className="flex gap-4 pt-4">
             <Button
               type="button"
@@ -197,7 +162,6 @@ export default function RegisterModal({ open, onClose, onRegister, onSwitchToLog
             </Button>
           </div>
         </form>
-
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Já tem uma conta?{' '}

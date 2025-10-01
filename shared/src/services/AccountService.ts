@@ -131,31 +131,10 @@ export class AccountService extends BaseService {
 
     // Verifica se as credenciais coincidem
     if (account.email === email && account.password === password) {
-      // Salva os dados do usuário no localStorage para persistir login
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: account.id,
-        name: account.name,
-        email: account.email,
-        isAuthenticated: true
-      }));
       return account;
     } else {
       throw new Error('Credenciais inválidas');
     }
-  }
-
-  static getCurrentUser(): { id: string; name: string; email: string; isAuthenticated: boolean } | null {
-    const userData = localStorage.getItem('currentUser');
-    return userData ? JSON.parse(userData) : null;
-  }
-
-  static logout(): void {
-    localStorage.removeItem('currentUser');
-  }
-
-  static isAuthenticated(): boolean {
-    const user = AccountService.getCurrentUser();
-    return user ? user.isAuthenticated : false;
   }
 }
 

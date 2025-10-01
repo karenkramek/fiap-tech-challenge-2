@@ -1,5 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
@@ -8,6 +9,7 @@ import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import Sidebar from './components/Sidebar';
+import store from 'shared/store';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
@@ -136,14 +138,14 @@ const App: React.FC = () => {
 
 const ShellApp: React.FC = () => {
   return (
-    <>
+    <Provider store={store}>
       <FeedbackProvider />
       <Suspense fallback={<LoadingSpinner />}>
         <ErrorBoundary>
           <App />
         </ErrorBoundary>
       </Suspense>
-    </>
+    </Provider>
   );
 };
 

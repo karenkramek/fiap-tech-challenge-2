@@ -52,20 +52,20 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
       .slice(0, 2);
   };
 
-  // Função para gerar email fictício baseado no nome
-  const generateEmail = (name: string): string => {
+  // ATENÇÃO: Essa função gera um email fictício para tratar usuários antigos, que não possuem email cadastrado.
+  // Verificar remoção quando for necessário
+  const generateLegacyEmail = (name: string): string => {
     const cleanName = name.toLowerCase().replace(/\s+/g, '.');
     return `${cleanName}@bytebank.com.br`;
   };
 
-  // Informações do usuário - usa currentUser se estiver logado, senão account padrão
   const user = currentUser ? {
     name: currentUser.name,
     email: currentUser.email,
     initials: getInitials(currentUser.name)
   } : (account ? {
     name: account.name,
-    email: generateEmail(account.name),
+    email: generateLegacyEmail(account.name), // Usuário antigo, sem email real
     initials: getInitials(account.name)
   } : null);
 
@@ -90,9 +90,8 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
 
   const handleLogout = () => {
     logout();
-    showSuccess(TOAST_MESSAGES.LOGOUT_SUCCESS, TOAST_DURATION.SHORT);
-    // Redirecionar para home após logout
     navigate('/');
+    showSuccess(TOAST_MESSAGES.LOGOUT_SUCCESS, TOAST_DURATION.SHORT);
   };
 
   const handleEnterClick = () => {
@@ -220,6 +219,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
           setLoginModalOpen(false);
           setRegisterModalOpen(true);
         }}
+        onLoginSuccess={() => navigate('/dashboard')}
       />
 
       {/* Modal de Cadastro */}
@@ -231,6 +231,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
           setRegisterModalOpen(false);
           setLoginModalOpen(true);
         }}
+        onRegisterSuccess={() => navigate('/dashboard')}
       />
     </header>
   );

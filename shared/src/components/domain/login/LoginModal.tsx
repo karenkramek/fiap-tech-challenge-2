@@ -1,63 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../../ui/Button';
 import ModalCloseButton from '../../ui/ModalCloseButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../../store/authSlice';
+import { RootState, AppDispatch } from '../../../store/index';
 
 interface LoginModalProps {
   open: boolean;
   onClose: () => void;
-  onLogin?: (email: string, password: string) => Promise<any>;
   onSwitchToRegister?: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister }: LoginModalProps) {
+export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginSuccess, onLogin }: LoginModalProps & { onLogin?: (email: string, password: string) => Promise<any> }) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localLoading, setLocalLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!email) {
-      setError('Por favor, insira seu email.');
-      return;
-    }
-
-    if (!password) {
-      setError('Por favor, insira sua senha.');
-      return;
-    }
-
-    // Validação básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Por favor, insira um email válido.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      let loggedAccount = null;
-      if (onLogin) {
-        loggedAccount = await onLogin(email, password);
-      }
-
-      // Limpar formulário após login bem-sucedido
+  useEffect(() => {
+    if (isAuthenticated && open) {
       setEmail('');
       setPassword('');
       onClose();
-    } catch (err) {
-      setError('Email ou senha incorretos. Tente novamente.');
-    } finally {
-      setLoading(false);
+      if (onLoginSuccess) onLoginSuccess();
+    }
+  }, [isAuthenticated, open, onClose, onLoginSuccess]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    if (!password) return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return;
+    if (onLogin) {
+      setLocalLoading(true);
+      try {
+        await onLogin(email, password);
+      } finally {
+        setLocalLoading(false);
+      }
+    } else {
+      dispatch(login({ email, password }));
     }
   };
 
   const handleClose = () => {
     setEmail('');
     setPassword('');
-    setError(null);
     onClose();
   };
 
@@ -122,9 +113,9 @@ export default function LoginModal({ open, onClose, onLogin, onSwitchToRegister 
               type="submit"
               variant="active"
               className="bg-primary-600 hover:bg-primary-700 text-white-50 font-medium"
-              disabled={loading}
+              disabled={loading || localLoading}
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {(loading || localLoading) ? 'Entrando...' : 'Entrar'}
             </Button>
           </div>
         </form>
