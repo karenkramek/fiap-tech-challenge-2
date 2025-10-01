@@ -83,14 +83,9 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
     }
   };
 
-  // Função utilitária para normalizar strings (remove acentos e deixa minúsculo)
-  function normalizeString(str: string) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  }
-
   const filteredSuggestions = description.length > 0
     ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
-        normalizeString(suggestion).startsWith(normalizeString(description)) && normalizeString(suggestion) !== normalizeString(description)
+        suggestion.startsWith(description) && suggestion !== description
       )
     : TRANSACTION_DESCRIPTION_SUGGESTIONS;
 
