@@ -10,7 +10,6 @@ import AccountService from 'shared/services/AccountService';
 
 // Constantes para timing de UI
 const MODAL_AUTO_OPEN_DELAY = 500; // ms para abrir modal após redirecionamento
-const NAVIGATE_DELAY = 1000; // ms para aguardar toast antes de navegar
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -18,7 +17,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false }) => {
-  const { account, loading, currentUser, login, logout, isAuthenticated } = useAccount();
+  const { account, loading, currentUser, logout, isAuthenticated, login } = useAccount();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -69,25 +68,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
     initials: getInitials(account.name)
   } : null);
 
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      const loggedAccount = await login(email, password);
-      console.log('Login successful:', loggedAccount);
-
-      // Toast de boas-vindas
-      showSuccess(`Bem-vindo(a), ${loggedAccount?.name || 'Usuário'}!`);
-
-      // Redirecionar para dashboard após login bem-sucedido
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, NAVIGATE_DELAY); // Pequeno delay para mostrar o toast
-
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error; // Re-lança o erro para o modal tratar
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -104,21 +84,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
     }
   };
 
-  const handleRegister = async (name: string, email: string, password: string) => {
+  const handleRegister = async ({ name, email, password }: { name: string, email: string, password: string }) => {
     try {
-      const newAccount = await AccountService.createAccount(name, email, password);
-      console.log('Account created successfully:', newAccount);
-
-      // Toast para cadastro
+      await AccountService.createAccount(name, email, password);
+      await login(email, password);
       showSuccess(`Conta criada para ${name}!`);
-
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Error creating account:', error);
-
-      // Toast de erro
       showError(TOAST_MESSAGES.REGISTER_ERROR);
-
-      throw error; // Re-lançar o erro para o modal tratar
+      throw error;
     }
   };
 
@@ -213,8 +187,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
       {/* Modal de Login */}
       <LoginModal
         open={loginModalOpen}
-        onClose={() => setLoginModalOpen(false)}
-        onLogin={handleLogin}
+        onClose={() => {
+          setLoginModalOpen(false);
+        }}
         onSwitchToRegister={() => {
           setLoginModalOpen(false);
           setRegisterModalOpen(true);

@@ -58,7 +58,6 @@ export function useTransactions() {
     }
     // Escutar evento customizado de limpeza de transações
     const handleTransactionsCleared = () => {
-      console.log('Evento de limpeza de transações recebido');
       setTransactions([]); // Limpa transações localmente
       fetchTransactions(); // E recarrega do servidor
     };

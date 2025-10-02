@@ -254,8 +254,7 @@ async function getCurrentAccount() {
 // Criar nova conta
 async function createNewAccount() {
   const accountData: CreateAccountDTO = {
-    name: 'Minha Conta Poupança',
-    initialBalance: 1000.00
+    name: 'Minha Conta Poupança'
   };
 
   try {
