@@ -12,9 +12,15 @@ interface LoginModalProps {
   onLoginSuccess?: () => void;
 }
 
+interface LoginFormErrors {
+  email?: string;
+  password?: string;
+}
+
 export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginSuccess }: LoginModalProps) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [formErrors, setFormErrors] = useState<LoginFormErrors>({});
   const [localLoading, setLocalLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -23,18 +29,69 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
   const handleClose = () => {
     setEmail('');
     setPassword('');
+    setFormErrors({});
     setLocalError(null);
     onClose();
+  };
+
+  const validateFields = () => {
+    const errors: LoginFormErrors = {};
+    if (!email) {
+      errors.email = 'Este campo é obrigatório';
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      errors.email = 'Email inválido';
+    }
+    if (!password) {
+      errors.password = 'Este campo é obrigatório';
+    }
+    return errors;
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    let errorMsg = '';
+    if (!value) {
+      errorMsg = 'Este campo é obrigatório';
+    } else if (id === 'email' && !/^\S+@\S+\.\S+$/.test(value)) {
+      errorMsg = 'Email inválido';
+    } else if (id === 'password' && value.length < 6) {
+      errorMsg = 'Senha deve ter ao menos 6 caracteres';
+    }
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      if (errorMsg) {
+        newErrors[id as keyof LoginFormErrors] = errorMsg;
+      } else {
+        delete newErrors[id as keyof LoginFormErrors];
+      }
+      return newErrors;
+    });
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    if (id === 'email') setEmail(value);
+    if (id === 'password') setPassword(value);
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[id as keyof LoginFormErrors];
+      return newErrors;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLocalLoading(true);
     setLocalError(null);
-
+    const errors = validateFields();
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setLocalLoading(false);
+      return;
+    }
     try {
       await dispatch(login({ email, password })).unwrap();
-      onLoginSuccess?.(); // Chama sucesso imediatamente
+      onLoginSuccess?.();
       handleClose();
     } catch (err: any) {
       setLocalError(err?.message || 'Erro ao fazer login');
@@ -62,12 +119,14 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
             type="email"
             id="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleChange}
+            onBlur={handleBlur}
             placeholder="seu.email@exemplo.com"
-            className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none text-primary-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
+            className={`w-full px-4 py-3 rounded-lg border shadow-sm focus:outline-none text-primary-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-700 ${formErrors.email ? 'border-red-500' : 'border-primary-700'}`}
             required
             disabled={loading}
           />
+          {formErrors.email && <span className="text-xs text-red-600 mt-1 block">{formErrors.email}</span>}
         </div>
         <div>
           <label htmlFor="password" className="block text-md font-bold text-primary-700 mb-1">
@@ -77,12 +136,14 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
             type="password"
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handleChange}
+            onBlur={handleBlur}
             placeholder="Digite sua senha"
-            className="w-full px-4 py-3 rounded-lg text-primary-700 border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
+            className={`w-full px-4 py-3 rounded-lg text-primary-700 border shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700 ${formErrors.password ? 'border-red-500' : 'border-primary-700'}`}
             required
             disabled={loading}
           />
+          {formErrors.password && <span className="text-xs text-red-600 mt-1 block">{formErrors.password}</span>}
         </div>
         <div className="flex gap-4 pt-4">
           <Button
