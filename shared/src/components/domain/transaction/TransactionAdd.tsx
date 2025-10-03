@@ -55,7 +55,7 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
   return (
     <form onSubmit={handleSubmit} className='space-y-5 mt-4'>
       <div>
-        <label className='block text-lg font-bold text-primary-700 mb-1'>Tipo *</label>
+        <label className='block text-md font-bold text-primary-700 mb-1'>Tipo *</label>
         <select
           id='type'
           value={transactionType}
@@ -70,7 +70,7 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
         </select>
       </div>
       <div>
-        <label className='block text-lg font-bold text-primary-700 mb-1'>Valor *</label>
+        <label className='block text-md font-bold text-primary-700 mb-1'>Valor *</label>
         <div className='relative'>
           <span className='absolute inset-y-0 left-0 flex items-center pl-4 text-white-800'>R$</span>
           <input
@@ -86,7 +86,7 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
         </div>
       </div>
       <div>
-        <label className='block text-lg font-bold text-primary-700 mb-1'>
+        <label className='block text-md font-bold text-primary-700 mb-1'>
           Descrição <span className='text-sm font-medium text-white-800'>(opcional)</span>
         </label>
         <input

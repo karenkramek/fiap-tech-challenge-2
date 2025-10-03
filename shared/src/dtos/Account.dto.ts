@@ -6,7 +6,6 @@ export interface AccountDTO {
 
 export interface CreateAccountDTO {
   name: string;
-  initialBalance?: number;
 }
 
 export interface UpdateAccountDTO {
@@ -33,7 +32,6 @@ export function isCreateAccountDTO(obj: any): obj is CreateAccountDTO {
     typeof obj === 'object' &&
     obj !== null &&
     typeof obj.name === 'string' &&
-    obj.name.trim().length > 0 &&
-    (obj.initialBalance === undefined || typeof obj.initialBalance === 'number')
+    obj.name.trim().length > 0
   );
 }

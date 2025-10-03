@@ -2,15 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Transaction } from '../models/Transaction';
-import { AccountService } from '../services/AccountService';
 import { TransactionService } from '../services/TransactionService';
 import { TransactionType } from '../types/TransactionType';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // Ordena por data decrescente, e por id crescente em caso de empate
   const sortTransactions = (txs: Transaction[]) => {
@@ -28,18 +30,12 @@ export function useTransactions() {
   const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
-
-      // Obter o usuário atual para filtrar transações
-      const currentUser = AccountService.getCurrentUser();
-      if (!currentUser) {
-        // Se não há usuário logado, não carregar transações
+      if (!user) {
         setTransactions([]);
         setError(null);
         return;
       }
-
-      // Buscar apenas transações do usuário atual
-      const data = await TransactionService.getAllTransactions(currentUser.id);
+      const data = await TransactionService.getAllTransactions(user.id);
       setTransactions(sortTransactions(data));
       setError(null);
     } catch (err) {
@@ -47,7 +43,7 @@ export function useTransactions() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Função para limpar transações localmente (usada após criar conta)
   const clearTransactions = useCallback(() => {
@@ -56,39 +52,26 @@ export function useTransactions() {
 
   // Detectar mudança de usuário e recarregar transações
   useEffect(() => {
-    const checkUserChange = () => {
-      const currentUser = AccountService.getCurrentUser();
-      const newUserId = currentUser?.id || null;
-
-      if (newUserId !== currentUserId) {
-        setCurrentUserId(newUserId);
-        fetchTransactions(); // Recarrega transações quando usuário muda
-      }
-    };
-
+    if (user?.id !== currentUserId) {
+      setCurrentUserId(user?.id || null);
+      fetchTransactions();
+    }
     // Escutar evento customizado de limpeza de transações
     const handleTransactionsCleared = () => {
-      console.log('Evento de limpeza de transações recebido');
       setTransactions([]); // Limpa transações localmente
       fetchTransactions(); // E recarrega do servidor
     };
 
-    checkUserChange();
-
     // Escutar mudanças no localStorage (quando login/logout acontece)
-    window.addEventListener('storage', checkUserChange);
+    window.addEventListener('storage', fetchTransactions);
     // Escutar evento customizado de limpeza
     window.addEventListener('transactionsCleared', handleTransactionsCleared);
 
-    // Também escutar mudanças locais no localStorage
-    const interval = setInterval(checkUserChange, 1000);
-
     return () => {
-      window.removeEventListener('storage', checkUserChange);
+      window.removeEventListener('storage', fetchTransactions);
       window.removeEventListener('transactionsCleared', handleTransactionsCleared);
-      clearInterval(interval);
     };
-  }, [currentUserId, fetchTransactions]);
+  }, [currentUserId, fetchTransactions, user]);
 
   const addTransaction = useCallback(async (
     type: TransactionType,
@@ -99,13 +82,11 @@ export function useTransactions() {
   ) => {
     setLoading(true);
     try {
-      const currentUser = AccountService.getCurrentUser();
-      if (!currentUser) {
+      if (!user) {
         throw new Error('Usuário não está logado');
       }
-
       const newTransaction = await TransactionService.addTransaction(
-        currentUser.id,
+        user.id,
         type,
         amount,
         date,
@@ -119,7 +100,7 @@ export function useTransactions() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const updateTransaction = useCallback(async (
     id: string,
@@ -169,13 +150,11 @@ export function useTransactions() {
 
   // Carregamento inicial
   useEffect(() => {
-    if (currentUserId === null) {
-      // Primeira execução, definir usuário atual e carregar
-      const currentUser = AccountService.getCurrentUser();
-      setCurrentUserId(currentUser?.id || 'anonymous');
+    if (currentUserId === null && user) {
+      setCurrentUserId(user.id);
       fetchTransactions();
     }
-  }, [fetchTransactions, currentUserId]);
+  }, [fetchTransactions, currentUserId, user]);
 
   return {
     transactions,

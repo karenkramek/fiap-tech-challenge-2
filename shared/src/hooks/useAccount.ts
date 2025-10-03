@@ -1,97 +1,55 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Account } from '../models/Account';
-import { AccountService } from '../services/AccountService';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store';
+import type { AccountData } from '../store/authSlice';
+import { login as loginThunk, logout as logoutAction } from '../store/authSlice';
 
-export function useAccount() {
-  const [account, setAccount] = useState<Account | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [currentUser, setCurrentUser] = useState(AccountService.getCurrentUser());
+export function useAccount(): {
+  account: AccountData | null;
+  loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+  currentUser: AccountData | null;
+  login: (email: string, password: string) => Promise<AccountData | undefined>;
+  logout: () => void;
+  refreshAccount: () => Promise<void>;
+} {
+  const dispatch: AppDispatch = useDispatch();
+  const account = useSelector((state: RootState) => state.auth.user);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const loading = useSelector((state: RootState) => state.auth.loading);
+  const error = useSelector((state: RootState) => state.auth.error);
 
-  const fetchAccount = useCallback(async () => {
+  const login = async (email: string, password: string): Promise<AccountData | undefined> => {
     try {
-      setLoading(true);
-
-      // Obter o usuário atual do localStorage
-      const currentUser = AccountService.getCurrentUser();
-      if (!currentUser) {
-        // Se não há usuário logado, limpar conta
-        setAccount(null);
-        setError(null);
-        return;
-      }
-
-      // Buscar a conta específica do usuário logado
-      const data = await AccountService.getAccountById(currentUser.id);
-      setAccount(data);
-      setError(null);
+      const result = await dispatch(loginThunk({ email, password })).unwrap();
+      return result as AccountData;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch account'));
-      // Do not set a default value for account when an error occurs.
-      setAccount(null);
-    } finally {
-      setLoading(false);
+      return undefined;
     }
-  }, []);
+  };
 
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      const loggedAccount = await AccountService.login(email, password);
-      setAccount(loggedAccount);
-      setCurrentUser(AccountService.getCurrentUser());
-      return loggedAccount;
-    } catch (err) {
-      throw err;
-    }
-  }, []);
+  const logout = () => {
+    dispatch(logoutAction());
+    localStorage.removeItem('authUser');
+  };
 
-  const logout = useCallback(() => {
-    AccountService.logout();
-    setCurrentUser(null);
-    setAccount(null);
-  }, []);
-
-  useEffect(() => {
-    fetchAccount();
-  }, [fetchAccount]);
-
-  // Atualizar currentUser quando localStorage mudar (ex: em outras abas)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const newUser = AccountService.getCurrentUser();
-      if (newUser?.id !== currentUser?.id) {
-        setCurrentUser(newUser);
-        fetchAccount(); // Recarregar conta quando usuário mudar
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Verificar mudanças locais também (no mesmo tab)
-    const interval = setInterval(() => {
-      const newUser = AccountService.getCurrentUser();
-      if (newUser?.id !== currentUser?.id) {
-        setCurrentUser(newUser);
-        fetchAccount();
-      }
-    }, 1000);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
-  }, [currentUser, fetchAccount]);
+  // Implementar se necessário: buscar dados atualizados do usuário
+  const refreshAccount = async () => {
+    // Exemplo buscar o saldo real e dados do usuário diretamente do backend
+    // Exemplo: dispatch(fetchAccountThunk())
+    return Promise.resolve();
+  };
 
   return {
     account,
     loading,
     error,
-    currentUser,
-    isAuthenticated: AccountService.isAuthenticated(),
+    isAuthenticated,
+    currentUser: account,
     login,
     logout,
-    refreshAccount: fetchAccount
+    refreshAccount,
   };
 }

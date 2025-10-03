@@ -86,7 +86,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <label className="block text-lg font-bold text-primary-700 mb-1">
+      <label className="block text-md font-bold text-primary-700 mb-1">
         Anexo <span className="text-sm font-medium text-white-800">(opcional)</span>
       </label>
 

@@ -6,7 +6,6 @@ export interface IAccount {
 
 export interface ICreateAccount {
   name: string;
-  initialBalance?: number;
 }
 
 export interface IUpdateAccount {

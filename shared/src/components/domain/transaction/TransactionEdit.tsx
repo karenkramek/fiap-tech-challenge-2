@@ -109,7 +109,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
             </div>
           )}
           <div>
-            <label className="block text-lg font-bold text-primary-700 mb-1">Tipo *</label>
+            <label className="block text-md font-bold text-primary-700 mb-1">Tipo *</label>
             <select
               id="type"
               value={type}
@@ -124,7 +124,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
             </select>
           </div>
           <div>
-            <label className="block text-lg font-bold text-primary-700 mb-1">Valor *</label>
+            <label className="block text-md font-bold text-primary-700 mb-1">Valor *</label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-white-800">R$</span>
               <input
@@ -141,7 +141,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
             </div>
           </div>
           <div>
-            <label className="block text-lg font-bold text-primary-700 mb-1">Data *</label>
+            <label className="block text-md font-bold text-primary-700 mb-1">Data *</label>
             <input
               type="date"
               id="date"
@@ -153,7 +153,7 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
             />
           </div>
           <div>
-            <label className="block text-lg font-bold text-primary-700 mb-1">
+            <label className="block text-md font-bold text-primary-700 mb-1">
               Descrição <span className="text-sm font-medium text-white-800">(opcional)</span>
             </label>
             <input
