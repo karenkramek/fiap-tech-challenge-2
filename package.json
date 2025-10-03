@@ -31,11 +31,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.9.0",
     "lucide-react": "^0.544.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-redux": "^9.2.0",
+    "react-hot-toast": "^2.6.0",
     "tailwind-merge": "^3.3.1"
   }
 }
