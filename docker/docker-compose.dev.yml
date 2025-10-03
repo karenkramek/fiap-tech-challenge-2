@@ -1,0 +1,107 @@
+services:
+  shell:
+    build:
+      context: ../shell
+      dockerfile: ../docker/Dockerfile.frontend
+      args:
+        PORT: 3030
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3034
+    ports:
+      - "3030:3030"
+    volumes:
+      - ../shell:/app
+      - ../shared:/shared
+      - /app/node_modules
+    depends_on:
+      - dashboard
+      - transactions
+      - shared
+      - api
+      - upload
+
+  dashboard:
+    build:
+      context: ../dashboard-mfe
+      dockerfile: ../docker/Dockerfile.frontend
+      args:
+        PORT: 3031
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3034
+    ports:
+      - "3031:3031"
+    volumes:
+      - ../dashboard-mfe:/app
+      - ../shared:/shared
+      - /app/node_modules
+    depends_on:
+      - shared
+      - api
+
+  transactions:
+    build:
+      context: ../transactions-mfe
+      dockerfile: ../docker/Dockerfile.frontend
+      args:
+        PORT: 3032
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3034
+    ports:
+      - "3032:3032"
+    volumes:
+      - ../transactions-mfe:/app
+      - ../shared:/shared
+      - /app/node_modules
+    depends_on:
+      - shared
+      - api
+
+  shared:
+    build:
+      context: ../shared
+      dockerfile: ../docker/Dockerfile.frontend
+      args:
+        PORT: 3033
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3034
+    ports:
+      - "3033:3033"
+    volumes:
+      - ../shared:/app
+      - /app/node_modules
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.jsonserver
+    environment:
+      PORT: 3034
+    ports:
+      - "3034:3034"
+    volumes:
+      - db-data:/data
+      - ../db.template.json:/data/db.template.json:ro
+
+  upload:
+    build:
+      context: ../upload-server
+      dockerfile: ../docker/Dockerfile.node
+    environment:
+      PORT: 3035
+    ports:
+      - "3035:3035"
+    volumes:
+      - ../upload-server:/app
+      - /app/node_modules
+      - ../uploads:/uploads
+
+volumes:
+  db-data:
