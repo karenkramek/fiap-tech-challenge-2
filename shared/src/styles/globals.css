@@ -19,9 +19,6 @@ html, body {
 }
 
 /* Estilos globais, utilidades, etc. */
-
-.flex { display: flex; }
-.grid { display: grid; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
 .justify-end { justify-content: flex-end; }
@@ -56,14 +53,14 @@ html, body {
 .min-h-screen { min-height: 100vh; }
 
 /* Responsive grid classes */
+@media (min-width: 640px) {
+  .sm\:col-span-1 { grid-column: span 1 / span 1; }
+}
+
 @media (min-width: 768px) {
   .md\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .md\:col-span-2 { grid-column: span 2 / span 2; }
   .md\:col-span-3 { grid-column: span 3 / span 3; }
-}
-
-@media (min-width: 640px) {
-  .sm\:col-span-1 { grid-column: span 1 / span 1; }
 }
 
 @media (min-width: 1024px) {
@@ -71,8 +68,11 @@ html, body {
 }
 
 @media (min-width: 1280px) {
+  .xl\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .xl\:col-span-1 { grid-column: span 1 / span 1; }
+  .xl\:col-span-4 { grid-column: span 4 / span 4; }
   .xl\:hidden { display: none; }
+  .xl\:block { display: block; }
 }
 
 /* Color utility classes using design tokens */
