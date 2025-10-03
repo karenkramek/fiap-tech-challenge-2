@@ -2,9 +2,9 @@ import React from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 
 export const showSuccess = (msg: string, duration?: number) =>
-  toast.success(msg, duration ? { duration } : undefined);
+  toast.success(msg, { duration: typeof duration === 'number' ? duration : 3000 });
 export const showError = (msg: string, duration?: number) =>
-  toast.error(msg, duration ? { duration } : undefined);
+  toast.error(msg, { duration: typeof duration === 'number' ? duration : 3000 });
 export const showLoading = (msg: string) => toast.loading(msg);
 export const dismissLoading = () => toast.dismiss();
 
