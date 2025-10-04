@@ -12,7 +12,8 @@
     "dev:shared": "cd shared && npm run dev",
     "dev:api": "json-server --watch db.json --port 3034",
     "dev:upload": "cd upload-server && npm start",
-    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
+    "dev:investments": "cd investments-mfe && npm run dev",
+    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:investments\" \"npm run dev:shell\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

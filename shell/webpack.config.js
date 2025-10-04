@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const path = require('path');
 
 module.exports = {
   entry: "./src/app/index.tsx",
@@ -13,6 +14,12 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"],
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom'),
+      'react-redux': path.resolve('./node_modules/react-redux'),
+      '@reduxjs/toolkit': path.resolve('./node_modules/@reduxjs/toolkit')
+    }
   },
   module: {
     rules: [
@@ -53,25 +60,39 @@ module.exports = {
       remotes: {
         dashboardMFE: 'dashboardMFE@http://localhost:3031/remoteEntry.js',
         transactionsMFE: 'transactionsMFE@http://localhost:3032/remoteEntry.js',
-        shared: 'shared@http://localhost:3033/remoteEntry.js',
-        investmentsMFE: 'investmentsMFE@http://localhost:3035/remoteEntry.js'
+        investments: 'investmentsMFE@http://localhost:3036/remoteEntry.js',
+        shared: 'shared@http://localhost:3033/remoteEntry.js'
       },
       shared: {
         react: {
           singleton: true,
-          requiredVersion: "^18.2.0",
+          requiredVersion: "18.2.0",
           eager: true,
+          strictVersion: true
         },
         "react-dom": {
           singleton: true,
-          requiredVersion: "^18.2.0",
+          requiredVersion: "18.2.0",
           eager: true,
+          strictVersion: true
         },
         "react-hot-toast": {
           singleton: true,
           requiredVersion: "^2.5.0",
           eager: true,
         },
+        'react-redux': {
+          singleton: true,
+          requiredVersion: "8.1.3",
+          eager: true,
+          strictVersion: true
+        },
+        '@reduxjs/toolkit': {
+          singleton: true,
+          requiredVersion: "1.9.7",
+          eager: true,
+          strictVersion: true
+        }
       },
     }),
     new HtmlWebpackPlugin({

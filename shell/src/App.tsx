@@ -12,6 +12,7 @@ import store from 'shared/store';
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
 const TransactionsPage = React.lazy(() => import('transactionsMFE/TransactionsPage'));
+const InvestmentsPage = React.lazy(() => import('investments/Investments'));
 
 // Layout wrapper for authenticated routes
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -109,6 +110,16 @@ const App: React.FC = () => {
                 <AuthenticatedLayout>
                   <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
                     <TransactionsPage />
+                  </Suspense>
+                </AuthenticatedLayout>
+              }
+            />
+            <Route
+              path="/investments"
+              element={
+                <AuthenticatedLayout>
+                  <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Investimentos...</div>}>
+                    <InvestmentsPage />
                   </Suspense>
                 </AuthenticatedLayout>
               }
