@@ -1,15 +1,15 @@
 import React, { Suspense, useState } from 'react';
 import BalanceCard from 'shared/components/domain/BalanceCard';
 import Card from 'shared/components/ui/Card';
-const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
-const TransactionAdd = React.lazy(() => import('shared/components/domain/transaction/TransactionAdd'));
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
+import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
+import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import { TOAST_MESSAGES } from 'shared/constants/toast';
 import { useTransactions } from 'shared/hooks/useTransactions';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
-import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
-import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
-import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
-import { TOAST_MESSAGES } from 'shared/constants/toast';
+const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
+const TransactionAdd = React.lazy(() => import('shared/components/domain/transaction/TransactionAdd'));
 
 const Dashboard: React.FC = () => {
   const [showBalance, setShowBalance] = useState(false);
@@ -64,9 +64,9 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div className="container mx-auto px-4 space-y-8">
-        <div className="flex gap-6">
+        <div className="grid md:grid-cols-5 gap-6">
           {/* Conteúdo principal */}
-          <main className="flex-1 space-y-6">
+          <main className="md:col-span-3 space-y-6">
             {/* Saldo */}
             <BalanceCard
               transactions={transactions}
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
             </Card>
           </main>
           {/* Extrato */}
-          <aside className="w-80">
+          <aside className="sm:col-span-1 md:col-span-2 lg:col-span-2 space-y-6">
             <Card>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="transactions-title text-primary-700">Extrato</h2>
