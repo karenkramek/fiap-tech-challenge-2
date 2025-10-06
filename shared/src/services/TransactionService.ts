@@ -261,32 +261,39 @@ export class TransactionService extends BaseService {
 
       const newBalance = account.balance + balanceChange;
 
-      // Buscar a conta completa com todos os campos
-      const fullAccount = await AccountService.getAccountById(accountId);
-
-      // Preservar todos os campos da conta, incluindo email e password
-      const updateData = {
-        id: fullAccount.id,
-        name: fullAccount.name,
-        balance: newBalance,
-        email: fullAccount.email,
-        password: fullAccount.password
-      };
-      await service.put(`/accounts/${fullAccount.id}`, updateData);
-    } catch (error) {
-      // Fallback to legacy API with specific account ID
-      console.warn('Falling back to legacy API for balance update');
-      const account = await api.get<AccountDTO>(`/accounts/${accountId}`);
-      const accountData = account.data;
-      const newBalance = accountData.balance + balanceChange;
-
-      await api.put(`/accounts/${accountId}`, {
-        ...accountData,
-        balance: newBalance
+      // ✅ USAR PATCH PARA ATUALIZAR APENAS O SALDO
+      await service.patch(`/accounts/${accountId}`, { 
+        balance: newBalance 
       });
+      
+    } catch (error) {
+      // Fallback usando fetch direto com PATCH
+      console.warn('Falling back to direct API call for balance update');
+      
+      try {
+        const accountResponse = await fetch(`http://localhost:3034/accounts/${accountId}`);
+        if (!accountResponse.ok) {
+          throw new Error('Account not found');
+        }
+        
+        const accountData = await accountResponse.json();
+        const newBalance = accountData.balance + balanceChange;
 
-      if (error instanceof AxiosError && error.response?.status === 409) {
-        throw new Error('Account balance update conflict. Please retry.');
+        // ✅ USAR PATCH PARA PRESERVAR INVESTIMENTOS
+        const updateResponse = await fetch(`http://localhost:3034/accounts/${accountId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ balance: newBalance })
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error('Failed to update account balance');
+        }
+      } catch (fallbackError) {
+        console.error('Direct API call also failed:', fallbackError);
+        throw fallbackError;
       }
     }
   }
