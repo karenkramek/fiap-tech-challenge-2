@@ -55,7 +55,7 @@ const Home: React.FC = () => {
 
             {/* Content overlay */}
             <div className="container mx-auto relative z-10">
-               <div className="grid lg:grid-cols-10 gap-8 items-center min-h-[500px] lg:col-start-2 lg:col-end-12 mx-auto max-w-7xl">
+               <div className="grid lg:grid-cols-10 gap-8 items-center min-h-[500px] mx-auto max-w-7xl">
                   <div className="lg:col-span-6 text-center lg:text-left">
                      {/* Main heading */}
                      <h1 className="text-5xl font-bold text-white mb-8 leading-tight">
