@@ -51,35 +51,23 @@ export class AccountService extends BaseService {
       };
 
       try {
-        console.log('Criando conta nova...');
-        console.log('Dados da conta a serem enviados:', newAccount);
-
-        // Usar POST para adicionar uma nova conta ao array
         const response = await api.post('/accounts', newAccount);
-
-        console.log('Conta criada com sucesso:', response.data);
-        console.log('Status da resposta:', response.status);
-
-        // Verificar se o email foi salvo
         const savedAccount = response.data;
         if (!savedAccount.email || !savedAccount.password) {
           console.warn('ATENÇÃO: Email ou senha não foram salvos na resposta da API!');
-          console.log('Campo email na resposta:', savedAccount.email);
-          console.log('Campo password na resposta:', savedAccount.password);
         }
-
-        console.log('Nova conta criada com saldo zero - transações isoladas por usuário');
-
         return Account.fromJSON(response.data);
       } catch (error) {
         console.error('Erro ao criar conta:', error);
         throw new Error('Erro ao criar conta. Tente novamente.');
       }
     } else {
-      // Novo método com DTO
       const service = new AccountService();
-      const newAccountData = await service.post<AccountDTO, CreateAccountDTO>('/accounts', nameOrData);
-
+      const dto = {
+        ...nameOrData,
+        balance: 0
+      };
+      const newAccountData = await service.post<AccountDTO, typeof dto>('/accounts', dto);
       return Account.fromJSON(newAccountData);
     }
   }
@@ -131,31 +119,10 @@ export class AccountService extends BaseService {
 
     // Verifica se as credenciais coincidem
     if (account.email === email && account.password === password) {
-      // Salva os dados do usuário no localStorage para persistir login
-      localStorage.setItem('currentUser', JSON.stringify({
-        id: account.id,
-        name: account.name,
-        email: account.email,
-        isAuthenticated: true
-      }));
       return account;
     } else {
       throw new Error('Credenciais inválidas');
     }
-  }
-
-  static getCurrentUser(): { id: string; name: string; email: string; isAuthenticated: boolean } | null {
-    const userData = localStorage.getItem('currentUser');
-    return userData ? JSON.parse(userData) : null;
-  }
-
-  static logout(): void {
-    localStorage.removeItem('currentUser');
-  }
-
-  static isAuthenticated(): boolean {
-    const user = AccountService.getCurrentUser();
-    return user ? user.isAuthenticated : false;
   }
 }
 
