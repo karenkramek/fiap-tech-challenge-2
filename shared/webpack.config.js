@@ -96,6 +96,8 @@ module.exports = {
       shared: {
         react: { singleton: true, requiredVersion: '^18.2.0' },
         'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
+        'react-redux': { singleton: true, requiredVersion: '^8.1.3' },
+        '@reduxjs/toolkit': { singleton: true, requiredVersion: '^1.9.7' },
         axios: { singleton: true },
         'react-hot-toast': { singleton: true, requiredVersion: '^2.5.0' }
       }

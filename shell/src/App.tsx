@@ -1,6 +1,7 @@
 import React, { Suspense, useState } from 'react';
 import { Provider } from 'react-redux';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import store from 'shared/store';
 import Header from './components/Header';
