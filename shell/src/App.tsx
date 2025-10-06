@@ -2,7 +2,6 @@ import React, { Suspense, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
-import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import Header from './components/Header';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
