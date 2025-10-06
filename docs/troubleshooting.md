@@ -47,6 +47,19 @@ npm cache clean --force
 1. Identifique qual processo está utilizando a porta.
 2. Finalize o processo conflitante ou altere a porta no arquivo de configuração do serviço.
 
+## Problemas com Testes
+
+Para problemas específicos relacionados à execução de testes, consulte o guia dedicado:
+
+📖 **Guia completo:** Ver [Troubleshooting de Testes](./testing-troubleshooting.md)
+
+**Problemas mais comuns:**
+- Erro "Cannot resolve module 'shared/...'"
+- "matchMedia is not a function"
+- "IntersectionObserver is not defined"
+- Warnings de `act()` em testes React
+- Timeouts em testes assíncronos
+
 ## JSON Server sem persistir dados
 
 - Verifique se o volume `docker_db-data` está criado e montado.

@@ -1,11 +1,11 @@
 import { LogOut, Menu } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation, Location as RouterLocation } from 'react-router-dom';
-import { useAccount } from 'shared/hooks/useAccount';
-import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
-import { TOAST_DURATION, TOAST_MESSAGES } from 'shared/constants/toast';
+import React, { useEffect, useState } from 'react';
+import { Link, Location as RouterLocation, useLocation, useNavigate } from 'react-router-dom';
 import LoginModal from 'shared/components/domain/login/LoginModal';
 import RegisterModal from 'shared/components/domain/login/RegisterModal';
+import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
+import { TOAST_DURATION, TOAST_MESSAGES } from 'shared/constants/toast';
+import { useAccount } from 'shared/hooks/useAccount';
 import AccountService from 'shared/services/AccountService';
 
 // Constantes para timing de UI
@@ -136,6 +136,24 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
           >
             ByteBank
           </Link>
+
+          {/* Navigation Links - apenas na home */}
+          {showAuthButtons && (
+            <nav className='hidden md:flex items-center space-x-6 !ml-20'>
+              <Link
+                to="/"
+                className='text-white hover:text-primary-200 transition-colors font-medium'
+              >
+                Início
+              </Link>
+              <Link
+                to="/sobre"
+                className='text-white hover:text-primary-200 transition-colors font-medium'
+              >
+                Sobre
+              </Link>
+            </nav>
+          )}
         </div>
 
         {/* Botões de Conta e Login - apenas quando showAuthButtons for true (tela inicial) */}

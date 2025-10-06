@@ -5,33 +5,11 @@ import {
    Star
 } from 'lucide-react';
 import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAccount } from 'shared/hooks/useAccount';
 import "../styles/Home.css";
 import Footer from "./Footer";
 
 const Home: React.FC = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAccount();
   const interactiveBubbleRef = useRef<HTMLDivElement>(null); // Adicione esta linha
-
-  const handleDashboardClick = () => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    } else {
-      // A proteção de rota irá interceptar e mostrar o modal de login
-      navigate('/dashboard');
-    }
-  };
-
-  const handleTransactionsClick = () => {
-    if (isAuthenticated) {
-      navigate('/transactions');
-    } else {
-      // A proteção de rota irá interceptar e mostrar o modal de login
-      navigate('/transactions');
-    }
-  };
 
   return (
    <div className="min-h-screen bg-gray-50">
@@ -77,19 +55,20 @@ const Home: React.FC = () => {
 
             {/* Content overlay */}
             <div className="container mx-auto relative z-10">
-               <div className="grid lg:grid-cols-12 gap-8 items-center min-h-[500px]">
-                  <div className="lg:col-span-7 xl:col-span-6 text-center lg:text-left">
+               <div className="grid lg:grid-cols-10 gap-8 items-center min-h-[500px] lg:col-start-2 lg:col-end-12 mx-auto max-w-7xl">
+                  <div className="lg:col-span-6 text-center lg:text-left">
                      {/* Main heading */}
-                     <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-5xl font-bold text-white mb-8 leading-tight">
-                        Liberdade financeira na palma da sua mão
+                     <h1 className="text-5xl font-bold text-white mb-8 leading-tight">
+                        Cuide do seu dinheiro com clareza, controle e tranquilidade.
                      </h1>
 
                      <p className="text-xl text-white mb-8 pr-6">
-                        Gerencie transações, monitore saldos e tome decisões inteligentes sobre seu dinheiro, onde e quando quiser.
+                       Organize transações, acompanhe investimentos e <br />
+                       tenha clareza sobre cada decisão financeira.
                      </p>
                   </div>
 
-                  <div className="lg:col-span-5 xl:col-span-6 hidden lg:flex justify-center items-center">
+                  <div className="lg:col-span-4 hidden lg:flex justify-center items-center">
                      <img
                         src="/images/hero-image.png"
                         alt="Controle da vida financeira"
@@ -102,7 +81,7 @@ const Home: React.FC = () => {
          <div className="py-28 bg-white">
             <div className="container mx-auto px-4">
                <h2 className="text-4xl font-bold text-center text-black mb-12">
-                  Conheça as vantagens do nosso banco
+                  Conheça nossas vantagens
                </h2>
 
                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
@@ -159,6 +138,7 @@ const Home: React.FC = () => {
                </div>
             </div>
          </div>
+
          <Footer />
       </div>
   );

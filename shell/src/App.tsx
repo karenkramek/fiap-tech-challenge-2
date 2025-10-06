@@ -3,6 +3,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'r
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import About from './components/About';
 import Header from './components/Header';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -105,34 +106,42 @@ const App: React.FC = () => {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen bg-gray-50">
-        <ProtectedRoute>
-          <Routes>
-            <Route path="/" element={<HomeLayout />} />
-            <Route
-              path="/dashboard"
-              element={
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <Suspense fallback={<div>Loading Dashboard...</div>}>
-                      <Dashboard />
-                    </Suspense>
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              }
-            />
-            <Route
-              path="/transactions/*"
-              element={
-                <AuthenticatedLayout>
-                  <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
-                    <TransactionsPage />
-                  </Suspense>
-                </AuthenticatedLayout>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </ProtectedRoute>
+        <Routes>
+          {/* Rotas públicas (sem autenticação) */}
+          <Route path="/sobre" element={<About />} />
+
+          {/* Rotas que precisam de proteção */}
+          <Route path="/*" element={
+            <ProtectedRoute>
+              <Routes>
+                <Route path="/" element={<HomeLayout />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <AuthenticatedLayout>
+                      <ErrorBoundary>
+                        <Suspense fallback={<div>Loading Dashboard...</div>}>
+                          <Dashboard />
+                        </Suspense>
+                      </ErrorBoundary>
+                    </AuthenticatedLayout>
+                  }
+                />
+                <Route
+                  path="/transactions/*"
+                  element={
+                    <AuthenticatedLayout>
+                      <Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Transações...</div>}>
+                        <TransactionsPage />
+                      </Suspense>
+                    </AuthenticatedLayout>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </ProtectedRoute>
+          } />
+        </Routes>
       </div>
     </Router>
   );
