@@ -4,6 +4,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'r
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import store from 'shared/store';
+import About from './components/About';
 import Header from './components/Header';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -92,6 +93,7 @@ const App: React.FC = () => {
         <ProtectedRoute>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/sobre" element={<About />} />
             <Route path="/dashboard"
               element={
                 <AuthenticatedLayout>
