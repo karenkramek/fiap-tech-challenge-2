@@ -13,7 +13,7 @@
     "dev:shared": "cd shared && npm run dev",
     "dev:api": "json-server --watch db.json --port 3034",
     "dev:upload": "cd upload-server && npm start",
-    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
+    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:investments\" \"npm run dev:shell\"",
     "test": "npm run test:shared && npm run test:shell && npm run test:dashboard && npm run test:transactions",
     "test:shared": "cd shared && npm test",
     "test:shell": "cd shell && npm test",

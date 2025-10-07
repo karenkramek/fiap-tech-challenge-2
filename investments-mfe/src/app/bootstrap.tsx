@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from '../App';
-import '../styles/index.css';
-import '../styles/investments-styles.css';
+import '../styles/styles.css';
 import { BrowserRouter, useLocation, Navigate } from 'react-router-dom';
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import { useAuthProtection } from 'shared/hooks/useAuthProtection';

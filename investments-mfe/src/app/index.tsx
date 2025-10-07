@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from '../App';
-import '../styles/investments-styles.css';
+import '../styles/styles.css';
 
 import('./bootstrap');
 
