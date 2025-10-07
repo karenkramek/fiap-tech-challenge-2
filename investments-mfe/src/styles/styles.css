@@ -4,6 +4,15 @@
 
 @import '../../../shared/src/styles/tokens.css';
 
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Utility classes for investments components */
 .flex { display: flex; }
 .grid { display: grid; }
@@ -77,5 +86,3 @@
 .text-white-50 {
   color: var(--white-50);
 }
-
-/* ...restante do CSS igual ao antigo investments-styles.css... */

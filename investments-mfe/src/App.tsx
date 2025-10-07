@@ -28,14 +28,16 @@ import {
   scatterOptions,
   riskReturnData
 } from './config/chartConfigs';
-import './styles/index.css';
-import './styles/investments-styles.css';
+import './styles/styles.css';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
+import { useSelector } from 'react-redux';
+import { RootState } from 'shared/store';
 
 Chart.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement);
 
 const App = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
   // Hooks customizados
   const { transactions, investments, loading, accountBalance, fetchInvestmentsAndTransactions } = useInvestments();
   const modals = useModals();
@@ -86,6 +88,7 @@ const App = () => {
   ].some(v => v > 0);
   // Handler para investimento
   const handleInvestmentSubmit = (e: React.FormEvent) => {
+    if (!user?.id) return;
     investmentOps.handleInvestmentSubmit(
       e,
       accountBalance,
@@ -96,6 +99,7 @@ const App = () => {
   };
   // Handlers para exclusão de metas
   const confirmDeleteGoal = async () => {
+    if (!user?.id) return;
     if (goalsHook.goalToDelete === null) return;
     await goalsHook.handleDeleteGoal(goalsHook.goalToDelete);
     goalModalHook.setShowDeleteModal(false);

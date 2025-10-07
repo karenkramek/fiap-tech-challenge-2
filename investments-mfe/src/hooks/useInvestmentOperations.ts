@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-
-const accountId = 'acc001';
+import { useSelector } from 'react-redux';
+import { RootState } from 'shared/store';
 
 export const useInvestmentOperations = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [investmentType, setInvestmentType] = useState('');
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [investmentDesc, setInvestmentDesc] = useState('');
@@ -17,7 +18,8 @@ export const useInvestmentOperations = () => {
     fetchData: () => void
   ) => {
     e.preventDefault();
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    if (!user?.id) return;
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account) return;
 
@@ -58,12 +60,13 @@ export const useInvestmentOperations = () => {
     closeRedeemModal: () => void
   ) => {
     if (!investmentToRedeem) return;
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    if (!user?.id) return;
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account) return;
 
-    const updatedInvestments = (account.investments || []).filter(
-      inv => inv.id !== investmentToRedeem.id
+    const updatedInvestments = (account.investments || []).filter((inv: { id: string }) =>
+      inv.id !== investmentToRedeem.id
     );
     const novoSaldo = account.balance + (investmentToRedeem.amount || 0);
 
