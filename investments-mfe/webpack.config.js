@@ -4,7 +4,7 @@ const { DefinePlugin } = require('webpack');
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/app/index.tsx',
   mode: 'development',
   devServer: {
     port: 3036, 
@@ -15,12 +15,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
-    alias: {
-      react: path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
-      'react-redux': path.resolve('./node_modules/react-redux'),
-      '@reduxjs/toolkit': path.resolve('./node_modules/@reduxjs/toolkit')
-    }
   },
   module: {
     rules: [
@@ -56,45 +50,51 @@ module.exports = {
     ]
   },
   plugins: [
+    new DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
+    }),
     new ModuleFederationPlugin({
       name: 'investmentsMFE',
       filename: 'remoteEntry.js',
       exposes: {
-        './Investments': './src/pages/Investments'
+        './InvestmentsPage': './src/App.tsx'
+      },
+      remotes: {
+        shared: 'shared@http://localhost:3033/remoteEntry.js',
+        dashboardMFE: 'dashboardMFE@http://localhost:3031/remoteEntry.js',
+        transactionsMFE: 'transactionsMFE@http://localhost:3032/remoteEntry.js',
       },
       shared: {
         react: {
           singleton: true,
-          requiredVersion: '18.2.0',
-          eager: true,
-          strictVersion: true
+          requiredVersion: '^18.2.0',
+          eager: false
         },
         'react-dom': {
           singleton: true,
-          requiredVersion: '18.2.0',
-          eager: true,
-          strictVersion: true
+          requiredVersion: '^18.2.0',
+          eager: false
         },
         'react-redux': {
           singleton: true,
-          requiredVersion: '8.1.3',
-          eager: true,
-          strictVersion: true
+          requiredVersion: '^8.1.3',
+          eager: false
         },
         '@reduxjs/toolkit': {
           singleton: true,
-          requiredVersion: '1.9.7',
-          eager: true,
-          strictVersion: true
+          requiredVersion: '^1.9.7',
+          eager: false
+        },
+        'react-hot-toast': {
+          singleton: true,
+          requiredVersion: '^2.5.0',
+          eager: false
         }
       }
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    }),
-    new DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-      'process.env.API_URL': JSON.stringify(process.env.API_URL || 'http://localhost:3001')
     })
   ]
 };

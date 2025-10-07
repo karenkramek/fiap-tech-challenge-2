@@ -11,15 +11,7 @@ interface GoalsCardProps {
   savingGoal: string;
   setSavingGoal: (v: string) => void;
   handleSaveGoal: () => void;
-  showGoalModal: boolean;
-  setShowGoalModal: (v: boolean) => void;
-  goalName: string;
-  setGoalName: (v: string) => void;
-  goalDeadline: string;
-  setGoalDeadline: (v: string) => void;
-  handleConfirmGoal: () => void;
   goals: Goal[];
-  widgetMessage: string;
   depositValues: string[];
   setDepositValues: React.Dispatch<React.SetStateAction<string[]>>;
   withdrawValues: string[];
@@ -27,25 +19,13 @@ interface GoalsCardProps {
   handleDeposit: (idx: number) => void;
   handleWithdraw: (idx: number) => void;
   openDeleteGoalModal: (idx: number) => void;
-  showDeleteModal: boolean;
-  goalToDelete: number | null;
-  closeDeleteGoalModal: () => void;
-  confirmDeleteGoal: () => void;
 }
 
 const GoalsCard: React.FC<GoalsCardProps> = ({
   savingGoal,
   setSavingGoal,
   handleSaveGoal,
-  showGoalModal,
-  setShowGoalModal,
-  goalName,
-  setGoalName,
-  goalDeadline,
-  setGoalDeadline,
-  handleConfirmGoal,
   goals,
-  widgetMessage,
   depositValues,
   setDepositValues,
   withdrawValues,
@@ -53,10 +33,6 @@ const GoalsCard: React.FC<GoalsCardProps> = ({
   handleDeposit,
   handleWithdraw,
   openDeleteGoalModal,
-  showDeleteModal,
-  goalToDelete,
-  closeDeleteGoalModal,
-  confirmDeleteGoal,
 }) => {
   const depositInputRef = useRef<HTMLInputElement>(null);
 
@@ -183,9 +159,6 @@ const GoalsCard: React.FC<GoalsCardProps> = ({
             );
           })}
         </div>
-      )}
-      {widgetMessage && (
-        <span className="text-xs text-green-700 mt-4 text-center">{widgetMessage}</span>
       )}
       <span className="text-xs text-gray-400 mt-4 text-center">
         Adicione e acompanhe suas metas de economia.

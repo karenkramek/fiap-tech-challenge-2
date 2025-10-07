@@ -7,11 +7,12 @@ import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
 import store from 'shared/store';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
 const TransactionsPage = React.lazy(() => import('transactionsMFE/TransactionsPage'));
-const InvestmentsPage = React.lazy(() => import('investments/Investments'));
+const InvestmentsPage = React.lazy(() => import('investmentsMFE/InvestmentsPage'));
 
 // Layout wrapper for authenticated routes
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {

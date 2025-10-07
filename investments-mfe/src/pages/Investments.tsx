@@ -28,7 +28,7 @@ import {
   scatterOptions,
   riskReturnData
 } from '../config/chartConfigs';
-import '../investments-styles.css';
+import '../styles/investments-styles.css';
 
 Chart.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement);
 
@@ -43,9 +43,7 @@ export default function Investments() {
   const goalModalHook = useGoalModal(goalsHook.createGoal);
   
   // Hook para resgate
-  const redeemHook = useRedeemInvestment(fetchInvestmentsAndTransactions, (msg) => {
-    // Usar a função showMessage dos goals para consistência
-  });
+  const redeemHook = useRedeemInvestment(fetchInvestmentsAndTransactions, () => {});
 
   // Carregar metas quando loading terminar
   useEffect(() => {
@@ -205,7 +203,6 @@ export default function Investments() {
           setSavingGoal={goalModalHook.setSavingGoal}
           handleSaveGoal={goalModalHook.handleSaveGoal}
           goals={goalsHook.goals}
-          widgetMessage={goalsHook.widgetMessage}
           depositValues={goalsHook.depositValues}
           setDepositValues={goalsHook.setDepositValues}
           withdrawValues={goalsHook.withdrawValues}
@@ -267,13 +264,6 @@ export default function Investments() {
           goalsHook.setGoalToDelete(null);
         }}
       />
-
-      {/* Widget de mensagem */}
-      {goalsHook.widgetMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-          {goalsHook.widgetMessage}
-        </div>
-      )}
     </div>
   );
 }

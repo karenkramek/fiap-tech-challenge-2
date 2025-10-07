@@ -60,7 +60,7 @@ module.exports = {
       remotes: {
         dashboardMFE: 'dashboardMFE@http://localhost:3031/remoteEntry.js',
         transactionsMFE: 'transactionsMFE@http://localhost:3032/remoteEntry.js',
-        investments: 'investmentsMFE@http://localhost:3036/remoteEntry.js',
+        investmentsMFE: 'investmentsMFE@http://localhost:3036/remoteEntry.js',
         shared: 'shared@http://localhost:3033/remoteEntry.js'
       },
       shared: {

@@ -11,6 +11,11 @@ declare module 'transactionsMFE/TransactionsPage' {
   export default TransactionsPage;
 }
 
+declare module 'investmentsMFE/InvestmentsPage' {
+  const InvestmentsPage: React.ComponentType<any>;
+  export default InvestmentsPage;
+}
+
 declare module 'shared/hooks/useAccount' {
   interface Account {
     id: string;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
 
 export const useGoalModal = (createGoal: (name: string, value: string, deadline: string) => Promise<void>) => {
   const [showGoalModal, setShowGoalModal] = useState(false);
@@ -18,8 +19,9 @@ export const useGoalModal = (createGoal: (name: string, value: string, deadline:
       setGoalName('');
       setGoalDeadline('');
       setSavingGoal('');
+      showSuccess('Meta criada com sucesso!');
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Erro ao criar meta. Tente novamente.');
+      showError(error instanceof Error ? error.message : 'Erro ao criar meta. Tente novamente.');
     }
   };
 

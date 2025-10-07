@@ -1,23 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from 'shared/store';
+import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
 
-const accountId = 'acc001';
+// Tipos auxiliares para investimentos e cofrinhos
+interface Investment {
+  type: string;
+  description?: string;
+  amount?: number;
+  goalValue?: number;
+  deadline?: string;
+}
+interface Account {
+  id: string;
+  investments?: Investment[];
+  balance: number;
+}
 
 export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [goals, setGoals] = useState<{ name: string; value: number; deadline?: string; saved: number }[]>([]);
   const [depositValues, setDepositValues] = useState<string[]>([]);
   const [withdrawValues, setWithdrawValues] = useState<string[]>([]);
   const [goalToDelete, setGoalToDelete] = useState<number | null>(null);
-  const [widgetMessage, setWidgetMessage] = useState('');
 
   const loadExistingGoals = async () => {
+    if (!user?.id) return;
     try {
-      const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
-      const account = res.data && res.data[0];
+      const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
+      const account: Account | undefined = res.data && res.data[0];
       if (!account) return;
 
-      const cofrinhos = (account.investments || []).filter(inv => inv.type === 'COFRINHO');
-      const loadedGoals = cofrinhos.map(cofrinho => ({
+      const cofrinhos = (account.investments || []).filter((inv: Investment) => inv.type === 'COFRINHO');
+      const loadedGoals = cofrinhos.map((cofrinho: Investment) => ({
         name: cofrinho.description || 'Meta sem nome',
         value: cofrinho.goalValue || 0,
         deadline: cofrinho.deadline || '',
@@ -32,25 +48,21 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     }
   };
 
-  const showMessage = (message: string) => {
-    setWidgetMessage(message);
-    setTimeout(() => setWidgetMessage(''), 3000);
-  };
-
   const handleDeposit = async (idx: number) => {
+    if (!user?.id) return;
     const value = depositValues[idx];
     if (!value || Number(value) <= 0) return;
     const depositAmount = Number(value);
 
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account || account.balance < depositAmount) {
-      showMessage('Saldo insuficiente para depósito!');
+      showError('Saldo insuficiente para depósito!');
       return;
     }
 
     const cofrinhoDesc = goals[idx].name;
-    const investmentsAtualizados = (account.investments || []).map(inv =>
+    const investmentsAtualizados = (account.investments || []).map((inv: Investment) =>
       inv.type === 'COFRINHO' && inv.description === cofrinhoDesc
         ? { ...inv, amount: (inv.amount || 0) + depositAmount }
         : inv
@@ -73,26 +85,27 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
       return arr;
     });
     
-    showMessage(`R$ ${depositAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} depositado na meta!`);
+    showSuccess(`R$ ${depositAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} depositado na meta!`);
     fetchInvestmentsAndTransactions();
   };
 
   const handleWithdraw = async (idx: number) => {
+    if (!user?.id) return;
     const value = withdrawValues[idx];
     if (!value || Number(value) <= 0) return;
     const withdrawAmount = Number(value);
 
     if (withdrawAmount > goals[idx].saved) {
-      showMessage('Você não pode sacar mais do que o valor poupado na meta!');
+      showError('Você não pode sacar mais do que o valor poupado na meta!');
       return;
     }
 
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account) return;
 
     const cofrinhoDesc = goals[idx].name;
-    const investmentsAtualizados = (account.investments || []).map(inv =>
+    const investmentsAtualizados = (account.investments || []).map((inv: Investment) =>
       inv.type === 'COFRINHO' && inv.description === cofrinhoDesc
         ? { ...inv, amount: Math.max((inv.amount || 0) - withdrawAmount, 0) }
         : inv
@@ -115,18 +128,19 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
       return arr;
     });
     
-    showMessage(`R$ ${withdrawAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sacado da meta!`);
+    showSuccess(`R$ ${withdrawAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sacado da meta!`);
     fetchInvestmentsAndTransactions();
   };
 
   const handleDeleteGoal = async (idx: number) => {
+    if (!user?.id) return;
     const goal = goals[idx];
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account) return;
 
-    const updatedInvestments = (account.investments || []).filter(
-      inv => !(inv.type === 'COFRINHO' && inv.description === goal.name)
+    const updatedInvestments = (account.investments || []).filter((inv: Investment) =>
+      !(inv.type === 'COFRINHO' && inv.description === goal.name)
     );
 
     await axios.patch(`http://localhost:3034/accounts/${account.id}`, {
@@ -138,11 +152,12 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     setDepositValues(values => values.filter((_, i) => i !== idx));
     setWithdrawValues(values => values.filter((_, i) => i !== idx));
     
-    showMessage('Meta excluída e valor devolvido ao saldo!');
+    showSuccess('Meta excluída e valor devolvido ao saldo!');
     fetchInvestmentsAndTransactions();
   };
 
   const createGoal = async (goalName: string, savingGoal: string, goalDeadline: string) => {
+    if (!user?.id) throw new Error('Usuário não autenticado.');
     if (!goalName.trim() || !savingGoal || Number(savingGoal) <= 0) {
       throw new Error('Por favor, preencha o nome da meta e um valor válido.');
     }
@@ -157,7 +172,7 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
       date: new Date().toISOString()
     };
 
-    const res = await axios.get(`http://localhost:3034/accounts?id=${accountId}`);
+    const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
     const account = res.data && res.data[0];
     if (!account) throw new Error('Erro ao carregar conta.');
 
@@ -176,7 +191,7 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     setDepositValues(prev => [...prev, '']);
     setWithdrawValues(prev => [...prev, '']);
     
-    showMessage('Meta criada com sucesso!');
+    showSuccess('Meta criada com sucesso!');
     fetchInvestmentsAndTransactions();
   };
 
@@ -188,7 +203,6 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     setWithdrawValues,
     goalToDelete,
     setGoalToDelete,
-    widgetMessage,
     loadExistingGoals,
     handleDeposit,
     handleWithdraw,
