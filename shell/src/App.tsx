@@ -65,8 +65,8 @@ const App: React.FC = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const location = useLocation();
 
-  // Header: showAuthButtons só na home
-  const isHome = location.pathname === '/';
+  // Header: showAuthButtons só na home e sobre
+  const isHome = location.pathname === '/' || location.pathname === '/sobre';
 
   return (
     <>
