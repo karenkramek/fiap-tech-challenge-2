@@ -81,6 +81,16 @@ module.exports = {
           requiredVersion: '^18.2.0',
           eager: false
         },
+        'react-redux': {
+          singleton: true,
+          requiredVersion: '^8.1.3',
+          eager: false
+        },
+        '@reduxjs/toolkit': {
+          singleton: true,
+          requiredVersion: '^1.9.7',
+          eager: false
+        },
         'react-hot-toast': {
           singleton: true,
           requiredVersion: '^2.5.0',

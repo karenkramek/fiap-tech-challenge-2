@@ -219,6 +219,76 @@ Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker
 - [Troubleshooting](./docs/troubleshooting.md) — Diagnóstico rápido para erros comuns em desenvolvimento.
 - [Limpeza do Ambiente](./docs/environment-cleanup.md) — Scripts e boas práticas para limpeza completa dos pacotes.
 
+## 🧪 Testes
+
+Este projeto conta com uma suíte completa de testes automatizados cobrindo todos os microfrontends e utilitários compartilhados.
+
+### Cobertura de Testes
+
+| Módulo | Arquivos de Teste | Total de Testes | Status |
+|--------|-------------------|-----------------|---------|
+| **Módulo Shared** | 2 | 25 testes | ✅ Todos passando |
+| **Shell App** | 1 | 7 testes | ✅ Todos passando |
+| **Dashboard MFE** | 1 | 11 testes | ✅ Todos passando |
+| **Transactions MFE** | 1 | 14 testes | ✅ Todos passando |
+| **TOTAL** | **5** | **57 testes** | **✅ 100% passando** |
+
+### 🏃‍♂️ Executando os Testes
+
+**Executar todos os testes (recomendado):**
+
+```bash
+# Executa os testes em todos os módulos
+npm run test:all
+```
+
+**Executar testes por módulo específico:**
+
+```bash
+# Testes do módulo shared (utilitários e hooks)
+cd shared && npm test
+
+# Testes do Shell App (roteamento e layout)
+cd shell && npm test
+
+# Testes do Dashboard MFE (componentes de dashboard)
+cd dashboard-mfe && npm test
+
+# Testes do Transactions MFE (gestão de transações)
+cd transactions-mfe && npm test
+```
+
+**Modo de desenvolvimento (watch mode):**
+
+```bash
+# Em qualquer módulo, para execução contínua durante desenvolvimento
+npm run test:watch
+```
+
+**Relatórios de cobertura:**
+
+```bash
+# Gerar relatório de cobertura de testes
+npm run test:coverage
+```
+
+### Stack de Testes
+
+- **Jest 29.7.0** - Framework principal de testes
+- **React Testing Library 14.1.2** - Utilitários para teste de componentes React
+- **TypeScript** - Type safety completa nos testes
+- **@testing-library/user-event** - Simulação avançada de interação do usuário
+
+### Tipos de Testes Implementados
+
+1. **Testes de Componentes** - Renderização, interação e comportamento dos componentes
+2. **Testes de Hooks** - Lógica customizada de hooks React
+3. **Testes de Utilitários** - Funções helper e formatadores
+4. **Testes de Integração** - Fluxos completos de usuário e Module Federation
+5. **Testes de Formulários** - Validação, submissão e estados de erro
+
+📖 **Documentação completa:** Ver [Relatório de Implementação de Testes](./TESTING_IMPLEMENTATION_REPORT.md)
+
 ## 🔌 Portas
 
 | Serviço            | Porta | URL                       |
@@ -232,13 +302,27 @@ Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker
 
 ## 📜 Scripts Disponíveis
 
+### Instalação e Setup
 - `npm run install:all` — Instala dependências em todos os projetos (raiz, shell, MFEs e shared)
+- `npm run setup:db` — Cria db.json a partir do template se não existir
+
+### Desenvolvimento
 - `npm run dev:all` — Inicia todos os serviços em paralelo
 - `npm run dev:shell` — Inicia apenas o Shell
 - `npm run dev:dashboard` — Inicia apenas o Dashboard MFE
 - `npm run dev:transactions` — Inicia apenas o Transactions MFE
 - `npm run dev:shared` — Inicia apenas a Shared Library
 - `npm run dev:api` — Inicia apenas o JSON Server (API mock)
+- `npm run dev:upload` — Inicia apenas o Upload Server
+
+### Testes
+- `npm test` — Executa todos os testes de todos os módulos
+- `npm run test:shared` — Testes apenas do módulo shared
+- `npm run test:shell` — Testes apenas do Shell App
+- `npm run test:dashboard` — Testes apenas do Dashboard MFE
+- `npm run test:transactions` — Testes apenas do Transactions MFE
+- `npm run test:watch` — Modo watch para todos os módulos (desenvolvimento)
+- `npm run test:coverage` — Gera relatórios de cobertura para todos os módulos
 
 ## 🧩 Escopo da Fase 2 (Resumo)
 
@@ -253,7 +337,9 @@ Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodan
 
 ## 🔧 Troubleshooting
 
-Consulte o documento [Troubleshooting](./docs/troubleshooting.md) para um checklist rápido de erros comuns, comandos úteis e links para guias complementares.
+**Problemas gerais:** Consulte o documento [Troubleshooting](./docs/troubleshooting.md) para um checklist rápido de erros comuns, comandos úteis e links para guias complementares.
+
+**Problemas com testes:** Para questões específicas relacionadas à execução de testes, consulte [Troubleshooting de Testes](./docs/testing-troubleshooting.md).
 
 ## 🧹 Limpeza do Ambiente (Clean All)
 
