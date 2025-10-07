@@ -13,7 +13,13 @@
     "dev:api": "json-server --watch db.json --port 3034",
     "dev:upload": "cd upload-server && npm start",
     "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:shared && npm run test:shell && npm run test:dashboard && npm run test:transactions",
+    "test:shared": "cd shared && npm test",
+    "test:shell": "cd shell && npm test",
+    "test:dashboard": "cd dashboard-mfe && npm test",
+    "test:transactions": "cd transactions-mfe && npm test",
+    "test:watch": "concurrently \"npm run test:shared -- --watch\" \"npm run test:shell -- --watch\" \"npm run test:dashboard -- --watch\" \"npm run test:transactions -- --watch\"",
+    "test:coverage": "npm run test:shared -- --coverage && npm run test:shell -- --coverage && npm run test:dashboard -- --coverage && npm run test:transactions -- --coverage"
   },
   "keywords": [
     "microfrontend",

@@ -1,12 +1,13 @@
 import React, { Suspense, useState } from 'react';
-import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
+import store from 'shared/store';
 import Header from './components/Header';
 import Home from './components/Home';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
-import store from 'shared/store';
 
 // Dynamic imports for microfrontends - these will be loaded at runtime
 const Dashboard = React.lazy(() => import('dashboardMFE/Dashboard'));
