@@ -23,23 +23,29 @@ jobs:
       matrix:
         service:
           - name: shell
-            dockerfile: docker/Dockerfile.node
-            target: shell
+            context: shell
+            dockerfile: docker/Dockerfile.frontend
+            port: "3030"
           - name: dashboard
-            dockerfile: docker/Dockerfile.node
-            target: dashboard
+            context: dashboard-mfe
+            dockerfile: docker/Dockerfile.frontend
+            port: "3031"
           - name: transactions
-            dockerfile: docker/Dockerfile.node
-            target: transactions
+            context: transactions-mfe
+            dockerfile: docker/Dockerfile.frontend
+            port: "3032"
           - name: shared
-            dockerfile: docker/Dockerfile.node
-            target: shared
+            context: shared
+            dockerfile: docker/Dockerfile.frontend
+            port: "3033"
           - name: api
+            context: .
             dockerfile: docker/Dockerfile.jsonserver
-            target: ""
+            port: "3034"
           - name: upload
+            context: upload-server
             dockerfile: docker/Dockerfile.node
-            target: upload
+            port: "3035"
 
     steps:
       - name: Checkout code
@@ -55,7 +61,7 @@ jobs:
           # Substituir / por - para ser válido como Docker tag
           BRANCH_NAME="${BRANCH_NAME//\//-}"
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-      
+
       - name: Debug Docker Hub credentials
         run: |
           echo "Username: ${{ env.DOCKER_USERNAME }}"
@@ -71,9 +77,10 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ matrix.service.context }}
           file: ${{ matrix.service.dockerfile }}
-          target: ${{ matrix.service.target }}
+          build-args: |
+            PORT=${{ matrix.service.port }}
           push: true
           tags: |
             ${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:latest
