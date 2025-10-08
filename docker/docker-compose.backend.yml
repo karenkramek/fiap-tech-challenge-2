@@ -8,7 +8,8 @@ services:
       - "3034:3034"
     volumes:
       - ../db.json:/data/db.json
-    command: ["--watch", "/data/db.json", "--host", "0.0.0.0", "--port", "3034"]
+    environment:
+      - PORT=3034
     restart: unless-stopped
     networks:
       - bytebank-network
