@@ -50,11 +50,16 @@ jobs:
 
       - name: Extract branch name
         shell: bash
-        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          # Substituir / por - para ser válido como Docker tag
+          BRANCH_NAME="${BRANCH_NAME//\//-}"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+      
       - name: Debug Docker Hub credentials
         run: |
           echo "Username: ${{ env.DOCKER_USERNAME }}"
+          echo "Branch tag: ${{ env.BRANCH_NAME }}"
           echo "Token exists: ${{ secrets.DOCKER_HUB_TOKEN != '' }}"
 
       - name: Login to Docker Hub
