@@ -22,30 +22,38 @@ jobs:
     strategy:
       matrix:
         service:
+          # Frontend services - Deploy no Vercel
           - name: shell
             context: shell
             dockerfile: docker/Dockerfile.frontend
             port: "3030"
+            deploy_target: vercel
           - name: dashboard
             context: dashboard-mfe
             dockerfile: docker/Dockerfile.frontend
             port: "3031"
+            deploy_target: vercel
           - name: transactions
             context: transactions-mfe
             dockerfile: docker/Dockerfile.frontend
             port: "3032"
+            deploy_target: vercel
           - name: shared
             context: shared
             dockerfile: docker/Dockerfile.frontend
             port: "3033"
+            deploy_target: vercel
+          # Backend services - Deploy na AWS EC2
           - name: api
             context: .
             dockerfile: docker/Dockerfile.jsonserver
             port: "3034"
+            deploy_target: aws
           - name: upload
             context: upload-server
             dockerfile: docker/Dockerfile.node
             port: "3035"
+            deploy_target: aws
 
     steps:
       - name: Checkout code
@@ -88,6 +96,14 @@ jobs:
             ${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:buildcache,mode=max
+          labels: |
+            deploy.target=${{ matrix.service.deploy_target }}
+            service.name=${{ matrix.service.name }}
+            service.port=${{ matrix.service.port }}
 
       - name: Image digest
-        run: echo "Image pushed - ${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:latest"
+        run: |
+          echo "Image pushed - ${{ env.DOCKER_USERNAME }}/bytebank-${{ matrix.service.name }}:latest"
+          echo "Deploy target: ${{ matrix.service.deploy_target }}"
+          echo "📦 Frontend images (shell, dashboard, transactions, shared) = Deploy no Vercel"
+          echo "🚀 Backend images (api, upload) = Deploy na AWS EC2"
