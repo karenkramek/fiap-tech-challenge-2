@@ -79,13 +79,67 @@ rm db.json && npm run setup:db
 
 📖 **Guia completo:** Ver [JSON Server Guide](./docs/json-server-guide.md)
 
-## 🚀 Como Executar Localmente
+## 🚀 Como Executar o Projeto
 
-### Pré-requisitos (Docker)
+### Pré-requisitos
 
-- Node.js (versão 18+ recomendada)
-- npm ou yarn
-- Git
+#### 🐳 Execução com Docker (Recomendado)
+
+A forma mais simples e consistente de rodar o projeto é via Docker, garantindo que todos os serviços funcionem corretamente sem conflitos de ambiente.
+
+- **Docker Engine** e **Docker Compose V2**
+  - **macOS:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) ou [Colima](https://github.com/abiosoft/colima) (alternativa leve)
+  - **Linux:** [Docker Engine](https://docs.docker.com/engine/install/) + [Docker Compose Plugin](https://docs.docker.com/compose/install/linux/)
+  - **Windows:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) com backend WSL2
+- **Portas 3030-3035** disponíveis no host
+- **Git** para clonar o repositório
+
+#### 💻 Execução local (alternativa)
+
+Se preferir rodar sem Docker:
+
+- **Node.js** versão 18 ou superior ([Download](https://nodejs.org/))
+- **npm** (incluído com Node.js) ou **yarn**
+- **Git** para clonar o repositório
+
+---
+
+## 🐳 Opção 1: Executar com Docker (Recomendado)
+
+A estrutura Docker oferece hot reload, isolamento por serviço e ambiente consistente entre diferentes máquinas.
+
+### Quick Start
+
+```bash
+# 1) Clone o repositório
+git clone <url-do-repositorio>
+cd fiap-tech-challenge-2
+
+# 2) Suba todos os serviços
+docker compose -f docker/docker-compose.dev.yml up
+```
+
+> 💡 Use `-d` para rodar em segundo plano: `docker compose -f docker/docker-compose.dev.yml up -d`
+
+**Pronto!** Acesse a aplicação em [http://localhost:3030](http://localhost:3030)
+
+### Recursos do ambiente Docker
+
+- **Hot reload** — Alterações no código refletem automaticamente nos containers
+- **Isolamento** — Cada serviço roda em seu próprio container
+- **Volumes persistentes** — Dados do JSON Server e uploads são mantidos
+- **Dependências gerenciadas** — Não há conflito com node_modules do host
+
+### Próximos passos e documentação
+
+Para operações avançadas, rebuild, troubleshooting e comandos específicos por sistema operacional, consulte:
+
+- [Fluxos de Trabalho no Docker](./docs/docker-workflow.md) — Rebuild de imagens, checklist pós-`git pull`, comandos úteis e passo a passo por SO.
+- [JSON Server Guide](./docs/json-server-guide.md) — Inspeção de volume, exportação e reset do `db.json`.
+
+---
+
+## 💻 Opção 2: Executar Localmente (Sem Docker)
 
 ### 📦 Instalação das Dependências
 
@@ -164,60 +218,7 @@ npm run dev:shell
 
 **🌐 Acesso:** Quando todos estiverem rodando, acesse: [http://localhost:3030](http://localhost:3030)
 
-## 🐳 Ambiente com Docker
-
-Para facilitar o desenvolvimento isolado ou integrado, adicionamos uma estrutura Docker pensada em hot reload e isolamento por serviço.
-
-### Estrutura gerada
-
-- `docker/Dockerfile.frontend` — base Node 22 + webpack dev server para os MFEs e o Shell.
-- `docker/Dockerfile.node` — imagem Node 22 para o servidor de upload.
-- `docker/Dockerfile.jsonserver` + `docker/scripts/api-entrypoint.sh` — `json-server` com setup automático do `db.json` a partir do template.
-- `docker/docker-compose.dev.yml` — orquestra shell, MFEs, shared, API mock e upload server.
-
-### Pré-requisitos
-
-- Docker Desktop (ou engine) >= 24 com Compose V2.
-- Porta 3030-3035 liberadas no host.
-- (Opcional) Execute `npm run setup:db` uma vez para garantir a presença de `db.json` antes do primeiro build; se não existir, o entrypoint da API cria a partir do template.
-
-### Subir apenas um serviço
-
-Você pode abrir um único serviço e suas dependências básicas em modo interativo:
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up shell
-```
-
-Esse comando inicia `shared`, `dashboard`, `transactions`, `api` e `upload` automaticamente por causa do `depends_on`, além do próprio Shell.
-
-Para iniciar outro MFE em isolamento, aponte para o serviço correspondente. Exemplo para o dashboard:
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up dashboard shared api upload
-```
-
-### Subir toda a stack de uma vez
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up
-```
-
-Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker compose down` com o mesmo arquivo.
-
-### Hot reload e volumes
-
-- O código-fonte de cada pacote é montado como volume (`./<pacote>:/app`), permitindo que alterações locais reflitam instantaneamente nos containers.
-- `node_modules` fica dentro do container via volume anônimo (`/app/node_modules`) para evitar conflito com as máquinas host.
-- O diretório `uploads/` é montado em `/uploads` dentro do container, preservando anexos enviados.
-- O `json-server` utiliza o volume nomeado `docker_db-data`, evitando travamentos de I/O com o host. O conteúdo inicial é carregado a partir de `db.template.json`.
-
-### Leituras complementares
-
-- [Fluxos de Trabalho no Docker](./docs/docker-workflow.md) — Rebuild de imagens, checklist pós-`git pull` e passo a passo por sistema operacional.
-- [JSON Server Guide](./docs/json-server-guide.md) — Dicas para inspeção de volume, exportação e reset do `db.json`.
-- [Troubleshooting](./docs/troubleshooting.md) — Diagnóstico rápido para erros comuns em desenvolvimento.
-- [Limpeza do Ambiente](./docs/environment-cleanup.md) — Scripts e boas práticas para limpeza completa dos pacotes.
+---
 
 ## 🧪 Testes
 
@@ -303,10 +304,12 @@ npm run test:coverage
 ## 📜 Scripts Disponíveis
 
 ### Instalação e Setup
+
 - `npm run install:all` — Instala dependências em todos os projetos (raiz, shell, MFEs e shared)
 - `npm run setup:db` — Cria db.json a partir do template se não existir
 
 ### Desenvolvimento
+
 - `npm run dev:all` — Inicia todos os serviços em paralelo
 - `npm run dev:shell` — Inicia apenas o Shell
 - `npm run dev:dashboard` — Inicia apenas o Dashboard MFE
@@ -316,6 +319,7 @@ npm run test:coverage
 - `npm run dev:upload` — Inicia apenas o Upload Server
 
 ### Testes
+
 - `npm test` — Executa todos os testes de todos os módulos
 - `npm run test:shared` — Testes apenas do módulo shared
 - `npm run test:shell` — Testes apenas do Shell App
