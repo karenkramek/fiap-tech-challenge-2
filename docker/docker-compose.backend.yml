@@ -7,8 +7,9 @@ services:
     ports:
       - "3034:3034"
     volumes:
-      - ./db.json:/data/db.json
-    command: ["--watch", "/data/db.json", "--host", "0.0.0.0", "--port", "3034"]
+      - ../db.json:/data/db.json
+    environment:
+      - PORT=3034
     restart: unless-stopped
     networks:
       - bytebank-network
@@ -19,7 +20,7 @@ services:
     ports:
       - "3035:3035"
     volumes:
-      - ./uploads:/app/uploads
+      - ../uploads:/app/uploads
     restart: unless-stopped
     networks:
       - bytebank-network

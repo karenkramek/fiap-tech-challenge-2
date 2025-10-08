@@ -1,10 +1,7 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
-
 module.exports = {
   theme: {
     extend: {
       colors: {
-        ...defaultTheme.colors,
         primary: {
           50: '#F8FDFF',
           100: 'var(--primary-100)',
@@ -101,8 +98,8 @@ module.exports = {
         'foreground-muted': 'var(--foreground-muted)',
       },
       fontFamily: {
-        sans: ['var(--font-family-primary)', ...defaultTheme.fontFamily.sans],
-        heading: ['var(--font-family-secondary)', ...defaultTheme.fontFamily.sans],
+        sans: ['var(--font-family-primary)', 'ui-sans-serif', 'system-ui'],
+        heading: ['var(--font-family-secondary)', 'ui-sans-serif', 'system-ui'],
       },
       fontSize: {
         xs: 'var(--font-size-xs)',
