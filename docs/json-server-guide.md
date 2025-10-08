@@ -9,7 +9,7 @@ Este documento reúne os detalhes operacionais do mock de API utilizado no proje
 
 ## Provisionamento automático
 
-Sempre que o `json-server` é iniciado via scripts npm ou Docker, o entrypoint verifica se existe um `db.json`. Caso não exista, ele copia o conteúdo de `db.template.json`.
+Sempre que o `json-server` é iniciado via scripts npm ou Docker, o sistema verifica se existe um `db.json`. Caso não exista, ele copia o conteúdo de `db.template.json`. No Docker, essa lógica está definida diretamente no `CMD` do `Dockerfile.jsonserver`.
 
 ```bash
 # Cria (ou recria) o db.json a partir do template manualmente
