@@ -115,7 +115,7 @@ Backend (API = leve)          → AWS EC2 (controle total)
 ### Componentes e URLs
 
 #### Frontends (Vercel)
-- **Shell:** https://bytebank-shared.vercel.app
+- **Shell:** https://bytebank-shell.vercel.app
   - Orquestra os MFEs via Module Federation
   - CDN global, HTTPS, deploy automático
 
