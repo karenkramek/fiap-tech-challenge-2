@@ -9,6 +9,7 @@ echo ""
 
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m'
 
 # 1. Parar containers front-end se estiverem rodando
@@ -21,12 +22,16 @@ echo -e "${BLUE}[2/5] Atualizando repositório...${NC}"
 cd ~/fiap-tech-challenge-2
 git pull
 
-# 3. Configurar banco de dados
-echo -e "${BLUE}[3/5] Configurando banco de dados...${NC}"
-if [ ! -f "db.json" ]; then
-    cp db.template.json db.json
-    echo -e "${GREEN}✓ db.json criado${NC}"
+# 3. Configurar banco de dados (template)
+echo -e "${BLUE}[3/5] Verificando template do banco de dados...${NC}"
+if [ ! -f "db.template.json" ]; then
+    echo -e "${RED}❌ Erro: db.template.json não encontrado!${NC}"
+    exit 1
 fi
+echo -e "${GREEN}✓ Template encontrado (db.json será resetado automaticamente no próximo start)${NC}"
+
+# 4. Tornar script de inicialização executável
+chmod +x docker/init-db.sh
 
 # 4. Criar pasta de uploads
 mkdir -p uploads

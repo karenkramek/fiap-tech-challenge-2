@@ -65,6 +65,8 @@ A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combin
 
 🔒 **Segurança e Boas Práticas:** Ver [Práticas de Segurança em Cloud](./docs/SECURITY_PRACTICES.md) para detalhes sobre autenticação, autorização, proteção de rotas, configurações de segurança AWS/Vercel e checklist de conformidade.
 
+🔄 **Reset Automático do Banco de Dados:** O `db.json` é automaticamente resetado a cada deploy no EC2 (importante para novos módulos como investimentos).
+
 ## 🧱 Visão da Arquitetura
 
 - Shell App (porta 3030) — Host principal da aplicação
