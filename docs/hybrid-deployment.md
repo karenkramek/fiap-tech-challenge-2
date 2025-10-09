@@ -162,8 +162,10 @@ Cada MFE tem seu próprio projeto Vercel com configurações específicas:
 
 Variáveis de ambiente:
 ```bash
-REACT_APP_API_BASE_URL=http://44.206.72.128:3034
+REACT_APP_API_BASE_URL=/api
 ```
+
+> **Nota:** A URL `/api` é um **caminho relativo** que usa o proxy configurado no `vercel.json`. O Vercel redireciona automaticamente requisições de `/api/*` para `http://44.206.72.128:3034/*`, resolvendo problemas de mixed content entre HTTPS (Vercel) e HTTP (EC2).
 
 #### 2. Dashboard MFE
 ```json
@@ -177,7 +179,7 @@ REACT_APP_API_BASE_URL=http://44.206.72.128:3034
 
 Variáveis de ambiente:
 ```bash
-REACT_APP_API_BASE_URL=http://44.206.72.128:3034
+REACT_APP_API_BASE_URL=/api
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
@@ -195,12 +197,14 @@ REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 
 Variáveis de ambiente:
 ```bash
-REACT_APP_API_BASE_URL=http://44.206.72.128:3034
-REACT_APP_UPLOAD_URL=http://44.206.72.128:3035
+REACT_APP_API_BASE_URL=/api
+REACT_APP_UPLOAD_URL=/uploads
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 ```
+
+> **Nota:** O caminho `/uploads` também usa proxy do Vercel, redirecionando para `http://44.206.72.128:3035/uploads/*`.
 
 #### 4. Shell (Host)
 ```json
@@ -214,8 +218,8 @@ REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 
 Variáveis de ambiente:
 ```bash
-REACT_APP_API_BASE_URL=http://44.206.72.128:3034
-REACT_APP_UPLOAD_URL=http://44.206.72.128:3035
+REACT_APP_API_BASE_URL=/api
+REACT_APP_UPLOAD_URL=/uploads
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
