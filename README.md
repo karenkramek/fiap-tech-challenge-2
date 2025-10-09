@@ -63,6 +63,8 @@ A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combin
 
 📖 **Arquitetura de Deploy:** Ver [Deployment Híbrido Vercel + AWS](./docs/hybrid-deployment.md) para entender como funciona a estratégia de deploy em múltiplas clouds.
 
+🔒 **Segurança e Boas Práticas:** Ver [Práticas de Segurança em Cloud](./docs/SECURITY_PRACTICES.md) para detalhes sobre autenticação, autorização, proteção de rotas, configurações de segurança AWS/Vercel e checklist de conformidade.
+
 ## 🧱 Visão da Arquitetura
 
 - Shell App (porta 3030) — Host principal da aplicação
