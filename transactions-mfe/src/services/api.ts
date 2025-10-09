@@ -2,7 +2,19 @@ import axios from 'axios';
 import { Account } from 'shared/models/Account';
 import { Transaction } from 'shared/models/Transaction';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034';
+// Função helper para ler variáveis de ambiente de forma segura
+const getEnvVar = (key: string, defaultValue: string): string => {
+  try {
+    // @ts-ignore - process.env é injetado pelo Webpack
+    return typeof process !== 'undefined' && process.env && process.env[key]
+      ? process.env[key]
+      : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const API_BASE_URL = getEnvVar('REACT_APP_API_BASE_URL', 'http://localhost:3034');
 
 class TransactionAPIService {
   private api = axios.create({
