@@ -1,4 +1,4 @@
-# 🌐 Arquitetura de Deployment Híbrido - Vercel + AWS
+# 🌐 Arquitetura de Deployment Híbrida - Vercel + AWS
 
 Este documento explica a estratégia de deployment do ByteBank, que utiliza uma **arquitetura híbrida multi-cloud** para otimizar custos, performance e escalabilidade.
 
