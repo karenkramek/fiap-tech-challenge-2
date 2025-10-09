@@ -19,7 +19,7 @@ fi
 
 # SEMPRE sobrescreve o db.json com o template
 echo "📋 Resetando db.json a partir do template..."
-cp "$TEMPLATE_FILE" "$DB_FILE"
+cp -f "$TEMPLATE_FILE" "$DB_FILE"
 
 echo "✅ Banco de dados resetado com sucesso!"
 echo "ℹ️  Base limpa iniciada a partir do template"
