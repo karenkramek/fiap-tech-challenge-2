@@ -49,7 +49,7 @@ Esta é a evolução do [projeto da Fase 1](https://github.com/karenkramek/byteb
 A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combinando o melhor de cada plataforma:
 
 ### 🚀 Frontends (Vercel)
-- **Shell App:** https://bytebank-shared.vercel.app
+- **Shell App:** https://bytebank-shell.vercel.app
 - **Dashboard MFE:** https://dashboard-mfe-eta.vercel.app
 - **Transactions MFE:** https://transactions-mfe-iota.vercel.app
 - **Shared Library:** https://bytebank-shared.vercel.app
