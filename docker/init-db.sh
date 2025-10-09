@@ -19,8 +19,27 @@ fi
 
 # SEMPRE sobrescreve o db.json com o template
 echo "📋 Resetando db.json a partir do template..."
-rm -f "$DB_FILE"
-cp "$TEMPLATE_FILE" "$DB_FILE"
+
+# Define arquivo temporário com PID único
+TEMP_FILE="/data/db.json.tmp.$$"
+
+# Função de limpeza em caso de erro
+cleanup() {
+    if [ -f "$TEMP_FILE" ]; then
+        echo "🧹 Limpando arquivo temporário..."
+        rm -f "$TEMP_FILE"
+    fi
+}
+
+# Registra função de limpeza para executar em caso de erro ou saída
+trap cleanup EXIT ERR
+
+# Copia template para arquivo temporário
+cp "$TEMPLATE_FILE" "$TEMP_FILE"
+
+# Move atomicamente (sobrescreve o arquivo existente)
+# mv é atômico e funciona mesmo se o arquivo estiver aberto
+mv -f "$TEMP_FILE" "$DB_FILE"
 
 echo "✅ Banco de dados resetado com sucesso!"
 echo "ℹ️  Base limpa iniciada a partir do template"
