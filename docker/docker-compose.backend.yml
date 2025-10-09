@@ -7,8 +7,7 @@ services:
     ports:
       - "3034:3034"
     volumes:
-      - ../db.json:/data/db.json
-      - ../db.template.json:/data/db.template.json
+      - ../:/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     environment:
       - PORT=3034
