@@ -1,15 +1,69 @@
 # Tech Challenge - Fase 2 - Grupo 28 - 4FRNT
 
-ByteBank - Arquitetura de Microfrontends com Webpack Module Federation.
+ByteBank: Arquitetura de Microfrontends com Webpack Module Federation + Cloud (AWS EC2 & Vercel).
+
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Webpack](https://img.shields.io/badge/Webpack-5-8DD6F9?style=flat&logo=webpack&logoColor=white)](https://webpack.js.org/)
+[![Module Federation](https://img.shields.io/badge/Module_Federation-5-FF6B6B?style=flat&logo=webpack&logoColor=white)](https://webpack.js.org/concepts/module-federation/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Jest](https://img.shields.io/badge/Jest-29.7-C21325?style=flat&logo=jest&logoColor=white)](https://jestjs.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
+[![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/ec2/)
 
 ## 🎯 Contexto da Fase 2
 
-Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma arquitetura de microfrontends, compondo a aplicação a partir de múltiplos MFEs integrados via Module Federation, mantendo os princípios de componentização, reutilização e tipagem estática.
+Esta é a evolução do [projeto da Fase 1](https://github.com/karenkramek/bytebank-fiap) para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma **arquitetura de microfrontends**, compondo a aplicação a partir de múltiplos MFEs integrados via **Module Federation**, mantendo os princípios de componentização, reutilização e tipagem estática.
 
-## 🎥 Demo e Design
+### 🚀 Principais Implementações da Fase 2:
 
-- 📹 Vídeo de Apresentação (Fase 1 – conceito e UI): [Assista no Loom](https://www.loom.com/share/35534aa22a264f7da957a72e228920e7?sid=1991a61a-66c3-4387-a536-83a96cf53144)
-- 🎨 Design no Figma: [Protótipo no Figma](https://www.figma.com/design/Y2JoXXiG50h2nj9FiG71i7/ByteBank-4FRNT---Fase1?node-id=0-1&p=f&t=vmoSPz2lFa4bemW4-0)
+- **Arquitetura de Microfrontends:** Webpack Module Federation para integração dinâmica entre Shell, Dashboard, Transactions e Shared Library
+- **Gerenciamento de Estado:** Redux Toolkit com TypeScript para estado global compartilhado entre MFEs
+- **Autenticação e Autorização:** Sistema de login/logout com proteção de rotas e controle de acesso
+- **Deployment Híbrido Cloud:**
+  - **Vercel (Frontends):** 4 projetos deployados com CDN global, HTTPS automático e deploy contínuo via GitHub
+  - **AWS EC2 (Backend):** API Server e Upload Server containerizados com Docker em instância t3.micro (free tier)
+- **CI/CD:** GitHub Actions para build e push automático de imagens Docker para Docker Hub
+- **Testes Automatizados:** 57 testes com Jest e React Testing Library cobrindo componentes, hooks e integrações
+- **Containerização:** Docker Compose para ambiente de desenvolvimento consistente e isolado
+
+## 📋 Gestão de Projeto
+
+- 📊 **Trello (Fase 2):** [Board de Acompanhamento de Atividades](https://trello.com/b/rP7VdDRt/fase-2)
+- 🎨 **Figma (Fase 2):** [Protótipo e Design System](https://www.figma.com/design/tpk67fOWALc2rEf9r6bZjG/ByteBank-4FRNT---Fase2?node-id=1-750)
+- 📹 **Vídeo de Apresentação (Fase 2):** TBD (em produção)
+- 🔗 **Repositório Fase 1:** [bytebank-fiap](https://github.com/karenkramek/bytebank-fiap)
+
+## 👥 Integrantes do Grupo
+
+| Nome                                            | Email                                                         | RM                                          |
+|-------------------------------------------------|---------------------------------------------------------------|---------------------------------------------|
+| Fernanda Raquel Campos Jiacinto                 | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com)     | [366526](mailto:RM366526@fiap.com.br)       |
+| Kaique Kenichi Furukawa Endo                    | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com)   | [366448](mailto:RM366448@fiap.com.br)       |
+| Karen Cristina Kramek                           | [kakakramek@gmail.com](mailto:kakakramek@gmail.com)           | [361140](mailto:RM361140@fiap.com.br)       |
+| Tatiane Gabrielle Marçal Rodrigues da Costa     | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | [365215](mailto:RM365215@fiap.com.br)     |
+
+## 🌐 Deploy em Produção
+
+A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combinando o melhor de cada plataforma:
+
+### 🚀 Frontends (Vercel)
+- **Shell App:** https://bytebank-shell.vercel.app
+- **Dashboard MFE:** https://dashboard-mfe-eta.vercel.app
+- **Transactions MFE:** https://transactions-mfe-iota.vercel.app
+- **Shared Library:** https://bytebank-shared.vercel.app
+
+### 🖥️ Backend (AWS EC2)
+- **API Server:** http://44.206.72.128:3034
+- **Upload Server:** http://44.206.72.128:3035
+
+> ⚠️ **Nota de Segurança:** Este é um ambiente de demonstração para fins acadêmicos.
+> A API é pública e contém apenas dados mock/exemplo. Não utilize para dados sensíveis reais.
+
+📖 **Arquitetura de Deploy:** Ver [Deployment Híbrido Vercel + AWS](./docs/hybrid-deployment.md) para entender como funciona a estratégia de deploy em múltiplas clouds.
+
+🔒 **Segurança e Boas Práticas:** Ver [Práticas de Segurança em Cloud](./docs/SECURITY_PRACTICES.md) para detalhes sobre autenticação, autorização, proteção de rotas, configurações de segurança AWS/Vercel e checklist de conformidade.
 
 ## 🧱 Visão da Arquitetura
 
@@ -43,13 +97,48 @@ Essa separação permite evoluir os MFEs e a lib compartilhada de forma independ
 
 ## ✨ Funcionalidades
 
-- Dashboard intuitivo com saldo e extrato
-- Listagem de transações com visualização, edição e remoção
-- Adição de novas transações (depósito, transferência, etc.)
+### 🏦 Dashboard e Visualização
+- Dashboard intuitivo com saldo atual e controle de visibilidade
+- Visualização de transações recentes (últimas 5)
+- Cartões informativos com dados financeiros
+- Gráficos e estatísticas de transações
+
+### 💰 Gestão de Transações
+- Listagem completa de transações com paginação
+- **Filtro e pesquisa de transações** por descrição, valor, tipo e data
+- **Scroll infinito** com carregamento progressivo (5 itens por vez)
+- Adição de novas transações (depósito, saque, transferência, pagamento)
+- Edição e exclusão de transações existentes
+- **Sugestões inteligentes de descrições** durante o preenchimento
+- **Validações completas** de formulário (valor, data, tipo, descrição)
 - Upload de arquivos anexos às transações (PDF, imagens, documentos)
-- Edição de transações existentes
+- Visualização e download de anexos
+
+### 🔐 Autenticação e Segurança
+- Sistema completo de login e registro de usuários
+- **Proteção de rotas** com redirecionamento automático
+- Persistência de sessão (localStorage)
+- Logout com limpeza de dados sensíveis
+- Validação de campos com feedback em tempo real
+
+### 🎨 Interface e Experiência
 - Design system consistente e responsivo (Tailwind CSS)
-- Tipagem estática com TypeScript
+- **Página About/Sobre** com informações institucionais
+- **Página Home** com hero image animada e apresentação
+- **Notificações toast** para feedback de ações (sucesso, erro, loading)
+- **Error Boundary** para captura e tratamento de erros
+- Loading states e skeletons para melhor UX
+- Sidebar responsiva com navegação intuitiva
+- Header dinâmico com informações do usuário
+- Footer com links e informações
+
+### 🔧 Recursos Técnicos
+- Tipagem estática completa com TypeScript
+- Redux Toolkit para gerenciamento de estado global
+- Custom hooks reutilizáveis (useTransactions, useAccount, useAuthProtection)
+- Serviços tipados com validação (TransactionService, AccountService)
+- Utilitários para formatação de moeda e datas
+- Normalização de texto para busca sem acentos
 
 ## 🛠️ Tecnologias
 
