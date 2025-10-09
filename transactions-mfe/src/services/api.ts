@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Account } from 'shared/models/Account';
 import { Transaction } from 'shared/models/Transaction';
 
-const API_BASE_URL = 'http://localhost:3034';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034';
 
 class TransactionAPIService {
   private api = axios.create({
