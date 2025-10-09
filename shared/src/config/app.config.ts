@@ -1,20 +1,12 @@
-// Função helper para ler variáveis de ambiente de forma segura
-const getEnvVar = (key: string, defaultValue: string): string => {
-  try {
-    // @ts-ignore - process.env é injetado pelo Webpack
-    return typeof process !== 'undefined' && process.env && process.env[key]
-      ? process.env[key]
-      : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
+// Declaração global para TypeScript reconhecer as variáveis injetadas pelo Webpack
+declare const REACT_APP_API_BASE_URL: string | undefined;
+declare const REACT_APP_UPLOAD_URL: string | undefined;
 
 // Configurações do projeto
 export const AppConfig = {
   // URLs dos serviços
-  API_BASE_URL: getEnvVar('REACT_APP_API_BASE_URL', 'http://localhost:3034'),
-  UPLOAD_SERVICE_URL: getEnvVar('REACT_APP_UPLOAD_URL', 'http://localhost:3035'),
+  API_BASE_URL: typeof REACT_APP_API_BASE_URL !== 'undefined' ? REACT_APP_API_BASE_URL : 'http://localhost:3034',
+  UPLOAD_SERVICE_URL: typeof REACT_APP_UPLOAD_URL !== 'undefined' ? REACT_APP_UPLOAD_URL : 'http://localhost:3035',
 
   // Configurações de upload
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
