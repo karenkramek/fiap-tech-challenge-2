@@ -419,13 +419,6 @@ npm run test:coverage
 - `npm run test:watch` — Modo watch para todos os módulos (desenvolvimento)
 - `npm run test:coverage` — Gera relatórios de cobertura para todos os módulos
 
-## 🧩 Escopo da Fase 2 (Resumo)
-
-- Evolução para microfrontends com integração via Module Federation
-- Separação de responsabilidades por MFE e biblioteca compartilhada
-- Integração com API mock para fluxo de transações e dashboard
-- Reutilização de componentes, hooks e utilitários entre MFEs
-
 ## 🛑 Encerrando a Execução
 
 Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodando tudo junto com `npm run dev:all`, interrompa no terminal desse comando.

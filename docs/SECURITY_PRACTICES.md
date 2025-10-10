@@ -157,9 +157,11 @@ export const PUBLIC_ROUTES = [
 
 ```bash
 # Exemplos de variáveis de ambiente (NÃO commitadas)
-REACT_APP_API_BASE_URL=http://44.206.72.128:3034
-REACT_APP_UPLOAD_URL=http://44.206.72.128:3035
+REACT_APP_API_BASE_URL=/api
+REACT_APP_UPLOAD_URL=/api/upload
 ```
+
+> **Nota:** Use URLs relativas no Vercel. O código detecta automaticamente se já contém `/api/upload` para evitar duplicação. O proxy do Vercel redireciona para o EC2.
 
 ### 4. Content Security Policy (CSP)
 - ✅ Proteção contra XSS (Cross-Site Scripting)

@@ -57,7 +57,7 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       'NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-      'REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
+      'REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL ?? 'http://localhost:3034')
     }),
     new ModuleFederationPlugin({
       name: 'dashboardMFE',

@@ -55,7 +55,13 @@ export class FileUploadService {
     formData.append('transactionType', transactionType);
 
     try {
-      const response = await fetch(`${AppConfig.UPLOAD_SERVICE_URL}/api/upload`, {
+      // Se UPLOAD_SERVICE_URL já tem /api/upload (Vercel), usa direto
+      // Se não tem (localhost com porta), adiciona /api/upload
+      const uploadUrl = AppConfig.UPLOAD_SERVICE_URL.includes('/api/upload')
+        ? AppConfig.UPLOAD_SERVICE_URL
+        : `${AppConfig.UPLOAD_SERVICE_URL}/api/upload`;
+
+      const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData
       });
@@ -97,7 +103,13 @@ export class FileUploadService {
         return false;
       }
 
-      const response = await fetch(`${AppConfig.UPLOAD_SERVICE_URL}/api/upload/${encodeURIComponent(fileName)}`, {
+      // Se UPLOAD_SERVICE_URL já tem /api/upload (Vercel), usa direto
+      // Se não tem (localhost com porta), adiciona /api/upload
+      const uploadUrl = AppConfig.UPLOAD_SERVICE_URL.includes('/api/upload')
+        ? AppConfig.UPLOAD_SERVICE_URL
+        : `${AppConfig.UPLOAD_SERVICE_URL}/api/upload`;
+
+      const response = await fetch(`${uploadUrl}/${encodeURIComponent(fileName)}`, {
         method: 'DELETE'
       });
 
