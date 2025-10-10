@@ -2,11 +2,18 @@
 declare const REACT_APP_API_BASE_URL: string | undefined;
 declare const REACT_APP_UPLOAD_URL: string | undefined;
 
+// Helper para determinar ambiente
+const isDevelopmentEnv = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
 // Configurações do projeto
 export const AppConfig = {
   // URLs dos serviços
-  API_BASE_URL: typeof REACT_APP_API_BASE_URL !== 'undefined' ? REACT_APP_API_BASE_URL : 'http://localhost:3034',
-  UPLOAD_SERVICE_URL: typeof REACT_APP_UPLOAD_URL !== 'undefined' ? REACT_APP_UPLOAD_URL : 'http://localhost:3035',
+  API_BASE_URL: typeof REACT_APP_API_BASE_URL !== 'undefined' && REACT_APP_API_BASE_URL !== ''
+    ? REACT_APP_API_BASE_URL
+    : 'http://localhost:3034',
+  UPLOAD_SERVICE_URL: typeof REACT_APP_UPLOAD_URL !== 'undefined' && REACT_APP_UPLOAD_URL !== ''
+    ? REACT_APP_UPLOAD_URL
+    : (isDevelopmentEnv ? 'http://localhost:3035' : ''),
 
   // Configurações de upload
   MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
