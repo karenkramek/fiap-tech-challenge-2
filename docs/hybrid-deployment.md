@@ -198,15 +198,13 @@ REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 Variáveis de ambiente:
 ```bash
 REACT_APP_API_BASE_URL=/api
-REACT_APP_UPLOAD_URL=
+REACT_APP_UPLOAD_URL=/api/upload
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 ```
 
-> **Nota sobre UPLOAD_URL:** O valor é **vazio** porque o código adiciona automaticamente `/api/upload` para uploads e `/uploads/*` para downloads. O proxy do Vercel redireciona:
-> - `/api/upload` → `http://44.206.72.128:3035/api/upload` (POST de arquivos)
-> - `/uploads/*` → `http://44.206.72.128:3035/uploads/*` (GET de arquivos)
+> **Nota sobre UPLOAD_URL:** Use `/api/upload`. O código detecta se já contém o caminho completo para evitar duplicação. O proxy do Vercel redireciona para o EC2:3035.
 
 #### 4. Shell (Host)
 ```json
@@ -221,13 +219,13 @@ REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 Variáveis de ambiente:
 ```bash
 REACT_APP_API_BASE_URL=/api
-REACT_APP_UPLOAD_URL=
+REACT_APP_UPLOAD_URL=/api/upload
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
 ```
 
-> **Nota sobre UPLOAD_URL:** Mesmo valor vazio que Transactions MFE. Permite que o código construa os caminhos completos internamente.
+> **Nota sobre UPLOAD_URL:** Use `/api/upload` (mesmo comportamento que Transactions MFE).
 
 ### Module Federation no Vercel
 

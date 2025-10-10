@@ -8,14 +8,17 @@ REACT_APP_DASHBOARD_URL=https://bytebank-dashboard.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://bytebank-transactions.vercel.app
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_API_BASE_URL=/api
-REACT_APP_UPLOAD_URL=
+REACT_APP_UPLOAD_URL=/api/upload
 ```
 
 > ⚠️ **Importante sobre UPLOAD_URL:**
-> - O valor deve estar **vazio** (não colocar nada após o `=`)
-> - O código adiciona automaticamente `/api/upload` para uploads e `/uploads/*` para downloads
-> - O proxy no `vercel.json` redireciona essas requisições para o EC2
-> - **NÃO use** `/uploads` pois causará erro 404 (o código adicionará `/api/upload` resultando em `/uploads/api/upload`)
+
+> - Use **`/api/upload`** (URL relativa que o proxy redireciona)
+> - O código detecta automaticamente se já tem `/api/upload` para evitar duplicação
+> - Para downloads, o código usa o `filePath` retornado (ex: `/uploads/file.pdf`)
+> - O proxy no `vercel.json` redireciona:
+>   - `/api/upload/*` → EC2:3035
+>   - `/uploads/*` → EC2:3035
 
 ### 2. Dashboard MFE
 ```
@@ -26,11 +29,11 @@ REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 ### 3. Transactions MFE
 ```
 REACT_APP_API_BASE_URL=/api
-REACT_APP_UPLOAD_URL=
+REACT_APP_UPLOAD_URL=/api/upload
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 ```
 
-> **Nota:** `REACT_APP_UPLOAD_URL` também deve estar vazio (mesmo comportamento do Shell).
+> **Nota:** `REACT_APP_UPLOAD_URL` usa `/api/upload` (mesmo comportamento do Shell).
 
 ### 4. Shared Library
 ```
