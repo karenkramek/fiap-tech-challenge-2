@@ -133,6 +133,21 @@ export class FileUploadService {
     if (!filePath) {
       throw new Error('Caminho do arquivo não fornecido');
     }
+
+    // Se filePath já começa com /uploads
+    if (filePath.startsWith('/uploads')) {
+      // Em produção (Vercel), usa URL relativa /uploads (proxy redireciona)
+      // Em local, precisa adicionar a base URL do upload server
+      if (AppConfig.UPLOAD_SERVICE_URL.includes('localhost')) {
+        // Local: remove /api/upload e adiciona a base do upload server
+        const baseUrl = AppConfig.UPLOAD_SERVICE_URL.replace('/api/upload', '');
+        return `${baseUrl}${filePath}`;
+      }
+      // Vercel: usa path relativo (proxy configurado)
+      return filePath;
+    }
+
+    // Fallback para caso legado (não deve acontecer)
     return `${AppConfig.UPLOAD_SERVICE_URL}${filePath}`;
   }
 
