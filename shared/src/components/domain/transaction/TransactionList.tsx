@@ -14,35 +14,52 @@ import ModalWrapper from '../../ui/ModalWrapper';
 import { Transaction } from '../../../models/Transaction';
 import { filterTransactions } from '../../../utils/transactionFilter';
 
-// Componente para ações de transação
+// Componente para ações de transação - SIMPLIFICADO
 const TransactionActions: React.FC<{
   onEdit: () => void;
   onDelete: () => void;
   loading?: boolean;
-}> = React.memo(({ onEdit, onDelete, loading }) => (
-  <div className="flex items-center gap-2">
-    <button
-      className="p-1 hover:bg-primary-50 rounded"
-      title="Editar"
-      aria-label="Editar transação"
-      onClick={onEdit}
-      disabled={loading}
-    >
-      <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-    </button>
-    <button
-      className="p-1 hover:bg-error-50 rounded"
-      title="Excluir"
-      aria-label="Excluir transação"
-      onClick={onDelete}
-      disabled={loading}
-    >
-      <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-    </button>
-  </div>
-));
+  transaction: any;
+}> = React.memo(({ onEdit, onDelete, loading, transaction }) => {
+  const isIncome = transaction.isIncome();
+  const description = transaction.description || 'Sem descrição';
+  const value = formatCurrencyWithSymbol(transaction.amount);
+  
+  // Formatação de data legível para leitor de tela
+  const formatDateForScreenReader = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    });
+  };
+  
+  const date = formatDateForScreenReader(transaction.date);
+  
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        className="p-1 hover:bg-primary-50 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        aria-label={`Editar transação - ${description} - ${value} - ${date}`}
+        onClick={onEdit}
+        disabled={loading}
+      >
+        <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} aria-hidden="true" />
+      </button>
+      <button
+        className="p-1 hover:bg-error-50 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-error-500"
+        aria-label={`Excluir transação - ${description} - ${value} - ${date}`}
+        onClick={onDelete}
+        disabled={loading}
+      >
+        <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} aria-hidden="true" />
+      </button>
+    </div>
+  );
+});
 
-// Componente para detalhes da transação
+// Componente para detalhes da transação - SIMPLIFICADO
 const TransactionDetails: React.FC<{
   description: string;
   attachmentPath?: string;
@@ -50,7 +67,9 @@ const TransactionDetails: React.FC<{
   showLabel: boolean;
 }> = React.memo(({ description, attachmentPath, transactionType, showLabel }) => (
   <div className="flex flex-col flex-1 justify-center">
-    <p className="text-gray-700 text-sm mb-0 truncate">{description || "Sem descrição"}</p>
+    <p className="text-gray-700 text-sm mb-0 truncate">
+      {description || "Sem descrição"}
+    </p>
     {attachmentPath ? (
       <div className="mt-1">
         <AttachmentDisplay
@@ -64,25 +83,31 @@ const TransactionDetails: React.FC<{
   </div>
 ));
 
-// Componente para item de transação
+// Componente para item de transação - SIMPLIFICADO
 const TransactionItem: React.FC<{
   transaction: any;
   mode: 'dashboard' | 'full';
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
-}> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
+  index: number;
+}> = React.memo(({ transaction, mode, onEdit, onDelete, loading, index }) => {
+  const isIncome = transaction.isIncome();
+  
   return (
-    <div className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
+    <article className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           <TransactionTypeBadge type={transaction.type} />
-          <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
+          <time className="text-sm text-gray-500" dateTime={transaction.date}>
+            {formatDate(transaction.date)}
+          </time>
         </div>
         <TransactionActions
           onEdit={() => onEdit(transaction.id)}
           onDelete={() => onDelete(transaction.id)}
           loading={!!loading}
+          transaction={transaction}
         />
       </div>
       <div className="flex items-stretch mb-2 p-1">
@@ -93,10 +118,12 @@ const TransactionItem: React.FC<{
           showLabel={mode === 'full'}
         />
         <div className="flex items-center ml-4 min-h-[40px]">
-          <span className={`text-lg font-semibold ${transaction.isIncome() ? 'text-green-600' : 'text-red-600'}`}>{transaction.isIncome() ? '' : '-'} {formatCurrencyWithSymbol(transaction.amount)}</span>
+          <span className={`text-lg font-semibold ${isIncome ? 'text-green-600' : 'text-red-600'}`}>
+            {isIncome ? '' : '-'} {formatCurrencyWithSymbol(transaction.amount)}
+          </span>
         </div>
       </div>
-    </div>
+    </article>
   );
 });
 
@@ -208,43 +235,27 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
   const isLoading = loading;
 
   return (
-    <>
-      {/* Skeleton Loader */}
-      {isLoading && (
-        <div className="space-y-2 mt-1 animate-pulse">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex flex-col border-b py-2 px-2">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-5 w-40 bg-gray-300 rounded" /> {/* badge e date skeleton */}
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-5 w-5 bg-gray-300 rounded" />
-                  <div className="h-5 w-5 bg-gray-300 rounded" />
-                </div>
-              </div>
-              <div className="flex items-stretch mb-2 p-1">
-                <div className="flex flex-col flex-1 justify-center gap-2">
-                  <div className="h-4 w-32 bg-gray-300 rounded" /> {/* description skeleton */}
-                  <div className="h-3 w-20 bg-gray-200 rounded" /> {/* attachment skeleton */}
-                </div>
-                <div className="flex items-center ml-4 min-h-[40px]">
-                  <div className="h-6 w-16 bg-gray-300 rounded" /> {/* amount skeleton */}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {/* Lista de transações agrupadas por mês/ano */}
+    <div>
+      {/* Anúncio para leitores de tela */}
+      <div className="sr-only" aria-live="polite">
+        {isLoading ? 'Carregando transações...' : 
+         filteredTransactions.length === 0 ? 'Nenhuma transação encontrada' :
+         `${filteredTransactions.length} transação${filteredTransactions.length !== 1 ? 'ões' : ''} encontrada${filteredTransactions.length !== 1 ? 's' : ''}`}
+      </div>
+
+      {/* Lista de transações agrupadas por mês/ano - SIMPLIFICADA */}
       {!isLoading && filteredTransactions.length > 0 ? (
         <div>
           {sortedKeys.map((key, idx) => {
             const [month, year] = key.split("-");
             const isLast = idx === sortedKeys.length - 1;
+            let transactionIndex = 0;
+            for (let i = 0; i < idx; i++) {
+              transactionIndex += grouped[sortedKeys[i]].length;
+            }
+            
             return (
-              <div key={key} className={isLast ? "mb-0" : "mb-6"}>
+              <section key={key} className={isLast ? "mb-0" : "mb-6"}>
                 <h3 className={monthTitleClass}>
                   {getMonthName(month)} {year}
                 </h3>
@@ -268,10 +279,11 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                             onEdit={openEditModal}
                             onDelete={openDeleteModal}
                             loading={formLoading}
+                            index={transactionIndex + tIdx}
                           />
                         </div>
                         {isFullMode && isLastGroup && isLastItem && showAllRecordsMessage && (
-                          <div className="w-full flex justify-center py-4">
+                          <div className="w-full flex justify-center py-4" role="status" aria-live="polite">
                             <span className="text-gray-500 text-sm">Todos os registros foram exibidos.</span>
                           </div>
                         )}
@@ -279,15 +291,17 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                     );
                   })}
                 </div>
-              </div>
+              </section>
             );
           })}
         </div>
       ) : !isLoading ? (
-        <p className="text-white-800">Nenhuma transação encontrada.</p>
+        <div role="status" aria-live="polite">
+          <p className="text-white-800">Nenhuma transação encontrada.</p>
+        </div>
       ) : null}
 
-      {/* Modais de editar e excluir */}
+      {/* Modais mantidos iguais */}
       <ModalWrapper open={editModal.open} onClose={closeEditModal} title="Editar Transação" size="md">
         <TransactionEdit
           transactionId={transactionToEdit}
@@ -305,7 +319,22 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
         onCancel={closeDeleteModal}
         loading={formLoading}
       />
-    </>
+
+      {/* CSS para sr-only */}
+      <style jsx>{`
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+      `}</style>
+    </div>
   );
 });
 
