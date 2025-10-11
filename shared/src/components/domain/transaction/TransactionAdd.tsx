@@ -46,50 +46,62 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
     descriptionInputRef.current?.focus();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    if (onSubmit) onSubmit(e);
-    // O fechamento deve ser controlado pelo pai após sucesso, mas pode ser chamado aqui se necessário
-    // Exemplo: onClose && onClose();
-  };
-
   return (
-    <form onSubmit={handleSubmit} className='space-y-5 mt-4'>
+    <form 
+      onSubmit={onSubmit} 
+      className='space-y-5 mt-4'
+      aria-label="Formulário de nova transação"
+    >
       <div>
-        <label className='block text-md font-bold text-primary-700 mb-1'>Tipo *</label>
+        <label htmlFor='transaction-type' className='block text-md font-bold text-primary-700 mb-1'>
+          Tipo <span aria-hidden="true">*</span>
+        </label>
         <select
-          id='type'
+          id='transaction-type'
           value={transactionType}
           onChange={onTypeChange}
           className='w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700 bg-white-50'
           disabled={loading}
           required
+          aria-required="true"
         >
           {Object.values(TransactionType).map((type) => (
             <option key={type} value={type}>{getTransactionTypeLabel(type)}</option>
           ))}
         </select>
       </div>
+
       <div>
-        <label className='block text-md font-bold text-primary-700 mb-1'>Valor *</label>
+        <label htmlFor='transaction-amount' className='block text-md font-bold text-primary-700 mb-1'>
+          Valor <span aria-hidden="true">*</span>
+        </label>
         <div className='relative'>
-          <span className='absolute inset-y-0 left-0 flex items-center pl-4 text-white-800'>R$</span>
+          <span className='absolute inset-y-0 left-0 flex items-center pl-4 text-white-800' aria-hidden="true">
+            R$
+          </span>
           <input
+            id='transaction-amount'
             type='text'
             value={amount}
             onChange={onAmountChange}
             inputMode='numeric'
             placeholder='00,00'
+            aria-placeholder=""
             className='w-full pl-12 pr-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700'
             disabled={loading}
             required
+            aria-required="true"
+            aria-label="Valor em reais, campo obrigatório"
           />
         </div>
       </div>
+
       <div>
-        <label className='block text-md font-bold text-primary-700 mb-1'>
+        <label htmlFor='transaction-description' className='block text-md font-bold text-primary-700 mb-1'>
           Descrição <span className='text-sm font-medium text-white-800'>(opcional)</span>
         </label>
         <input
+          id='transaction-description'
           type='text'
           value={description}
           onChange={onDescriptionChange}
@@ -98,26 +110,27 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
           className='w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700'
           disabled={loading}
         />
-        <BadgeSuggestions suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+        <BadgeSuggestions 
+          suggestions={filteredSuggestions} 
+          onSelect={handleSuggestionClick}
+        />
       </div>
+
       <FileUpload
         onFileSelect={onFileSelect}
         selectedFile={attachmentFile}
         disabled={loading}
       />
+
       <div className='flex gap-4 pt-4'>
-        <Button type='submit' variant='active' className='w-full py-3 bg-tertiary-600 hover:bg-tertiary-700 text-white-50 font-medium rounded-lg shadow-md' disabled={loading}>
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5 text-white-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-              </svg>
-              Salvando...
-            </span>
-          ) : (
-            'Adicionar'
-          )}
+        <Button 
+          type='submit' 
+          variant='active' 
+          className='w-full py-3 bg-tertiary-600 hover:bg-tertiary-700 text-white-50 font-medium rounded-lg shadow-md' 
+          disabled={loading}
+          aria-label="Adicionar transação"
+        >
+          {loading ? 'Salvando...' : 'Adicionar'}
         </Button>
       </div>
     </form>
