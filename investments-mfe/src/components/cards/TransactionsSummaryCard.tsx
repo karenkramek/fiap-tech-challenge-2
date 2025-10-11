@@ -1,11 +1,11 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import { calculateTransactionTotals } from '../utils/investmentCalculations';
-import { useInvestments } from '../hooks/useInvestments';
-import { useGoals } from '../hooks/useGoals';
-import { createResumoBarData, resumoBarOptions } from '../config/chartConfigs';
+import { calculateTransactionTotals } from '../../utils/investmentCalculations';
+import { useInvestments } from '../../hooks/useInvestments';
+import { useGoals } from '../../hooks/useGoals';
+import { createResumoBarData, resumoBarOptions } from '../../config/chartConfigs';
 
-const InvestmentsChartSwitcher: React.FC = () => {
+const TransactionsSummaryCard: React.FC = () => {
   const { transactions, investments } = useInvestments();
   const { goals } = useGoals(() => {});
 
@@ -32,4 +32,4 @@ const InvestmentsChartSwitcher: React.FC = () => {
   );
 };
 
-export default InvestmentsChartSwitcher;
+export default TransactionsSummaryCard;

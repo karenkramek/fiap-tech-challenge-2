@@ -9,7 +9,7 @@ import { useInvestments } from './hooks/useInvestments';
 import { useGoals } from './hooks/useGoals';
 import { useRedeemInvestment } from './hooks/useRedeemInvestment';
 import InvestmentsHeader from './components/InvestmentsHeader';
-import InvestmentsChartSwitcher from './components/InvestmentsChartSwitcher';
+import TransactionsSummaryCard from './components/cards/TransactionsSummaryCard';
 import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
 
 const App = () => {
@@ -31,7 +31,7 @@ const App = () => {
     <>
       <FeedbackProvider />
         <div className="min-h-screen">
-          {/* Titulo e resumo */}
+          {/* Titulo e Totalizadores */}
           <div className="mb-6 px-6">
             <InvestmentsHeader />
           </div>
@@ -62,7 +62,7 @@ const App = () => {
 
             {/* Entradas e Saídas / Investimentos e Metas */}
             <div className="flex flex-col">
-              <InvestmentsChartSwitcher />
+              <TransactionsSummaryCard />
             </div>
           </div>
         </div>

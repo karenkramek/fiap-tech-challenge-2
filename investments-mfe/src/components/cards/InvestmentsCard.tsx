@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import Button from 'shared/components/ui/Button';
 import { calculateInvestmentTotals } from '../../utils/investmentCalculations';
@@ -7,8 +7,10 @@ import { useInvestments } from '../../hooks/useInvestments';
 import InvestmentModal from '../modals/InvestmentModal';
 import Card from 'shared/components/ui/Card';
 import ConfirmationModal from 'shared/components/ui/ConfirmationModal';
-import { InvestmentService } from 'shared/services/InvestmentService';
+import { TransactionService } from 'shared/services/TransactionService';
 import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
+import { useSelector } from 'react-redux';
+import { RootState } from 'shared/store';
 
 interface InvestmentsCardProps {
   fetchInvestmentsAndTransactions: () => Promise<void>;
@@ -20,21 +22,22 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
   const totals = calculateInvestmentTotals(investments);
   const hasInvestments = totals.total > 0;
   const data = createDoughnutData(totals.funds, totals.treasury, totals.pension, totals.stocks);
-  const investmentAddRef = useRef<any>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [redeemLoading, setRedeemLoading] = useState(false);
+  const [investmentModalOpen, setInvestmentModalOpen] = useState(false);
+  const [editInvestment, setEditInvestment] = useState(null);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const handleAddInvestment = () => {
-    if (investmentAddRef.current && investmentAddRef.current.open) {
-      investmentAddRef.current.open();
-    }
+    setEditInvestment(null);
+    setInvestmentModalOpen(true);
   };
 
   const handleRedeemInvestments = async () => {
     setRedeemLoading(true);
     try {
-      // Remove todos os investimentos
-      await Promise.all(investments.map(inv => InvestmentService.remove(inv.id)));
+      if (!user?.id) throw new Error('Usuário não autenticado');
+      await TransactionService.redeemAllInvestments(user.id);
       showSuccess('Investimentos resgatados!');
       await fetchInvestmentsAndTransactions();
       setShowRedeemModal(false);
@@ -146,6 +149,8 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
                 </span>
               </div>
             }
+            showCancelButton={false} 
+            confirmVariant="success"
             confirmText="Resgatar"
             onConfirm={handleRedeemInvestments}
             onCancel={() => setShowRedeemModal(false)}
@@ -156,7 +161,11 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
       )}
 
       {/* Modais */}
-      <InvestmentModal ref={investmentAddRef} fetchInvestmentsAndTransactions={fetchInvestmentsAndTransactions} />
+      <InvestmentModal 
+        open={investmentModalOpen}
+        onClose={() => setInvestmentModalOpen(false)}
+        editInvestment={editInvestment}
+      />
     </Card>
   );
 };

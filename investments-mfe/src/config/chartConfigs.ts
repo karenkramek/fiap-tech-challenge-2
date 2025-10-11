@@ -45,15 +45,27 @@ export const doughnutOptions = {
 };
 
 export const createTransferBarData = (totals: Record<TransactionTypeKey, number>) => {
+  const simpleTypes: TransactionTypeKey[] = ['DEPOSIT', 'PAYMENT', 'TRANSFER', 'WITHDRAWAL'];
+  const investGoalTypes: TransactionTypeKey[] = ['INVESTMENT', 'GOAL'];
+
+  // Para cada dataset, só preenche os tipos correspondentes, os outros ficam zero
+  const simpleData = TRANSACTION_TYPE_KEYS.map(type => simpleTypes.includes(type) ? (totals[type] || 0) : 0);
+  const investGoalData = TRANSACTION_TYPE_KEYS.map(type => investGoalTypes.includes(type) ? (totals[type] || 0) : 0);
+
   return {
     labels: TRANSACTION_TYPE_KEYS.map(type => TRANSACTION_TYPE_LABELS[type]),
     datasets: [
       {
-        label: 'Total (R$)',
-        data: TRANSACTION_TYPE_KEYS.map(type => totals[type] || 0),
-        backgroundColor: TRANSACTION_TYPE_KEYS.map(type => TRANSACTION_TYPE_COLORS[type]),
+        label: 'Transações Simples',
+        data: simpleData,
+        backgroundColor: '#1ABC9C',
       },
-    ],
+      {
+        label: 'Investimentos e Metas',
+        data: investGoalData,
+        backgroundColor: '#F4B400',
+      }
+    ]
   };
 };
 

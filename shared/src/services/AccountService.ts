@@ -112,7 +112,6 @@ export class AccountService extends BaseService {
   static async login(email: string, password: string): Promise<Account> {
     // Buscar conta pelo email
     const account = await AccountService.getAccountByEmail(email);
-    console.log('🔎 Conta retornada para login:', account);
     if (!account) {
       throw new Error('Conta não encontrada');
     }

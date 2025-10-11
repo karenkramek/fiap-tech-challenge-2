@@ -9,7 +9,7 @@ import { GoalService } from 'shared/services/GoalService';
 import { TransactionService } from 'shared/services/TransactionService';
 import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
 import { useGoals } from '../../hooks/useGoals';
-import GoalModal from '../modals/GoalModal';
+import GoalsModal from '../modals/GoalsModal';
 import type { GoalDTO } from 'shared/services/GoalService';
 import { useSelector } from 'react-redux';
 import { RootState } from 'shared/store';
@@ -20,7 +20,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
   const accountId = useSelector((state: RootState) => state.auth.user?.id) || '';
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [goalModalOpen, setGoalModalOpen] = useState(false);
+  const [goalsModalOpen, setGoalsModalOpen] = useState(false);
   const [selectedGoalIdx, setSelectedGoalIdx] = useState<number | null>(null);
   const [goalToEdit, setGoalToEdit] = useState<GoalDTO | null>(null);
   const [assignValue, setAssignValue] = useState('');
@@ -60,7 +60,8 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
           return;
         }
         // Passa o goalId para a função de atribuição de valor
-        const goalId = goals[selectedGoalIdx].id;
+        const goal = goals[selectedGoalIdx];
+        const goalId = goal.id;
         await handleAssignValue(selectedGoalIdx, valueToAssign, goalId);
         await fetchInvestmentsAndTransactions();
         await loadExistingGoals();
@@ -68,6 +69,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         setAssignModalOpen(false);
         setAssignValue('');
       } catch (e) {
+        setAssignError('Erro ao atribuir valor à meta.');
       } finally {
         setAssignLoading(false);
       }
@@ -84,12 +86,14 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
     if (selectedGoalIdx !== null) {
       const goalId = goals[selectedGoalIdx].id;
       try {
-        await GoalService.delete(goalId);
-        // Remove transações relacionadas à meta
-        await TransactionService.deleteGoalTransactions(goalId);
-        await fetchInvestmentsAndTransactions();
-        await loadExistingGoals();
-        showSuccess('Meta excluída!');
+        const ok = await TransactionService.deleteGoalAndTransactions(goalId, accountId);
+        if (ok) {
+          await fetchInvestmentsAndTransactions();
+          await loadExistingGoals();
+          showSuccess('Meta excluída!');
+        } else {
+          showError('Erro ao excluir meta.');
+        }
       } catch (e) {
         showError('Erro ao excluir meta.');
       }
@@ -120,7 +124,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         await GoalService.create(newGoal);
         showSuccess('Meta criada!');
       }
-      setGoalModalOpen(false);
+      setGoalsModalOpen(false);
       setGoalToEdit(null);
       await loadExistingGoals();
       await fetchInvestmentsAndTransactions();
@@ -139,7 +143,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         <Button
           onClick={() => {
             setGoalToEdit(null);
-            setGoalModalOpen(true);
+            setGoalsModalOpen(true);
           }}
           className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
         >
@@ -188,7 +192,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
                       aria-label="Editar meta"
                       onClick={() => {
                         setGoalToEdit(goal);
-                        setGoalModalOpen(true);
+                        setGoalsModalOpen(true);
                       }}
                     >
                       <Edit className="h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer" />
@@ -308,9 +312,9 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
       </ModalWrapper>
 
       {/* Modal de criação/edição de meta */}
-      <GoalModal
-        open={goalModalOpen}
-        onClose={() => setGoalModalOpen(false)}
+      <GoalsModal
+        open={goalsModalOpen}
+        onClose={() => setGoalsModalOpen(false)}
         onSave={handleSaveGoal}
         initialGoal={goalToEdit}
       />

@@ -25,6 +25,8 @@ declare module 'shared/components/ui/ConfirmationModal' {
     onCancel: () => void;
     loading?: boolean;
     size?: 'sm' | 'md' | 'lg' | 'xl';
+    showCancelButton?: boolean;
+    confirmVariant?: 'danger' | 'warning' | 'success';
   }
   const ConfirmationModal: React.FC<ConfirmationModalProps>;
   export default ConfirmationModal;

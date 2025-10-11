@@ -66,7 +66,8 @@ export class TransactionService extends BaseService {
     date: Date,
     description?: string,
     attachmentFile?: File,
-    goalId?: string 
+    goalId?: string,
+    investmentId?: string
   ): Promise<Transaction> {
     this.validateTransactionInput(type, amount, date);
     const transactionId = uuidv4();
@@ -78,8 +79,8 @@ export class TransactionService extends BaseService {
         throw new Error('Falha no upload do arquivo. Transação não foi criada.');
       }
     }
-    // Inclui goalId ao criar a transação
-    const newTransaction = new Transaction(transactionId, accountId, type, amount, date, description, attachmentPath, goalId);
+
+    const newTransaction = new Transaction(transactionId, accountId, type, amount, date, description, attachmentPath, goalId, investmentId);
     try {
       const service = new TransactionService();
       const createdTransactionData = await service.post<TransactionDTO, TransactionDTO>('/transactions', newTransaction.toJSON());
@@ -103,7 +104,9 @@ export class TransactionService extends BaseService {
     amount: number,
     date: Date,
     description?: string,
-    attachmentFile?: File
+    attachmentFile?: File,
+    goalId?: string,
+    investmentId?: string
   ): Promise<Transaction> {
     if (!id || id.trim().length === 0) throw new Error('ID da transação é obrigatório');
     this.validateTransactionInput(type, amount, date);
@@ -117,7 +120,17 @@ export class TransactionService extends BaseService {
         throw new Error('Falha no upload do arquivo. Transação não foi atualizada.');
       }
     }
-    const updatedTransaction = new Transaction(id, oldTransaction.accountId, type, amount, date, description, attachmentPath);
+    const updatedTransaction = new Transaction(
+      id,
+      oldTransaction.accountId,
+      type,
+      amount,
+      date,
+      description,
+      attachmentPath,
+      goalId !== undefined ? goalId : oldTransaction.goalId,
+      investmentId !== undefined ? investmentId : oldTransaction.investmentId
+    );
     try {
       const service = new TransactionService();
       const updatedTransactionData = await service.put<TransactionDTO, TransactionDTO>(`/transactions/${id}`, updatedTransaction.toJSON());
@@ -163,9 +176,23 @@ export class TransactionService extends BaseService {
     }
   }
 
-  /**
-   * Remove todas as transações do tipo GOAL associadas a uma meta (goalId).
-   */
+  static async deleteGoalAndTransactions(goalId: string, accountId: string): Promise<boolean> {
+    if (!goalId) throw new Error('goalId é obrigatório');
+    try {
+      // 1. Busca a meta
+      const goal = await GoalService.getById(goalId);
+      if (!goal) throw new Error('Meta não encontrada');
+      // 2. Remove todas as transações GOAL relacionadas à meta (isso já credita o saldo)
+      await this.deleteGoalTransactions(goalId, accountId);
+      // 3. Remove a meta do backend
+      await GoalService.delete(goalId);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+
   static async deleteGoalTransactions(goalId: string, accountId?: string): Promise<number> {
     if (!goalId) throw new Error('goalId é obrigatório');
     // Busca todas as transações GOAL associadas à meta
@@ -177,6 +204,51 @@ export class TransactionService extends BaseService {
       if (ok) deleted++;
     }
     return deleted;
+  }
+
+  /**
+   * Deleta uma transação do tipo INVESTMENT, remove o investimento vinculado e credita o valor ao saldo.
+   */
+  static async deleteInvestmentTransaction(transactionId: string, loggedAccountId: string): Promise<boolean> {
+    const transaction = await this.getTransactionById(transactionId);
+    if (
+      transaction.type === TransactionType.INVESTMENT &&
+      transaction.investmentId &&
+      transaction.accountId === loggedAccountId
+    ) {
+      // Remove investimento
+      try {
+        const { InvestmentService } = await import('./InvestmentService');
+        await InvestmentService.remove(transaction.investmentId);
+      } catch (e) {
+        // Se não conseguir remover investimento, não prossegue
+        return false;
+      }
+      // Credita valor ao saldo
+      await this.updateAccountBalance(transaction.accountId, transaction.amount);
+      // Remove transação
+      const service = new TransactionService();
+      await service.delete<void>(`/transactions/${transactionId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Resgata todos os investimentos do usuário logado: remove transações e investimentos, credita saldo.
+   */
+  static async redeemAllInvestments(accountId: string): Promise<number> {
+    // Busca todas as transações do tipo INVESTMENT do usuário
+    const transactions = await this.getAllTransactions(accountId);
+    const investmentTransactions = transactions.filter(
+      t => t.type === TransactionType.INVESTMENT && t.investmentId && t.accountId === accountId
+    );
+    let total = 0;
+    for (const tx of investmentTransactions) {
+      const ok = await this.deleteInvestmentTransaction(tx.id, accountId);
+      if (ok) total += tx.amount;
+    }
+    return total;
   }
 
   /**

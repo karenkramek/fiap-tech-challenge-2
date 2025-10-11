@@ -29,7 +29,6 @@ export const calculateTransactionTotals = (transactions: any[], investments: any
   const totalInvestments = investments.reduce((sum: number, inv: any) => sum + (inv.amount || 0), 0);
   const totalGoals = goals.reduce((sum: number, goal: any) => sum + (goal.assigned || 0), 0);
 
-  console.log(totalGoals);
   return {
     inflows,
     outflows,

@@ -16,7 +16,7 @@ const GOAL_NAME_SUGGESTIONS = [
   'Outro objetivo'
 ];
 
-interface GoalModalProps {
+interface GoalsModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (goal: { name: string; value: number; deadline?: string }) => void;
@@ -30,7 +30,7 @@ interface GoalModalProps {
   } | null;
 }
 
-const GoalModal: React.FC<GoalModalProps> = ({
+const GoalsModal: React.FC<GoalsModalProps> = ({
   open,
   onClose,
   onSave,
@@ -127,4 +127,4 @@ const GoalModal: React.FC<GoalModalProps> = ({
   );
 };
 
-export default GoalModal;
+export default GoalsModal;

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'shared/store';
-// Remover import de showSuccess, showError
 import { GoalService, GoalDTO } from 'shared/services/GoalService';
 import { AccountService } from 'shared/services/AccountService';
 import { TransactionService } from 'shared/services/TransactionService';
@@ -11,7 +10,8 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [goals, setGoals] = useState<GoalDTO[]>([]);
   const [assignValues, setAssignValues] = useState<string[]>([]);
-  const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
+  const [goalsModalOpen, setGoalsModalOpen] = useState(false);
+  const [editGoal, setEditGoal] = useState<GoalDTO | null>(null);
 
   const loadExistingGoals = async () => {
     if (!user?.id) return;
@@ -34,33 +34,24 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     if (!account || account.balance < value) {
       return;
     }
-
+    // Cria a transação primeiro (que debita o saldo)
+    await TransactionService.addTransaction(
+      account.id,
+      TransactionType.GOAL,
+      value,
+      new Date(),
+      goal.name, // description da transação é o nome da meta
+      undefined, // attachmentFile
+      goalId || goal.id, // goalId,
+      undefined // investmentId
+    );
+    // Só depois atualiza o assigned da meta
     setGoals(goals =>
       goals.map((g, i) =>
         i === idx ? { ...g, assigned: (g.assigned || 0) + value } : g
       )
     );
     await GoalService.update(goal.id, { assigned: (goal.assigned || 0) + value });
-    await TransactionService.addTransaction(
-      account.id,
-      TransactionType.GOAL,
-      value,
-      new Date(),
-      `Atribuição à meta: ${goal.name}`,
-      undefined, // attachmentFile
-      goalId || goal.id // goalId sempre presente
-    );
-    fetchInvestmentsAndTransactions();
-  };
-
-  // Exclui meta
-  const handleDeleteGoal = async (idx: number) => {
-    if (!user?.id) return;
-    const goal = goals[idx];
-    if (!goal) return;
-    await GoalService.update(goal.id, { assigned: 0 });
-    setGoals(goals => goals.filter((_, i) => i !== idx));
-    setAssignValues(values => values.filter((_, i) => i !== idx));
     fetchInvestmentsAndTransactions();
   };
 
@@ -70,7 +61,6 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     if (!goalName.trim() || !savingGoal || Number(savingGoal) <= 0) {
       throw new Error('Por favor, preencha o nome da meta e um valor válido.');
     }
-
     const newGoal: GoalDTO = {
       id: Math.random().toString(36).substring(2, 9),
       accountId: user.id,
@@ -80,11 +70,16 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
       createdAt: new Date().toISOString(),
       deadline: goalDeadline
     };
-
     await GoalService.create(newGoal);
     setGoals(prevGoals => [...prevGoals, newGoal]);
     setAssignValues(prev => [...prev, '']);
-    // showSuccess removido, feedback fica no componente
+    fetchInvestmentsAndTransactions();
+  };
+
+  // Edita meta existente
+  const updateGoal = async (goalId: string, data: Partial<GoalDTO>) => {
+    await GoalService.update(goalId, data);
+    await loadExistingGoals();
     fetchInvestmentsAndTransactions();
   };
 
@@ -99,16 +94,29 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     return () => window.removeEventListener('userDataChanged', handleUserDataChanged);
   }, [user?.id]);
 
+  // Controle de modal de meta
+  const openGoalsModal = (goal?: GoalDTO) => {
+    setEditGoal(goal || null);
+    setGoalsModalOpen(true);
+  };
+  const closeGoalsModal = () => {
+    setEditGoal(null);
+    setGoalsModalOpen(false);
+  };
+
   return {
     goals,
     setGoals,
     assignValues,
     setAssignValues,
-    goalToDelete,
-    setGoalToDelete,
     loadExistingGoals,
     handleAssignValue,
-    handleDeleteGoal,
-    createGoal
+    createGoal,
+    updateGoal,
+    // Modal
+    goalsModalOpen,
+    openGoalsModal,
+    closeGoalsModal,
+    editGoal
   };
 };

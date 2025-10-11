@@ -10,7 +10,8 @@ export class Transaction {
     public date: Date,
     public description?: string,
     public attachmentPath?: string,
-    public goalId?: string
+    public goalId?: string,
+    public investmentId?: string
   ) {
     this.validateTransaction();
   }
@@ -43,6 +44,9 @@ export class Transaction {
     if (this.goalId !== undefined && typeof this.goalId !== 'string') {
       throw new Error('goalId deve ser uma string');
     }
+    if (this.investmentId !== undefined && typeof this.investmentId !== 'string') {
+      throw new Error('investmentId deve ser uma string');
+    }
   }
 
   static fromJSON(json: {
@@ -54,6 +58,7 @@ export class Transaction {
     description?: string;
     attachmentPath?: string;
     goalId?: string;
+    investmentId?: string;
   }): Transaction {
     if (!json) {
       throw new Error('Dados da transação não fornecidos');
@@ -67,7 +72,8 @@ export class Transaction {
       new Date(json.date),
       json.description,
       json.attachmentPath,
-      json.goalId
+      json.goalId,
+      json.investmentId
     );
   }
 
@@ -90,6 +96,9 @@ export class Transaction {
 
     if (this.goalId !== undefined) {
       result.goalId = this.goalId;
+    }
+    if (this.investmentId !== undefined) {
+      result.investmentId = this.investmentId;
     }
 
     return result;

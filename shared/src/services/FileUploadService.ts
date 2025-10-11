@@ -170,7 +170,6 @@ export class FileUploadService {
 
       const displayType = internalTypeMapping[type] || type;
       const result = `${timestamp}_${displayType}.${extension}`;
-      console.log('Generated display name:', result);
       return result;
     }
 
@@ -182,7 +181,6 @@ export class FileUploadService {
       if (transactionType) {
         const displayType = typeMapping[transactionType] || 'transacao';
         const result = `${timestamp}_${displayType}.${extension}`;
-        console.log('Generated display name from transaction type (simple):', result);
         return result;
       }
 
@@ -196,11 +194,9 @@ export class FileUploadService {
 
       const displayType = internalTypeMapping[type] || type;
       const result = `${timestamp}_${displayType}.${extension}`;
-      console.log('Generated display name (simple):', result);
       return result;
     }
 
-    console.log('No pattern matched, returning original:', fileName);
     return fileName;
   }
 
