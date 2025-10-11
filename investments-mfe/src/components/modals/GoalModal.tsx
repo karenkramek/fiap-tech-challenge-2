@@ -1,100 +1,129 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import ModalWrapper from 'shared/components/ui/ModalWrapper';
+import { parseCurrencyStringToNumber, createCurrencyInputHandler, formatCurrencyWithoutSymbol } from 'shared/utils/currency';
+import BadgeSuggestions from 'shared/components/ui/BadgeSuggestions';
+
+const GOAL_NAME_SUGGESTIONS = [
+  'Viajar',
+  'Comprar carro',
+  'Comprar casa',
+  'Casamento',
+  'Aposentadoria',
+  'Estudos',
+  'Reforma',
+  'Reserva de emergência',
+  'Filhos',
+  'Outro objetivo'
+];
 
 interface GoalModalProps {
-  showGoalModal: boolean;
-  setShowGoalModal: (show: boolean) => void;
-  goalName: string;
-  setGoalName: (name: string) => void;
-  goalDeadline: string;
-  setGoalDeadline: (deadline: string) => void;
-  savingGoal: string;
-  setSavingGoal: (goal: string) => void;
-  onConfirm: () => void;
+  open: boolean;
+  onClose: () => void;
+  onSave: (goal: { name: string; value: number; deadline?: string }) => void;
+  initialGoal?: {
+    id: string;
+    name: string;
+    value: number;
+    createdAt: string;
+    deadline?: string;
+    assigned: number;
+  } | null;
 }
 
 const GoalModal: React.FC<GoalModalProps> = ({
-  showGoalModal,
-  setShowGoalModal,
-  goalName,
-  setGoalName,
-  goalDeadline,
-  setGoalDeadline,
-  savingGoal,
-  setSavingGoal,
-  onConfirm,
+  open,
+  onClose,
+  onSave,
+  initialGoal
 }) => {
-  if (!showGoalModal) return null;
+  const [name, setName] = useState('');
+  const [value, setValue] = useState('');
+  const [deadline, setDeadline] = useState('');
+
+  useEffect(() => {
+    if (open && initialGoal) {
+      setName(initialGoal.name);
+      setValue(formatCurrencyWithoutSymbol(initialGoal.value));
+      setDeadline(initialGoal.deadline ? new Date(initialGoal.deadline).toISOString().slice(0, 10) : '');
+    } else if (open) {
+      setName('');
+      setValue('');
+      setDeadline('');
+    }
+  }, [open, initialGoal]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !value) return;
+    if (parseCurrencyStringToNumber(value) <= 0) return;
+    if (deadline) {
+      onSave({ name: name.trim(), value: parseCurrencyStringToNumber(value), deadline });
+    } else {
+      onSave({ name: name.trim(), value: parseCurrencyStringToNumber(value) });
+    }
+    onClose();
+  };
+
+  const handleValueChange = createCurrencyInputHandler(setValue);
+
+  const filteredSuggestions = GOAL_NAME_SUGGESTIONS.filter(s =>
+    name.length === 0 || s.toLowerCase().includes(name.toLowerCase())
+  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
-        <button
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
-          onClick={() => setShowGoalModal(false)}
-          aria-label="Fechar"
-        >
-          &times;
-        </button>
-        <h3 className="text-xl font-bold mb-4 text-primary-700">Criar Meta de Economia</h3>
-        
-        <form onSubmit={(e) => { e.preventDefault(); onConfirm(); }} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-gray-700 mb-1" htmlFor="goalName">Nome da meta</label>
+    <ModalWrapper open={open} onClose={onClose} title={initialGoal ? 'Editar Meta' : 'Nova Meta'} size="sm">
+      <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+        <div>
+          <label className="block text-md font-bold text-primary-700 mb-1">Nome *</label>
+          <input
+            type="text"
+            className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+          />
+          <BadgeSuggestions
+            suggestions={filteredSuggestions}
+            onSelect={suggestion => setName(suggestion)}
+          />
+        </div>
+        <div>
+          <label className="block text-md font-bold text-primary-700 mb-1">Valor *</label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-white-800">R$</span>
             <input
-              id="goalName"
               type="text"
-              className="w-full border rounded px-3 py-2"
-              value={goalName}
-              onChange={e => setGoalName(e.target.value)}
-              placeholder="Ex: Viagem para Europa"
+              className="w-full pl-12 pr-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
+              value={value}
+              onChange={handleValueChange}
+              inputMode="numeric"
+              placeholder="00,00"
+              minLength={1}
               required
             />
           </div>
-          
-          <div>
-            <label className="block text-gray-700 mb-1" htmlFor="savingGoal">Valor da meta (R$)</label>
-            <input
-              id="savingGoal"
-              type="number"
-              className="w-full border rounded px-3 py-2"
-              value={savingGoal}
-              onChange={e => setSavingGoal(e.target.value)}
-              min={1}
-              step="0.01"
-              placeholder="0,00"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-gray-700 mb-1" htmlFor="goalDeadline">Data limite (opcional)</label>
-            <input
-              id="goalDeadline"
-              type="date"
-              className="w-full border rounded px-3 py-2"
-              value={goalDeadline}
-              onChange={e => setGoalDeadline(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex gap-4 mt-4">
-            <button
-              type="submit"
-              className="bg-primary-700 text-white-50 px-6 py-2 rounded-lg font-semibold shadow hover:bg-primary-800 transition flex-1"
-            >
-              Criar Meta
-            </button>
-            <button
-              type="button"
-              className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-gray-500 transition flex-1"
-              onClick={() => setShowGoalModal(false)}
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div>
+          <label className="block text-md font-bold text-primary-700 mb-1">
+            Data Limite <span className="text-sm font-medium text-white-800">(opcional)</span>
+          </label>
+          <input
+            type="date"
+            className="w-full px-4 py-3 rounded-lg border border-primary-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-700"
+            value={deadline}
+            onChange={e => setDeadline(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-4 pt-4">
+          <button
+            type="submit"
+            className="w-full py-3 bg-tertiary-600 hover:bg-tertiary-700 text-white-50 font-medium rounded-lg shadow-md"
+          >
+            {initialGoal ? 'Atualizar' : 'Adicionar'}
+          </button>
+        </div>
+      </form>
+    </ModalWrapper>
   );
 };
 

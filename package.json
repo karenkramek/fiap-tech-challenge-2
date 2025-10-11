@@ -38,6 +38,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@types/date-fns": "^2.6.3",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.544.0",
     "react-hot-toast": "^2.6.0",
     "tailwind-merge": "^3.3.1"

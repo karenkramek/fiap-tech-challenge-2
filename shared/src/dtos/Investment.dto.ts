@@ -1,11 +1,16 @@
-export interface Investment {
+import type { InvestmentType, RiskLevel } from '../types/InvestmentType';
+
+export interface InvestmentDTO {
   id: string;
-  type: 'FUNDOS' | 'TESOURO' | 'PREVIDENCIA' | 'ACOES' | 'CDB';
+  accountId: string;
+  type: InvestmentType;
   amount: number;
-  description: string;
   date: string;
-  expectedReturn?: number;
-  riskLevel?: 'BAIXO' | 'MEDIO' | 'ALTO';
+  description: string | undefined;
+  goalId: string | undefined;
+  redeemed: boolean | undefined;
+  expectedReturn: number | undefined;
+  riskLevel: RiskLevel | undefined;
 }
 
 export interface InvestmentGoal {

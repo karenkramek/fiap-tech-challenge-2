@@ -59,6 +59,28 @@ declare module 'shared/hooks/useGroupedTransactions' {
   };
 }
 
+declare module 'shared/hooks/useAuthProtection' {
+  export interface AuthConfig {
+    publicRoutes?: string[];
+    redirectTo?: string;
+    showToast?: boolean;
+    toastMessage?: string;
+  }
+  export interface AuthCheckResult {
+    isAuthenticated: boolean;
+    loading: boolean;
+    isPublicRoute: boolean;
+    shouldRedirect: boolean;
+    shouldShowToast: boolean;
+    currentUser: { id: string; name: string; email: string } | null;
+  }
+  export const DEFAULT_PUBLIC_ROUTES: string[];
+  export function useAuthProtection(
+    currentPath: string,
+    config?: AuthConfig
+  ): AuthCheckResult;
+}
+
 // COMPONENTES
 
 declare module 'shared/components/ui/Button' {
@@ -80,17 +102,19 @@ declare module 'shared/components/ui/Icon' {
 }
 
 declare module 'shared/components/ui/ConfirmationModal' {
-  interface Props {
+  import * as React from 'react';
+  interface ConfirmationModalProps {
     open: boolean;
     title: string;
-    description: string;
-    confirmText: string;
-    cancelText: string;
+    description: React.ReactNode;
+    confirmText?: string;
+    cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
     loading?: boolean;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
   }
-  const ConfirmationModal: React.FC<Props>;
+  const ConfirmationModal: React.FC<ConfirmationModalProps>;
   export default ConfirmationModal;
 }
 
@@ -316,4 +340,27 @@ declare module 'shared/dtos/Account.dto' {
     name: string;
     balance: number;
   }
+}
+
+declare module 'shared/constants/toast' {
+  export const TOAST_DURATION: { SHORT: number; NORMAL: number; LONG: number };
+  export const TOAST_MESSAGES: {
+    LOGIN_SUCCESS: string;
+    LOGOUT_SUCCESS: string;
+    REGISTER_SUCCESS: string;
+    REGISTER_ERROR: string;
+    AUTH_REQUIRED: string;
+    TRANSACTION_SUCCESS: string;
+    TRANSACTION_ERROR: string;
+    INVALID_AMOUNT: string;
+  };
+}
+
+declare module 'shared/store' {
+  import { Store } from 'redux';
+  import { ThunkDispatch } from '@reduxjs/toolkit';
+  export type RootState = ReturnType<Store['getState']>;
+  export type AppDispatch = ThunkDispatch<RootState, any, any>;
+  const store: Store;
+  export default store;
 }

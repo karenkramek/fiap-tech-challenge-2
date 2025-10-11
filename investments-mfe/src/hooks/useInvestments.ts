@@ -1,30 +1,42 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from 'shared/store';
+import { AccountService } from 'shared/services/AccountService';
+import { TransactionService } from 'shared/services/TransactionService';
+import { InvestmentService } from 'shared/services/InvestmentService';
+import { Transaction } from 'shared/models/Transaction';
+import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
 
 export const useInvestments = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [investments, setInvestments] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [investments, setInvestments] = useState<InvestmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [accountBalance, setAccountBalance] = useState<number | null>(null);
 
-  const fetchInvestmentsAndTransactions = () => {
+  const fetchInvestmentsAndTransactions = async () => {
     if (!user?.id) return;
     setLoading(true);
-    Promise.all([
-      axios.get('http://localhost:3034/transactions'),
-      axios.get(`http://localhost:3034/accounts?id=${user.id}`)
-    ]).then(([txRes, accRes]) => {
-      setTransactions(txRes.data);
-      const account = accRes.data && accRes.data[0];
-      setInvestments(account?.investments || []);
+    try {
+      // Busca transações, investimentos globais e conta
+      const [transactionsList, investmentsList, account] = await Promise.all([
+        TransactionService.getAllTransactions(user.id),
+        InvestmentService.getAll(user.id),
+        AccountService.getAccountById(user.id)
+      ]);
+      setTransactions(transactionsList);
+      setInvestments(investmentsList);
       setAccountBalance(account?.balance ?? null);
-    }).finally(() => setLoading(false));
+    } catch (error) {
+      setTransactions([]);
+      setInvestments([]);
+      setAccountBalance(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(fetchInvestmentsAndTransactions, [user?.id]);
+  useEffect(() => { fetchInvestmentsAndTransactions(); }, [user?.id]);
 
   return {
     transactions,

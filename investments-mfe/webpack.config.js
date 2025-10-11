@@ -15,6 +15,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    alias: {
+      react: path.resolve(__dirname, '../shell/node_modules/react'),
+      'react-dom': path.resolve(__dirname, '../shell/node_modules/react-dom'),
+      'react-redux': path.resolve(__dirname, '../shell/node_modules/react-redux'),
+      '@reduxjs/toolkit': path.resolve(__dirname, '../shell/node_modules/@reduxjs/toolkit')
+    }
   },
   module: {
     rules: [
@@ -39,11 +45,17 @@ module.exports = {
           'style-loader',
           {
             loader: 'css-loader',
-            options: { importLoaders: 1 }
+            options: {
+              importLoaders: 1
+            }
           },
           {
             loader: 'postcss-loader',
-            options: { postcssOptions: { config: './postcss.config.js' } }
+            options: {
+              postcssOptions: {
+                config: './postcss.config.js'
+              }
+            }
           }
         ]
       }

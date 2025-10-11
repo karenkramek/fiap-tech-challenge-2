@@ -1,44 +1,41 @@
 import React from 'react';
+import ModalWrapper from 'shared/components/ui/ModalWrapper';
+import Button from 'shared/components/ui/Button';
+import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
 
 interface RedeemModalProps {
-  showRedeemModal: boolean;
-  investmentToRedeem: any;
-  onConfirm: () => void;
+  open: boolean;
   onClose: () => void;
+  investmentToRedeem: InvestmentDTO | null;
+  onConfirm: () => void;
 }
 
 const RedeemModal: React.FC<RedeemModalProps> = ({
-  showRedeemModal,
+  open,
+  onClose,
   investmentToRedeem,
-  onConfirm,
-  onClose
+  onConfirm
 }) => {
-  if (!showRedeemModal) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h3 className="text-xl font-bold mb-4 text-primary-700">Resgatar Investimento</h3>
-        <p className="mb-6">
-          Deseja resgatar o investimento <strong>{investmentToRedeem?.description}</strong> no valor de{' '}
-          <strong>R$ {investmentToRedeem?.amount?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>?
-        </p>
-        <div className="flex gap-4">
-          <button
-            className="bg-yellow-600 text-white px-6 py-2 rounded-lg font-semibold flex-1"
-            onClick={onConfirm}
-          >
-            Confirmar Resgate
-          </button>
-          <button
-            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold flex-1"
-            onClick={onClose}
-          >
-            Cancelar
-          </button>
-        </div>
+    <ModalWrapper
+      open={open}
+      onClose={onClose}
+      title="Resgatar Investimento"
+      size="md"
+    >
+      <p className="mb-6">
+        Deseja resgatar o investimento <strong>{investmentToRedeem?.description}</strong> no valor de{' '}
+        <strong>R$ {investmentToRedeem?.amount?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>?
+      </p>
+      <div className="flex gap-4">
+        <Button variant="warning" className="flex-1" onClick={onConfirm}>
+          Confirmar Resgate
+        </Button>
+        <Button variant="secondary" className="flex-1" onClick={onClose}>
+          Cancelar
+        </Button>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };
 

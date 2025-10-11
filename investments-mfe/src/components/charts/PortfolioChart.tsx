@@ -1,9 +1,9 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import { Investment } from '../../types/investments';
+import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
 
 interface PortfolioChartProps {
-  investments: Investment[];
+  investments: InvestmentDTO[];
 }
 
 export const PortfolioChart: React.FC<PortfolioChartProps> = ({ investments }) => {
@@ -22,7 +22,6 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({ investments }) =
           '#10B981', // TESOURO
           '#F59E0B', // PREVIDENCIA
           '#EF4444', // ACOES
-          '#8B5CF6'  // CDB
         ],
         borderWidth: 2,
         borderColor: '#fff'

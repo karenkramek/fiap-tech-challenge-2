@@ -21,6 +21,7 @@ function calculateBalance(transactions: Transaction[]) {
       case TransactionType.WITHDRAWAL:
       case TransactionType.PAYMENT:
       case TransactionType.TRANSFER:
+      case TransactionType.INVESTMENT:
         return acc - tx.amount;
       default:
         return acc;

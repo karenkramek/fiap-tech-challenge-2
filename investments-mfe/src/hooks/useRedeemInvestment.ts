@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from 'shared/store';
+import { Investment } from 'shared/models/Investment';
+import { InvestmentService } from 'shared/services/InvestmentService';
 
 export const useRedeemInvestment = (fetchData: () => void, showMessage: (msg: string) => void) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
-  const [investmentToRedeem, setInvestmentToRedeem] = useState<any>(null);
+  const [investmentToRedeem, setInvestmentToRedeem] = useState<Investment | null>(null);
 
-  const openRedeemModal = (inv: any) => {
+  const openRedeemModal = (inv: Investment) => {
     setInvestmentToRedeem(inv);
     setShowRedeemModal(true);
   };
@@ -18,22 +19,18 @@ export const useRedeemInvestment = (fetchData: () => void, showMessage: (msg: st
     setInvestmentToRedeem(null);
   };
 
+  // Atualizado para operar sobre o array global de investments
   const handleRedeemInvestment = async () => {
     if (!investmentToRedeem) return;
     if (!user?.id) return;
     try {
-      const res = await axios.get(`http://localhost:3034/accounts?id=${user.id}`);
-      const account = res.data && res.data[0];
+      // Remove investimento do array global
+      await InvestmentService.remove(investmentToRedeem.id);
+
+      // Atualiza saldo da conta via InvestmentService
+      const account = await InvestmentService.getAccountById(user.id);
       if (!account) return;
-
-      const updatedInvestments = (account.investments || []).filter((inv: { id: string }) =>
-        inv.id !== investmentToRedeem.id
-      );
-
-      await axios.patch(`http://localhost:3034/accounts/${account.id}`, {
-        investments: updatedInvestments,
-        balance: account.balance + (investmentToRedeem.amount || 0)
-      });
+      await InvestmentService.updateAccountBalance(account.id, account.balance + (investmentToRedeem.amount || 0));
 
       showMessage('Investimento resgatado com sucesso!');
       closeRedeemModal();

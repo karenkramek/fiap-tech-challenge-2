@@ -1,3 +1,4 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from '../App';
 import '../styles/styles.css';
@@ -5,6 +6,8 @@ import { BrowserRouter, useLocation, Navigate } from 'react-router-dom';
 // @ts-ignore
 import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
 import { useAuthProtection } from 'shared/hooks/useAuthProtection';
+import { Provider } from 'react-redux';
+import store from 'shared/store';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -21,9 +24,11 @@ function ProtectedApp() {
 
 const root = createRoot(container);
 root.render(
-  <ErrorBoundary>
-    <BrowserRouter>
-      <ProtectedApp />
-    </BrowserRouter>
-  </ErrorBoundary>
+  <Provider store={store}>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ProtectedApp />
+      </BrowserRouter>
+    </ErrorBoundary>
+  </Provider>
 );

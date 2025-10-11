@@ -24,10 +24,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": [
+      "react",
+      "react-dom",
+      "node"
+    ]
   },
   "include": [
-    "src/**/*", "src/app/index.tsx", "src/app/bootstrap.tsx",
+    "src/**/*",
+    "src/app/index.tsx",
+    "src/app/bootstrap.tsx"
   ],
   "exclude": [
     "node_modules"

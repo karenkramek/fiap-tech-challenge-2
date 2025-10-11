@@ -1,5 +1,6 @@
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
   mode: 'development',
@@ -11,6 +12,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    alias: {
+      react: require('path').resolve(__dirname, '../shell/node_modules/react'),
+      'react-dom': require('path').resolve(__dirname, '../shell/node_modules/react-dom'),
+      'react-redux': require('path').resolve(__dirname, '../shell/node_modules/react-redux'),
+      '@reduxjs/toolkit': require('path').resolve(__dirname, '../shell/node_modules/@reduxjs/toolkit')
+    }
   },
   module: {
     rules: [
@@ -50,6 +57,7 @@ module.exports = {
         './components/ui/FeedbackProvider': './src/components/ui/FeedbackProvider',
         './components/ui/ErrorBoundary': './src/components/ui/ErrorBoundary',
         './components/ui/LoadingSpinner': './src/components/ui/LoadingSpinner',
+        './components/ui/BadgeSuggestions': './src/components/ui/BadgeSuggestions',
         // Components (Domain - Transaction)
         './components/domain/transaction/TransactionAdd': './src/components/domain/transaction/TransactionAdd',
         './components/domain/transaction/TransactionTypeBadge': './src/components/domain/transaction/TransactionTypeBadge',
@@ -74,19 +82,24 @@ module.exports = {
         // DTOs
         './dtos/Transaction.dto': './src/dtos/Transaction.dto',
         './dtos/Account.dto': './src/dtos/Account.dto',
+        './dtos/Investment.dto': './src/dtos/Investment.dto',
         // Models
         './models/Account': './src/models/Account',
         './models/Transaction': './src/models/Transaction',
+        './models/Investment': './src/models/Investment',
         // Services
         './services/AccountService': './src/services/AccountService',
         './services/TransactionService': './src/services/TransactionService',
+        './services/InvestmentService': './src/services/InvestmentService',
         './services/FileUploadService': './src/services/FileUploadService',
+        './services/GoalService': './src/services/GoalService',
         './services/api': './src/services/api',
         // Utils
         './utils/currency': './src/utils/currency',
         './utils/date': './src/utils/date',
         // Types
         './types/TransactionType': './src/types/TransactionType',
+        './types/InvestmentType': './src/types/InvestmentType',
         // Constants
         './constants/toast': './src/constants/toast',
         './constants/routes': './src/constants/routes',

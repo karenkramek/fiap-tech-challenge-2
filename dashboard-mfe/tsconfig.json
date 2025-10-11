@@ -25,10 +25,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "src",
-    "paths": {
-      "shared/*": ["../../shared/src/*"]
-    }
+    "baseUrl": "src"
   },
   "include": [
     "src/**/*"

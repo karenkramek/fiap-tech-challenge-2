@@ -14,33 +14,6 @@ import ModalWrapper from '../../ui/ModalWrapper';
 import { Transaction } from '../../../models/Transaction';
 import { filterTransactions } from '../../../utils/transactionFilter';
 
-// Componente para ações de transação
-const TransactionActions: React.FC<{
-  onEdit: () => void;
-  onDelete: () => void;
-  loading?: boolean;
-}> = React.memo(({ onEdit, onDelete, loading }) => (
-  <div className="flex items-center gap-2">
-    <button
-      className="p-1 hover:bg-primary-50 rounded"
-      title="Editar"
-      aria-label="Editar transação"
-      onClick={onEdit}
-      disabled={loading}
-    >
-      <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-    </button>
-    <button
-      className="p-1 hover:bg-error-50 rounded"
-      title="Excluir"
-      aria-label="Excluir transação"
-      onClick={onDelete}
-      disabled={loading}
-    >
-      <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-    </button>
-  </div>
-));
 
 // Componente para detalhes da transação
 const TransactionDetails: React.FC<{
@@ -64,6 +37,17 @@ const TransactionDetails: React.FC<{
   </div>
 ));
 
+
+const TransactionTypeBadgeCustom: React.FC<{ type: TransactionType; originType?: string }> = ({ type, originType }) => {
+  if (originType === 'investment') {
+    return <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">INVESTIMENTO</span>;
+  }
+  if (originType === 'goal') {
+    return <span className="inline-block bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold">META</span>;
+  }
+  return <TransactionTypeBadge type={type} />;
+};
+
 // Componente para item de transação
 const TransactionItem: React.FC<{
   transaction: any;
@@ -72,18 +56,34 @@ const TransactionItem: React.FC<{
   onDelete: (id: string) => void;
   loading?: boolean;
 }> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
+  const isEditable = transaction.type !== TransactionType.GOAL && transaction.type !== TransactionType.INVESTMENT;
   return (
     <div className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <TransactionTypeBadge type={transaction.type} />
+          <TransactionTypeBadgeCustom type={transaction.type} originType={transaction.originType} />
           <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
         </div>
-        <TransactionActions
-          onEdit={() => onEdit(transaction.id)}
-          onDelete={() => onDelete(transaction.id)}
-          loading={!!loading}
-        />
+        <div className="flex items-center gap-2">
+          <button
+            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-primary-50' : 'bg-gray-100 cursor-not-allowed'}`}
+            title="Editar"
+            aria-label="Editar transação"
+            onClick={() => onEdit(transaction.id)}
+            disabled={!isEditable || loading}
+          >
+            <Edit className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-primary-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+          </button>
+          <button
+            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-error-50' : 'bg-gray-100 cursor-not-allowed'}`}
+            title="Excluir"
+            aria-label="Excluir transação"
+            onClick={() => onDelete(transaction.id)}
+            disabled={!isEditable || loading}
+          >
+            <Trash2 className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-error-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+          </button>
+        </div>
       </div>
       <div className="flex items-stretch mb-2 p-1">
         <TransactionDetails

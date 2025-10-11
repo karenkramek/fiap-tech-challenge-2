@@ -1,36 +1,45 @@
-export const sumByType = (investments: any[], type: string) =>
+import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
+import { InvestmentType } from 'shared/types/InvestmentType';
+
+export const sumByType = (investments: InvestmentDTO[], type: string) =>
   investments.filter(tx => tx.type === type).reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
-export const calculateInvestmentTotals = (allInvestments: any[]) => {
-  const fundos = sumByType(allInvestments, 'FUNDOS');
-  const tesouro = sumByType(allInvestments, 'TESOURO');
-  const previdencia = sumByType(allInvestments, 'PREVIDENCIA');
-  const bolsa = sumByType(allInvestments, 'BOLSA');
-  
+export const calculateInvestmentTotals = (allInvestments: InvestmentDTO[]) => {
+  const funds = sumByType(allInvestments, InvestmentType.FUNDS);
+  const treasury = sumByType(allInvestments, InvestmentType.TREASURY);
+  const pension = sumByType(allInvestments, InvestmentType.PENSION);
+  const stocks = sumByType(allInvestments, InvestmentType.STOCKS);
+
   return {
-    fundos,
-    tesouro,
-    previdencia,
-    bolsa,
-    rendaFixa: fundos + tesouro + previdencia,
-    rendaVariavel: bolsa,
-    total: fundos + tesouro + previdencia + bolsa
+    funds,
+    treasury,
+    pension,
+    stocks,
+    fixedIncome: funds + treasury + pension,
+    variableIncome: stocks,
+    total: funds + treasury + pension + stocks
   };
 };
 
-export const calculateTransactionTotals = (transactions: any[]) => {
-  const sumTx = (type: string) =>
-    transactions.filter(tx => tx.type === type).reduce((sum, tx) => sum + (tx.amount || 0), 0);
+export const calculateTransactionTotals = (transactions: any[], investments: any[] = [], goals: any[] = []) => {
+  const sumTx = (type: string) => transactions.filter(tx => tx.type === type).reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
-  const entradas = transactions.filter(tx => tx.type === 'DEPOSIT').reduce((sum, tx) => sum + (tx.amount || 0), 0);
-  const saidas = transactions.filter(tx => ['PAYMENT', 'TRANSFER', 'WITHDRAWAL'].includes(tx.type)).reduce((sum, tx) => sum + (tx.amount || 0), 0);
+  const inflows = sumTx('DEPOSIT');
+  const outflows = sumTx('PAYMENT') + sumTx('TRANSFER') + sumTx('WITHDRAWAL') + sumTx('INVESTMENT') + sumTx('GOAL');
+  const totalInvestments = investments.reduce((sum: number, inv: any) => sum + (inv.amount || 0), 0);
+  const totalGoals = goals.reduce((sum: number, goal: any) => sum + (goal.assigned || 0), 0);
 
+  console.log(totalGoals);
   return {
-    entradas,
-    saidas,
+    inflows,
+    outflows,
+    totalInvestments,
+    totalGoals,
     deposits: sumTx('DEPOSIT'),
-    payments: sumTx('PAYMENT'),
+    withdrawals: sumTx('WITHDRAWAL'),
     transfers: sumTx('TRANSFER'),
-    withdrawals: sumTx('WITHDRAWAL')
+    payments: sumTx('PAYMENT'),
+    investments: sumTx('INVESTMENT'),
+    goals: sumTx('GOAL'),
   };
 };

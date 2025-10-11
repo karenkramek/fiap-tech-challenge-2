@@ -1,5 +1,4 @@
-
-import { TransactionType } from '../types/TransactionType';
+import { TransactionType, TRANSACTION_TYPE_FILENAME } from '../types/TransactionType';
 import { AppConfig } from '../config/app.config';
 
 interface FileValidationResult {
@@ -102,7 +101,6 @@ export class FileUploadService {
       });
 
       if (response.ok) {
-        console.log(`Arquivo removido: ${filePath}`);
         return true;
       }
 
@@ -134,16 +132,7 @@ export class FileUploadService {
 
     const parts = filePath.split('/');
     const fileName = parts[parts.length - 1];
-
-    console.log('FileUploadService.getFileName - Processing:', fileName);
-    console.log('FileUploadService.getFileName - TransactionType provided:', transactionType);
-
-    const typeMapping: Record<TransactionType, string> = {
-      [TransactionType.DEPOSIT]: 'deposito',
-      [TransactionType.WITHDRAWAL]: 'saque',
-      [TransactionType.TRANSFER]: 'transferencia',
-      [TransactionType.PAYMENT]: 'pagamento'
-    };
+    const typeMapping: Record<TransactionType, string> = TRANSACTION_TYPE_FILENAME;
 
     // PRIORIDADE 1: Se temos transactionType, sempre usar ele
     if (transactionType) {
@@ -155,7 +144,6 @@ export class FileUploadService {
         const extension = extensionMatch[1];
         const displayType = typeMapping[transactionType] || 'transacao';
         const result = `${timestamp}_${displayType}.${extension}`;
-        console.log('🎯 Generated display name with transaction type:', result);
         return result;
       }
     }
@@ -169,7 +157,6 @@ export class FileUploadService {
       if (transactionType) {
         const displayType = typeMapping[transactionType] || 'transacao';
         const result = `${timestamp}_${displayType}.${extension}`;
-        console.log('Generated display name from transaction type:', result);
         return result;
       }
 

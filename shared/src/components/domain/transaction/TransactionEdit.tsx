@@ -7,7 +7,7 @@ import { formatDateForInput } from '../../../utils/date';
 import Button from '../../ui/Button';
 import FileUpload from '../file/FileUpload';
 import BadgeSuggestions from '../../ui/BadgeSuggestions';
-import { TRANSACTION_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
+import { TRANSACTION_DESCRIPTION_SUGGESTIONS, INVESTMENT_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
 
 interface TransactionEditProps {
   transactionId: string | null;
@@ -83,11 +83,15 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
     }
   };
 
-  const filteredSuggestions = description.length > 0
-    ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
-        suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
+  const filteredSuggestions = type === TransactionType.INVESTMENT
+    ? INVESTMENT_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+        description.length === 0 || (suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase())
       )
-    : TRANSACTION_DESCRIPTION_SUGGESTIONS;
+    : description.length > 0
+      ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+          suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
+        )
+      : TRANSACTION_DESCRIPTION_SUGGESTIONS;
 
   const handleSuggestionClick = (suggestion: string) => {
     setDescription(suggestion);
@@ -118,9 +122,11 @@ export default function TransactionEdit({ transactionId, onSuccess, onClose }: T
               disabled={loading}
               required
             >
-              {Object.values(TransactionType).map((t) => (
-                <option key={t} value={t}>{getTransactionTypeLabel(t)}</option>
-              ))}
+              {Object.values(TransactionType)
+                .filter(t => t !== TransactionType.INVESTMENT && t !== TransactionType.GOAL)
+                .map((t) => (
+                  <option key={t} value={t}>{getTransactionTypeLabel(t)}</option>
+                ))}
             </select>
           </div>
           <div>

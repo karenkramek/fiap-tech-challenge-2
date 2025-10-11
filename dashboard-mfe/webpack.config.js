@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const { DefinePlugin } = require('webpack');
+const path = require('path');
 
 module.exports = {
   entry: './src/app/index.tsx',
@@ -14,6 +15,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    alias: {
+      react: path.resolve(__dirname, '../shell/node_modules/react'),
+      'react-dom': path.resolve(__dirname, '../shell/node_modules/react-dom'),
+      'react-redux': path.resolve(__dirname, '../shell/node_modules/react-redux'),
+      '@reduxjs/toolkit': path.resolve(__dirname, '../shell/node_modules/@reduxjs/toolkit')
+    }
   },
   module: {
     rules: [
@@ -67,8 +74,8 @@ module.exports = {
       },
       remotes: {
         shared: 'shared@http://localhost:3033/remoteEntry.js',
-        dashboardMFE: 'dashboardMFE@http://localhost:3031/remoteEntry.js',
         transactionsMFE: 'transactionsMFE@http://localhost:3032/remoteEntry.js',
+        investmentsMFE: 'investmentsMFE@http://localhost:3036/remoteEntry.js',
       },
       shared: {
         react: {

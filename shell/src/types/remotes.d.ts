@@ -131,3 +131,7 @@ declare module 'shared/components/ui/ModalCloseButton' {
   }>;
   export default ModalCloseButton;
 }
+
+declare module 'shared/store';
+declare module 'shared/components/domain/login/LoginModal';
+declare module 'shared/components/domain/login/RegisterModal';
