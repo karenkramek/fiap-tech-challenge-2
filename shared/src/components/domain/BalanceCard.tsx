@@ -67,7 +67,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, on
             <button
               type='button'
               aria-label={showBalance ? 'Esconder saldo' : 'Exibir saldo'}
-              className='ml-3 p-1 rounded bg-transparent focus:outline-none focus:ring-2 focus:ring-warning-500'
+              className='ml-3 p-1 rounded bg-transparent outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-warning-500'
               onClick={onToggleBalance}
             >
               {showBalance ? (
