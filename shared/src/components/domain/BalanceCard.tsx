@@ -1,5 +1,5 @@
 // Componente de cartão de saldo, exibe o nome do usuário e saldo da conta
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { getCurrentDateFormatted } from '../../utils/date';
 import { formatCurrencyWithSymbol } from '../../utils/currency';
@@ -32,8 +32,28 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, on
   const { account, currentUser } = useAccount();
   const accountName = currentUser?.name || account?.name || '';
   const balance = calculateBalance(transactions);
+  
+  const announceRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (announceRef.current) {
+      if (showBalance) {
+        announceRef.current.textContent = `Saldo atual: ${formatCurrencyWithSymbol(balance)}`;
+      } else {
+        announceRef.current.textContent = 'Saldo ocultado';
+      }
+    }
+  }, [showBalance, balance]);
+
   return (
     <div className='balance-card'>
+      <div
+        ref={announceRef}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      ></div>
+      
       <div className='space-y-4'>
         <div>
           <h1 className='balance-title'>
@@ -47,19 +67,28 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, on
             <button
               type='button'
               aria-label={showBalance ? 'Esconder saldo' : 'Exibir saldo'}
-              className='ml-3 p-1 rounded bg-transparent focus:outline-none'
+              className='ml-3 p-1 rounded bg-transparent focus:outline-none focus:ring-2 focus:ring-warning-500'
               onClick={onToggleBalance}
             >
               {showBalance ? (
-                <Eye className='w-6 h-6 text-warning-800' />
+                <Eye 
+                  className='w-6 h-6 text-warning-800' 
+                  aria-hidden="true" 
+                />
               ) : (
-                <EyeOff className='w-6 h-6 text-warning-800' />
+                <EyeOff 
+                  className='w-6 h-6 text-warning-800' 
+                  aria-hidden="true"
+                />
               )}
             </button>
           </div>
           <div className='balance-card-divider'></div>
           <p className='balance-account-label'>Conta Corrente</p>
-          <p className='balance-amount'>
+          <p 
+            className='balance-amount'
+            aria-hidden={!showBalance}
+          >
             {showBalance ? formatCurrencyWithSymbol(balance) : 'R$ ---'}
           </p>
         </div>
