@@ -69,6 +69,7 @@ module.exports = {
         shared: `shared@${process.env.REACT_APP_SHARED_URL || 'http://localhost:3033'}/remoteEntry.js`,
         dashboardMFE: `dashboardMFE@${process.env.REACT_APP_DASHBOARD_URL || 'http://localhost:3031'}/remoteEntry.js`,
         transactionsMFE: `transactionsMFE@${process.env.REACT_APP_TRANSACTIONS_URL || 'http://localhost:3032'}/remoteEntry.js`,
+        investmentsMFE: `investmentsMFE@${process.env.REACT_APP_INVESTMENTS_URL || 'http://localhost:3036'}/remoteEntry.js`,
       },
       shared: {
         react: {

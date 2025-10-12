@@ -8,6 +8,13 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    hot: false,
+    liveReload: false,
+    client: false,
+  },
+  optimization: {
+    runtimeChunk: false,
+    minimize: false,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
@@ -50,6 +57,7 @@ module.exports = {
         './components/ui/FeedbackProvider': './src/components/ui/FeedbackProvider',
         './components/ui/ErrorBoundary': './src/components/ui/ErrorBoundary',
         './components/ui/LoadingSpinner': './src/components/ui/LoadingSpinner',
+        './components/ui/BadgeSuggestions': './src/components/ui/BadgeSuggestions',
         // Components (Domain - Transaction)
         './components/domain/transaction/TransactionAdd': './src/components/domain/transaction/TransactionAdd',
         './components/domain/transaction/TransactionTypeBadge': './src/components/domain/transaction/TransactionTypeBadge',
@@ -74,19 +82,25 @@ module.exports = {
         // DTOs
         './dtos/Transaction.dto': './src/dtos/Transaction.dto',
         './dtos/Account.dto': './src/dtos/Account.dto',
+        './dtos/Investment.dto': './src/dtos/Investment.dto',
         // Models
         './models/Account': './src/models/Account',
         './models/Transaction': './src/models/Transaction',
+        './models/Investment': './src/models/Investment',
         // Services
         './services/AccountService': './src/services/AccountService',
         './services/TransactionService': './src/services/TransactionService',
+        './services/InvestmentService': './src/services/InvestmentService',
         './services/FileUploadService': './src/services/FileUploadService',
+        './services/GoalService': './src/services/GoalService',
         './services/api': './src/services/api',
         // Utils
         './utils/currency': './src/utils/currency',
         './utils/date': './src/utils/date',
+        './utils/test-utils': './src/utils/test-utils.tsx',
         // Types
         './types/TransactionType': './src/types/TransactionType',
+        './types/InvestmentType': './src/types/InvestmentType',
         // Constants
         './constants/toast': './src/constants/toast',
         './constants/routes': './src/constants/routes',

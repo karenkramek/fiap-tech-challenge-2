@@ -59,9 +59,17 @@ const Sidebar: React.FC<SidebarProps> = ({
             </Link>
           </li>
           <li>
-            <span className='block py-2 px-4 text-white-800 cursor-not-allowed opacity-60'>
+            <Link
+              to="/investments"
+              onClick={toggleSidebar}
+              className={`block py-2 px-4 transition-colors w-full text-left ${
+                isActive('/investments')
+                  ? 'text-primary-700 font-bold bg-white-50 border-l-4 border-primary-700'
+                  : 'text-primary-700 hover:text-primary-700 hover:bg-white-50'
+              }`}
+            >
               Investimentos
-            </span>
+            </Link>
           </li>
           <li>
             <span className='block py-2 px-4 text-white-800 cursor-not-allowed opacity-60'>

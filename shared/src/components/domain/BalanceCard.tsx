@@ -1,11 +1,12 @@
 // Componente de cartão de saldo, exibe o nome do usuário e saldo da conta
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { getCurrentDateFormatted } from '../../utils/date';
 import { formatCurrencyWithSymbol } from '../../utils/currency';
 import { Transaction } from '../../models/Transaction';
 import { TransactionType } from '../../types/TransactionType';
 import { useAccount } from '../../hooks/useAccount';
+import api from '../../services/api';
 
 interface BalanceCardProps {
   transactions: Transaction[];
@@ -21,6 +22,7 @@ function calculateBalance(transactions: Transaction[]) {
       case TransactionType.WITHDRAWAL:
       case TransactionType.PAYMENT:
       case TransactionType.TRANSFER:
+      case TransactionType.INVESTMENT:
         return acc - tx.amount;
       default:
         return acc;
@@ -29,21 +31,60 @@ function calculateBalance(transactions: Transaction[]) {
 }
 
 const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, onToggleBalance }) => {
-  const { account, currentUser } = useAccount();
+  const { account, currentUser, refreshAccount } = useAccount();
+  const [realBalance, setRealBalance] = useState<number>(0);
+
   const accountName = currentUser?.name || account?.name || '';
-  const balance = calculateBalance(transactions);
-  
-  const announceRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    if (announceRef.current) {
-      if (showBalance) {
-        announceRef.current.textContent = `Saldo atual: ${formatCurrencyWithSymbol(balance)}`;
-      } else {
-        announceRef.current.textContent = 'Saldo ocultado';
-      }
+
+  // Buscar saldo real da API
+  const fetchRealBalance = async () => {
+    try {
+      const accountId = account?.id || currentUser?.id || '1';
+
+      const response = await api.get(`/accounts/${accountId}`);
+      setRealBalance(response.data.balance);
+
+    } catch (error) {
+      // Fallback: usar saldo do Redux ou calculado das transações
+      setRealBalance(account?.balance || currentUser?.balance || calculateBalance(transactions));
     }
-  }, [showBalance, balance]);
+  };
+
+  // Buscar saldo real quando componente monta ou conta muda
+  useEffect(() => {
+    fetchRealBalance();
+  }, [account?.id, currentUser?.id]);
+
+  // Buscar saldo real quando transações mudam
+  useEffect(() => {
+    fetchRealBalance();
+  }, [transactions.length]);
+
+  // Escutar eventos de atualização de saldo
+  useEffect(() => {
+    const handleBalanceUpdate = () => {
+      fetchRealBalance();
+      if (refreshAccount) {
+        refreshAccount();
+      }
+    };
+
+    window.addEventListener('balanceUpdated', handleBalanceUpdate);
+
+    return () => window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+  }, [refreshAccount]);
+
+  // Atualizar saldo a cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchRealBalance();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Usar saldo real da conta corrente
+  const displayBalance = realBalance;
 
   return (
     <div className='balance-card'>
@@ -85,11 +126,8 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, on
           </div>
           <div className='balance-card-divider'></div>
           <p className='balance-account-label'>Conta Corrente</p>
-          <p 
-            className='balance-amount'
-            aria-hidden={!showBalance}
-          >
-            {showBalance ? formatCurrencyWithSymbol(balance) : 'R$ ---'}
+          <p className='balance-amount'>
+            {showBalance ? formatCurrencyWithSymbol(displayBalance) : 'R$ ---'}
           </p>
         </div>
       </div>

@@ -16,7 +16,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     updateTransaction: (
       id: string,
@@ -24,7 +26,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     deleteTransaction: (id: string) => Promise<boolean>;
   };
@@ -78,17 +82,21 @@ declare module 'shared/components/ui/Icon' {
 }
 
 declare module 'shared/components/ui/ConfirmationModal' {
-  interface Props {
+  import * as React from 'react';
+  interface ConfirmationModalProps {
     open: boolean;
     title: string;
-    description: string;
-    confirmText: string;
-    cancelText: string;
+    description: React.ReactNode;
+    confirmText?: string;
+    cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
     loading?: boolean;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    showCancelButton?: boolean;
+    confirmVariant?: 'danger' | 'warning' | 'success';
   }
-  const ConfirmationModal: React.FC<Props>;
+  const ConfirmationModal: React.FC<ConfirmationModalProps>;
   export default ConfirmationModal;
 }
 
@@ -195,6 +203,24 @@ declare module 'shared/components/ui/ModalCloseButton' {
   export default ModalCloseButton;
 }
 
+// UI - BadgeSuggestions
+
+declare module 'shared/components/ui/BadgeSuggestions' {
+  interface BadgeSuggestionsProps {
+    suggestions: string[];
+    onSelect: (value: string) => void;
+  }
+  const BadgeSuggestions: React.FC<BadgeSuggestionsProps>;
+  export default BadgeSuggestions;
+}
+
+// Constants - transactionDescriptions
+
+declare module 'shared/constants/transactionDescriptions' {
+  export const TRANSACTION_DESCRIPTION_SUGGESTIONS: string[];
+  export const INVESTMENT_DESCRIPTION_SUGGESTIONS: string[];
+}
+
 // MODELS & TYPES
 
 declare module 'shared/models/Transaction' {
@@ -205,6 +231,8 @@ declare module 'shared/models/Transaction' {
     date: string | Date;
     description?: string;
     attachmentPath?: string;
+    goalId?: string;
+    investmentId?: string;
     isIncome(): boolean;
     isExpense(): boolean;
   }
@@ -280,6 +308,8 @@ declare module 'shared/dtos/Transaction.dto' {
     amount: number;
     date: string;
     description?: string;
+    goalId?: string;
+    investmentId?: string;
   }
 }
 
@@ -304,3 +334,17 @@ declare module 'shared/components/ui/LoadingSpinner' {
   const LoadingSpinner: React.ComponentType<{ size?: number }>;
   export default LoadingSpinner;
 }
+
+declare module 'shared/hooks/useAuthProtection';
+
+declare module 'shared/store' {
+  import { Store } from 'redux';
+  import { ThunkDispatch } from '@reduxjs/toolkit';
+  export type RootState = ReturnType<Store['getState']>;
+  export type AppDispatch = ThunkDispatch<RootState, any, any>;
+  const store: Store;
+  export default store;
+}
+
+declare module 'shared/types/global.types';
+declare module 'shared/types/api.types';

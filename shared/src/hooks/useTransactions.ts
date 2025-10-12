@@ -67,9 +67,18 @@ export function useTransactions() {
     // Escutar evento customizado de limpeza
     window.addEventListener('transactionsCleared', handleTransactionsCleared);
 
+    // Listen for user data changes (transações, metas, etc)
+    const handleUserDataChanged = (e: any) => {
+      if (!e.detail || e.detail.userId === user?.id) {
+        fetchTransactions();
+      }
+    };
+    window.addEventListener('userDataChanged', handleUserDataChanged);
+
     return () => {
       window.removeEventListener('storage', fetchTransactions);
       window.removeEventListener('transactionsCleared', handleTransactionsCleared);
+      window.removeEventListener('userDataChanged', handleUserDataChanged);
     };
   }, [currentUserId, fetchTransactions, user]);
 

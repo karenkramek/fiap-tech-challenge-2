@@ -135,7 +135,6 @@ jest.mock('shared/components/domain/transaction/TransactionAdd', () => {
     amount,
     transactionType,
     description,
-    attachmentFile,
     onAmountChange,
     onTypeChange,
     onDescriptionChange,
@@ -512,5 +511,15 @@ describe('TransactionsPage Component', () => {
     await waitFor(() => {
       expect(mockUseTransactions.fetchTransactions).toHaveBeenCalled();
     });
+  });
+
+  it('deve garantir acessibilidade nos botões principais', () => {
+    render(<TransactionsPage />);
+    // Botão de submit deve ser acessível
+    const submitButton = screen.getByRole('button', { name: /adicionar|enviar/i });
+    expect(submitButton).toBeInTheDocument();
+    // Botão de abrir modal deve ser acessível
+    const newTransactionButton = screen.getByRole('button', { name: /nova transação/i });
+    expect(newTransactionButton).toBeInTheDocument();
   });
 });

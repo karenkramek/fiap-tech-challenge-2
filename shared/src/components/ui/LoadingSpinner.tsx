@@ -1,7 +1,7 @@
 import React from 'react';
 
 const LoadingSpinner: React.FC<{ size?: number }> = ({ size = 32 }) => (
-  <div className="fixed inset-0 z-50 flex justify-center items-center">
+  <div className="fixed inset-0 z-50 flex justify-center items-center" role="status" aria-label="Carregando">
     <svg
       className="animate-spin text-primary-600"
       width={size}

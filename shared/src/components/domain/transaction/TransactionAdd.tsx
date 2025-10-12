@@ -3,7 +3,7 @@ import { TransactionType, getTransactionTypeLabel } from '../../../types/Transac
 import Button from '../../ui/Button';
 import FileUpload from '../file/FileUpload';
 import BadgeSuggestions from '../../ui/BadgeSuggestions';
-import { TRANSACTION_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
+import { TRANSACTION_DESCRIPTION_SUGGESTIONS, INVESTMENT_DESCRIPTION_SUGGESTIONS } from '../../../constants/transactionDescriptions';
 
 interface TransactionAddProps {
   amount: string;
@@ -35,11 +35,15 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
   
   const descriptionInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredSuggestions = description.length > 0
-    ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
-        suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
+  const filteredSuggestions = transactionType === TransactionType.INVESTMENT
+    ? INVESTMENT_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+        description.length === 0 || (suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase())
       )
-    : TRANSACTION_DESCRIPTION_SUGGESTIONS;
+    : description.length > 0
+      ? TRANSACTION_DESCRIPTION_SUGGESTIONS.filter(suggestion =>
+          suggestion.toLowerCase().includes(description.toLowerCase()) && suggestion.toLowerCase() !== description.toLowerCase()
+        )
+      : TRANSACTION_DESCRIPTION_SUGGESTIONS;
 
   const handleSuggestionClick = (suggestion: string) => {
     onDescriptionChange({ target: { value: suggestion } } as React.ChangeEvent<HTMLInputElement>);
@@ -65,9 +69,11 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
           required
           aria-required="true"
         >
-          {Object.values(TransactionType).map((type) => (
-            <option key={type} value={type}>{getTransactionTypeLabel(type)}</option>
-          ))}
+          {Object.values(TransactionType)
+            .filter((type: TransactionType) => type !== TransactionType.INVESTMENT && type !== TransactionType.GOAL)
+            .map((type: TransactionType) => (
+              <option key={type} value={type}>{getTransactionTypeLabel(type)}</option>
+            ))}
         </select>
       </div>
 

@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from 'lucide-react';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useGroupedTransactions } from "../../../hooks/useGroupedTransactions";
 import { useModal } from '../../../hooks/useModal';
 import { useTransactions } from '../../../hooks/useTransactions';
@@ -14,50 +14,6 @@ import ModalWrapper from '../../ui/ModalWrapper';
 import { Transaction } from '../../../models/Transaction';
 import { filterTransactions } from '../../../utils/transactionFilter';
 
-// Componente para ações de transação - SIMPLIFICADO
-const TransactionActions: React.FC<{
-  onEdit: () => void;
-  onDelete: () => void;
-  loading?: boolean;
-  transaction: any;
-}> = React.memo(({ onEdit, onDelete, loading, transaction }) => {
-  const isIncome = transaction.isIncome();
-  const description = transaction.description || 'Sem descrição';
-  const value = formatCurrencyWithSymbol(transaction.amount);
-  
-  // Formatação de data legível para leitor de tela
-  const formatDateForScreenReader = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    });
-  };
-  
-  const date = formatDateForScreenReader(transaction.date);
-  
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        className="p-1 hover:bg-primary-50 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-        aria-label={`Editar transação - ${description} - ${value} - ${date}`}
-        onClick={onEdit}
-        disabled={loading}
-      >
-        <Edit className={`h-5 w-5 text-white-800 hover:text-primary-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} aria-hidden="true" />
-      </button>
-      <button
-        className="p-1 hover:bg-error-50 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-error-500"
-        aria-label={`Excluir transação - ${description} - ${value} - ${date}`}
-        onClick={onDelete}
-        disabled={loading}
-      >
-        <Trash2 className={`h-5 w-5 text-white-800 hover:text-error-700 cursor-pointer ${loading ? 'opacity-50' : ''}`} aria-hidden="true" />
-      </button>
-    </div>
-  );
-});
 
 // Componente para detalhes da transação - SIMPLIFICADO
 const TransactionDetails: React.FC<{
@@ -83,32 +39,53 @@ const TransactionDetails: React.FC<{
   </div>
 ));
 
-// Componente para item de transação - SIMPLIFICADO
+
+const TransactionTypeBadgeCustom: React.FC<{ type: TransactionType; originType?: string }> = ({ type, originType }) => {
+  if (originType === 'investment') {
+    return <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">INVESTIMENTO</span>;
+  }
+  if (originType === 'goal') {
+    return <span className="inline-block bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold">META</span>;
+  }
+  return <TransactionTypeBadge type={type} />;
+};
+
+// Componente para item de transação
 const TransactionItem: React.FC<{
   transaction: any;
   mode: 'dashboard' | 'full';
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
-  index: number;
-}> = React.memo(({ transaction, mode, onEdit, onDelete, loading, index }) => {
-  const isIncome = transaction.isIncome();
-  
+}> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
+  const isEditable = transaction.type !== TransactionType.GOAL && transaction.type !== TransactionType.INVESTMENT;
   return (
     <article className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <TransactionTypeBadge type={transaction.type} />
-          <time className="text-sm text-gray-500" dateTime={transaction.date}>
-            {formatDate(transaction.date)}
-          </time>
+          <TransactionTypeBadgeCustom type={transaction.type} originType={transaction.originType} />
+          <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
         </div>
-        <TransactionActions
-          onEdit={() => onEdit(transaction.id)}
-          onDelete={() => onDelete(transaction.id)}
-          loading={!!loading}
-          transaction={transaction}
-        />
+        <div className="flex items-center gap-2">
+          <button
+            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-primary-50' : 'bg-gray-100 cursor-not-allowed'}`}
+            title="Editar"
+            aria-label="Editar transação"
+            onClick={() => onEdit(transaction.id)}
+            disabled={!isEditable || loading}
+          >
+            <Edit className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-primary-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+          </button>
+          <button
+            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-error-50' : 'bg-gray-100 cursor-not-allowed'}`}
+            title="Excluir"
+            aria-label="Excluir transação"
+            onClick={() => onDelete(transaction.id)}
+            disabled={!isEditable || loading}
+          >
+            <Trash2 className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-error-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+          </button>
+        </div>
       </div>
       <div className="flex items-stretch mb-2 p-1">
         <TransactionDetails
@@ -140,7 +117,20 @@ export interface TransactionListProps {
 const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard', search = '', totalTransactions }) => {
   const { transactions: hookTransactions, deleteTransaction, fetchTransactions, loading } = useTransactions();
   const transactions = propTransactions || hookTransactions;
-  const filteredTransactions = filterTransactions(transactions, search);
+  const lastFilterRef = useRef<string>("");
+  const lastTransactionsRef = useRef<Transaction[] | null>(null);
+  const lastFilteredRef = useRef<Transaction[]>([]);
+
+  // Filtro otimizado: só filtra se search mudou ou transactions mudou
+  let filteredTransactions: Transaction[];
+  if (search !== lastFilterRef.current || transactions !== lastTransactionsRef.current) {
+    filteredTransactions = filterTransactions(transactions, search);
+    lastFilterRef.current = search;
+    lastTransactionsRef.current = transactions;
+    lastFilteredRef.current = filteredTransactions;
+  } else {
+    filteredTransactions = lastFilteredRef.current;
+  }
 
   // Limitar para dashboard: mostrar só as 5 mais recentes
   const displayedTransactions =
@@ -152,11 +142,29 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
   const [page, setPage] = useState(1);
   const [infiniteTransactions, setInfiniteTransactions] = useState<Transaction[]>([]);
 
+  // Resetar paginação ao mudar o filtro de busca ou modo
+  useEffect(() => {
+    if (mode === 'full') {
+      setPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, mode]);
+
+  // Atualizar lista paginada ao mudar a página, displayedTransactions ou mode
   useEffect(() => {
     if (mode === 'full') {
       setInfiniteTransactions(displayedTransactions.slice(0, page * ITEMS_PER_PAGE));
     }
-  }, [displayedTransactions, page, mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, displayedTransactions, mode]);
+
+  // Corrigir possível loop: se page > 1 e displayedTransactions mudou (ex: novo filtro), garantir que page volte para 1
+  useEffect(() => {
+    if (mode === 'full' && page > 1 && infiniteTransactions.length > displayedTransactions.length) {
+      setPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedTransactions]);
 
   const transactionsToRender = mode === 'full' ? infiniteTransactions : displayedTransactions;
 
@@ -245,7 +253,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
 
       {/* Lista de transações agrupadas por mês/ano - SIMPLIFICADA */}
       {!isLoading && filteredTransactions.length > 0 ? (
-        <div>
+        <div role="region" aria-label="Lista de transações agrupadas por mês">
           {sortedKeys.map((key, idx) => {
             const [month, year] = key.split("-");
             const isLast = idx === sortedKeys.length - 1;
@@ -264,7 +272,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                     const isLastGroup = idx === sortedKeys.length - 1;
                     const isLastItem = tIdx === grouped[key].length - 1;
                     const isFullMode = mode === 'full';
-                    const showGradient = isFullMode && isLastGroup && isLastItem && !showAllRecordsMessage;
+                    const showGradient = isFullMode && isLastGroup && isLastItem && !showAllRecordsMessage && filteredTransactions.length >= 6;
                     return (
                       <React.Fragment key={transaction.id}>
                         <div style={showGradient ? {

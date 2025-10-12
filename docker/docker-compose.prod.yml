@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
       - REACT_APP_DASHBOARD_URL=http://localhost:3031
       - REACT_APP_TRANSACTIONS_URL=http://localhost:3032
+      - REACT_APP_INVESTMENTS_URL=http://localhost:3036
       - REACT_APP_SHARED_URL=http://localhost:3033
       - DANGEROUSLY_DISABLE_HOST_CHECK=true
     networks:
@@ -65,6 +66,16 @@ services:
       - "3035:3035"
     volumes:
       - ./uploads:/app/uploads
+    networks:
+      - bytebank-network
+
+  investments:
+    image: karenkramekfiap/bytebank-investments:latest
+    container_name: bytebank-investments
+    ports:
+      - "3036:3036"
+    environment:
+      - NODE_ENV=production
     networks:
       - bytebank-network
 

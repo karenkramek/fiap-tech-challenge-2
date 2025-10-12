@@ -1,12 +1,5 @@
 import '@testing-library/jest-dom';
 
-// Definições de tipos para Jest
-declare global {
-  const jest: any;
-  const beforeAll: any;
-  const afterAll: any;
-}
-
 // Mock para window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

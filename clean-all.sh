@@ -9,7 +9,7 @@
 #
 # ⏹️  Para interromper, pressione Ctrl+C
 
-folders=( "." "shared" "transactions-mfe" "dashboard-mfe" "shell" )
+folders=( "." "shared" "transactions-mfe" "dashboard-mfe" "shell" "investments-mfe" )
 
 for folder in "${folders[@]}"; do
     nm="$folder/node_modules"

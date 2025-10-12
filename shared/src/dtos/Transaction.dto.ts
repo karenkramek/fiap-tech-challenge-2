@@ -8,6 +8,8 @@ export interface TransactionDTO {
   date: string; // geralmente string (ISO) em APIs
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 export interface CreateTransactionDTO {
@@ -16,6 +18,8 @@ export interface CreateTransactionDTO {
   date: string;
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 export interface UpdateTransactionDTO {
@@ -24,6 +28,8 @@ export interface UpdateTransactionDTO {
   date?: string;
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 // Type guards para validação em runtime
@@ -39,7 +45,9 @@ export function isTransactionDTO(obj: any): obj is TransactionDTO {
     typeof obj.date === 'string' &&
     !isNaN(Date.parse(obj.date)) &&
     (obj.description === undefined || typeof obj.description === 'string') &&
-    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string')
+    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string') &&
+    (obj.goalId === undefined || typeof obj.goalId === 'string') &&
+    (obj.investmentId === undefined || typeof obj.investmentId === 'string')
   );
 }
 
@@ -53,6 +61,8 @@ export function isCreateTransactionDTO(obj: any): obj is CreateTransactionDTO {
     typeof obj.date === 'string' &&
     !isNaN(Date.parse(obj.date)) &&
     (obj.description === undefined || typeof obj.description === 'string') &&
-    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string')
+    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string') &&
+    (obj.goalId === undefined || typeof obj.goalId === 'string') &&
+    (obj.investmentId === undefined || typeof obj.investmentId === 'string')
   );
 }
