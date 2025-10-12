@@ -68,6 +68,16 @@ services:
     networks:
       - bytebank-network
 
+  investments:
+    image: karenkramekfiap/bytebank-investments:latest
+    container_name: bytebank-investments
+    ports:
+      - "3036:3036"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - bytebank-network
+
 networks:
   bytebank-network:
     driver: bridge

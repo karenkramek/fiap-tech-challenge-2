@@ -103,5 +103,25 @@ services:
       - /app/node_modules
       - ../uploads:/uploads
 
+  investments:
+    build:
+      context: ../investments-mfe
+      dockerfile: ../docker/Dockerfile.frontend
+      args:
+        PORT: 3036
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    environment:
+      NODE_ENV: development
+      REACT_APP_API_BASE_URL: http://localhost:3034
+    ports:
+      - "3036:3036"
+    volumes:
+      - ../investments-mfe:/app
+      - ../shared:/shared
+      - /app/node_modules
+    depends_on:
+      - shared
+      - api
+
 volumes:
   db-data:
