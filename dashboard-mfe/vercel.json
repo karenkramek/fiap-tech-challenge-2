@@ -9,6 +9,10 @@
       "main": true
     }
   },
+  "github": {
+    "silent": true,
+    "autoJobCancelation": true
+  },
   "rewrites": [
     {
       "source": "/api/upload/:path*",

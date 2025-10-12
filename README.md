@@ -49,6 +49,7 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
   - Shell App: https://bytebank-shell.vercel.app
   - Dashboard MFE: https://dashboard-mfe-eta.vercel.app
   - Transactions MFE: https://transactions-mfe-iota.vercel.app
+  - Investments MFE: https://investments-mfe.vercel.app
   - Shared Library: https://bytebank-shared.vercel.app
 - **Backend (AWS EC2):**
   - API Server: http://44.206.72.128:3034

@@ -183,6 +183,7 @@ REACT_APP_API_BASE_URL=/api
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
+REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 #### 3. Transactions MFE
@@ -202,11 +203,31 @@ REACT_APP_UPLOAD_URL=/api/upload
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
+REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 > **Nota sobre UPLOAD_URL:** Use `/api/upload`. O código detecta se já contém o caminho completo para evitar duplicação. O proxy do Vercel redireciona para o EC2:3035.
 
-#### 4. Shell (Host)
+#### 4. Investments MFE
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rootDirectory": "investments-mfe"
+}
+```
+
+Variáveis de ambiente:
+```bash
+REACT_APP_API_BASE_URL=/api
+REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
+REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
+REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
+REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
+```
+
+#### 5. Shell (Host)
 ```json
 {
   "buildCommand": "npm run build",
@@ -223,6 +244,7 @@ REACT_APP_UPLOAD_URL=/api/upload
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
 REACT_APP_DASHBOARD_URL=https://dashboard-mfe-eta.vercel.app
 REACT_APP_TRANSACTIONS_URL=https://transactions-mfe-iota.vercel.app
+REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 > **Nota sobre UPLOAD_URL:** Use `/api/upload` (mesmo comportamento que Transactions MFE).
