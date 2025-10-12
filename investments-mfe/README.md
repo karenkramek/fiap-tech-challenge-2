@@ -1,58 +1,60 @@
-# Investments Micro Frontend
+# 📈 Investments MFE
 
-This project is a micro frontend application that displays investment data and provides financial analysis through charts. It is built using React and TypeScript.
+Micro front-end responsável pela área de investimentos do ByteBank.
 
-## Project Structure
+---
 
-```
-investments-mfe
-├── src
-│   ├── pages
-│   │   └── Investments.tsx        # Main component for displaying investments
-│   ├── components
-│   │   ├── InvestmentList.tsx      # Component for listing investments
-│   │   └── FinancialCharts.tsx      # Component for displaying financial analysis charts
-│   └── types
-│       └── index.ts                # Type definitions for the project
-├── public
-│   └── index.html                  # Main HTML file for the application
-├── package.json                     # NPM configuration file
-├── tsconfig.json                   # TypeScript configuration file
-├── webpack.config.js               # Webpack configuration file
-└── README.md                       # Project documentation
+## 🚀 Como rodar localmente
+
+```bash
+npm install
+npm run dev
 ```
 
-## Installation
+Acesse: http://localhost:3036
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd investments-mfe
-   ```
+---
 
-2. Install the dependencies:
-   ```
-   npm install
-   ```
+## 📁 Estrutura
+- `src/components/` — Componentes de UI e domínio
+- `src/hooks/` — Hooks customizados
+- `src/utils/` — Funções utilitárias
+- `src/types/` — Tipos e interfaces
+- `src/__tests__/` — Testes automatizados (Jest + Testing Library)
+- `src/__mocks__/` — Mocks para testes
 
-## Usage
+---
 
-To start the development server, run:
+## 🧪 Testes
+
+- Para rodar os testes:
+  ```bash
+  npm test
+  ```
+- Os testes seguem o padrão dos outros MFEs do monorepo.
+- Adicione novos testes em `src/__tests__`.
+
+---
+
+## 🛠️ Integração com Shared
+
+Utilize componentes, hooks e serviços do pacote `shared` para garantir consistência visual e de regras de negócio entre os MFEs.
+
+Exemplo de importação:
+```js
+import Button from 'shared/components/ui/Button';
+import { useAccount } from 'shared/hooks/useAccount';
+import { formatCurrencyWithSymbol } from 'shared/utils/currency';
 ```
-npm start
-```
 
-This will launch the application in your default web browser.
+---
 
-## Features
+## 💡 Dicas & Boas Práticas
+- Siga o padrão de tipagem e organização dos outros MFEs.
+- Use sempre os tokens e o preset do shared para garantir consistência visual.
+- Para integração com outros MFEs, utilize Module Federation.
+- Consulte o README do `shared` para exemplos e padrões.
 
-- Fetches and displays a list of investments.
-- Provides financial analysis charts based on the investment data.
+---
 
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License.
+Dúvidas? Consulte o README do `shared` ou abra uma issue!

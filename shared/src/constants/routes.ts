@@ -10,7 +10,8 @@ export const PUBLIC_ROUTES = [
 
 export const PROTECTED_ROUTES = [
   '/dashboard',     // Dashboard principal
-  '/transactions'   // Página de transações
+  '/transactions',  // Página de transações
+  '/investments'    // Página de investimentos
 ] as const;
 
 export const DEFAULT_REDIRECT_ROUTE = '/';

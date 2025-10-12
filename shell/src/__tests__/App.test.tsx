@@ -44,6 +44,12 @@ jest.mock('transactionsMFE/TransactionsPage', () => {
   };
 });
 
+jest.mock('investmentsMFE/InvestmentsPage', () => {
+  return function MockInvestmentsPage() {
+    return <div data-testid="investments-component">Investments Page Component</div>;
+  };
+});
+
 // Mock do shared/components
 jest.mock('shared/components/ui/ErrorBoundary', () => {
   return function MockErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -155,6 +161,17 @@ const TestableApp: React.FC = () => {
                   </AuthenticatedLayoutComponent>
                 }
               />
+              <Route
+                path="/investments/*"
+                element={
+                  // AuthenticatedLayout com Investments
+                  <AuthenticatedLayoutComponent>
+                    <React.Suspense fallback={<div className="flex justify-center items-center h-64">Carregando Investimentos...</div>}>
+                      <div data-testid="investments-component">Investments Page Component</div>
+                    </React.Suspense>
+                  </AuthenticatedLayoutComponent>
+                }
+              />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
@@ -256,6 +273,18 @@ describe('App Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('transactions-component')).toBeInTheDocument();
+    });
+
+    // Verifica se o layout autenticado está presente
+    expect(screen.getByTestId('header')).toBeInTheDocument();
+    expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+  });
+
+  it('should render investments page for authenticated users', async () => {
+    renderWithRouter('/investments');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('investments-component')).toBeInTheDocument();
     });
 
     // Verifica se o layout autenticado está presente

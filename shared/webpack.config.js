@@ -97,6 +97,7 @@ module.exports = {
         // Utils
         './utils/currency': './src/utils/currency',
         './utils/date': './src/utils/date',
+        './utils/test-utils': './src/utils/test-utils.tsx',
         // Types
         './types/TransactionType': './src/types/TransactionType',
         './types/InvestmentType': './src/types/InvestmentType',

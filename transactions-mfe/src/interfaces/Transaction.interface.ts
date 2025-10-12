@@ -7,6 +7,8 @@ export interface ITransaction {
   date: Date;
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 export interface ICreateTransaction {
@@ -15,6 +17,8 @@ export interface ICreateTransaction {
   date: Date;
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 export interface IUpdateTransaction {
@@ -23,6 +27,8 @@ export interface IUpdateTransaction {
   date?: Date;
   description?: string;
   attachmentPath?: string;
+  goalId?: string;
+  investmentId?: string;
 }
 
 // Type guard para validação em runtime
@@ -38,6 +44,8 @@ export function isITransaction(obj: any): obj is ITransaction {
     obj.date instanceof Date &&
     !isNaN(obj.date.getTime()) &&
     (obj.description === undefined || typeof obj.description === 'string') &&
-    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string')
+    (obj.attachmentPath === undefined || typeof obj.attachmentPath === 'string') &&
+    (obj.goalId === undefined || typeof obj.goalId === 'string') &&
+    (obj.investmentId === undefined || typeof obj.investmentId === 'string')
   );
 }

@@ -24,7 +24,14 @@ import { validateObject, ValidationSchemas } from 'shared/utils/validation';
 import { TransactionType } from 'shared/types/TransactionType';
 
 // Dados do formulário
-const transactionData = {
+type TransactionForm = {
+  amount: number;
+  type: TransactionType;
+  date: Date;
+  description?: string;
+};
+
+const transactionData: TransactionForm = {
   amount: 150.50,
   type: TransactionType.DEPOSIT,
   date: new Date(),
@@ -36,11 +43,7 @@ const { isValid, errors } = validateObject(transactionData, ValidationSchemas.tr
 
 if (!isValid) {
   console.log('Erros encontrados:', errors);
-  // errors.amount - string com erro do valor (se houver)
-  // errors.type - string com erro do tipo (se houver)
-  // etc.
 } else {
-  // Dados válidos, pode prosseguir
   console.log('Dados válidos!');
 }
 ```
@@ -48,7 +51,7 @@ if (!isValid) {
 ### ✅ Validação de conta
 
 ```typescript
-import { ValidationSchemas } from 'shared/utils/validation';
+import { validateObject, ValidationSchemas } from 'shared/utils/validation';
 
 const accountData = {
   name: 'Conta Corrente',
@@ -60,7 +63,6 @@ const validation = validateObject(accountData, ValidationSchemas.account);
 if (validation.isValid) {
   // Criar conta
 } else {
-  // Mostrar erros no formulário
   Object.entries(validation.errors).forEach(([field, error]) => {
     console.log(`${field}: ${error}`);
   });
@@ -72,19 +74,16 @@ if (validation.isValid) {
 ```typescript
 import { ValidationUtils } from 'shared/utils/validation';
 
-// Validação de email
 const email = 'usuario@exemplo.com';
 if (ValidationUtils.isEmail(email)) {
   console.log('Email válido');
 }
 
-// Validação de valor monetário
 const amount = 999.99;
 if (ValidationUtils.isValidAmount(amount)) {
   console.log('Valor válido para transação');
 }
 
-// Criando regras customizadas
 const customRule = {
   validate: (value: string) => value.includes('@'),
   message: 'Deve conter @'
@@ -100,21 +99,16 @@ const customRule = {
 ```typescript
 import { isTransactionDTO } from 'shared/dtos/Transaction.dto';
 import { isAccountDTO } from 'shared/dtos/Account.dto';
+import { Transaction } from 'shared/models/Transaction';
 
-// Resposta da API (tipo any ou unknown)
 async function fetchData() {
   const response = await fetch('/api/transactions/123');
   const data = await response.json();
 
-  // Type guard garante tipagem
   if (isTransactionDTO(data)) {
-    // TypeScript agora sabe que data é TransactionDTO
-    console.log(data.amount); // ✅ Propriedade existe e é number
-    console.log(data.type);   // ✅ Propriedade existe e é TransactionType
-
-    // Converter para modelo
+    // data: TransactionDTO
     const transaction = Transaction.fromJSON(data);
-    console.log(transaction.getFormattedAmount()); // ✅ Método existe
+    console.log(transaction.getFormattedAmount());
   } else {
     console.error('Dados inválidos recebidos da API');
   }
@@ -124,30 +118,21 @@ async function fetchData() {
 ### ✅ Validando dados de localStorage
 
 ```typescript
-import { isITransaction } from 'transactions-mfe/src/interfaces/Transaction.interface';
+import { isTransactionDTO } from 'shared/dtos/Transaction.dto';
 
 function loadFromStorage() {
   const stored = localStorage.getItem('lastTransaction');
-
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-
-      // Converte string de volta para Date
-      if (parsed.date) {
-        parsed.date = new Date(parsed.date);
-      }
-
-      if (isITransaction(parsed)) {
-        // Dados válidos e tipados
-        console.log('Última transação:', parsed.description);
+      if (parsed.date) parsed.date = new Date(parsed.date);
+      if (isTransactionDTO(parsed)) {
         return parsed;
       }
     } catch (error) {
       console.error('Erro ao processar dados salvos');
     }
   }
-
   return null;
 }
 ```
@@ -163,22 +148,13 @@ import { TransactionService } from 'shared/services/TransactionService';
 import { TransactionType } from 'shared/types/TransactionType';
 import { TransactionFilters } from 'shared/types/api.types';
 
-// Buscar todas as transações
 async function loadTransactions() {
-  try {
-    const transactions = await TransactionService.getAllTransactions();
-    // transactions é Transaction[] com tipagem garantida
-
-    transactions.forEach(t => {
-      console.log(t.getFormattedAmount()); // ✅ Método disponível
-      console.log(t.getFormattedDate());   // ✅ Método disponível
-    });
-  } catch (error) {
-    console.error('Erro ao carregar transações:', error);
-  }
+  const transactions = await TransactionService.getAllTransactions();
+  transactions.forEach(t => {
+    console.log(t.getFormattedAmount());
+  });
 }
 
-// Buscar com filtros
 async function loadFilteredTransactions() {
   const filters: TransactionFilters = {
     startDate: '2025-01-01',
@@ -188,22 +164,17 @@ async function loadFilteredTransactions() {
     page: 1,
     limit: 10
   };
-
-  const transactions = await TransactionService.getAllTransactions(filters);
-  return transactions;
+  return TransactionService.getAllTransactions(filters);
 }
 
-// Criar nova transação
 async function createTransaction() {
   try {
     const newTransaction = await TransactionService.addTransaction(
       TransactionType.DEPOSIT,
       500.00,
       new Date(),
-      'Depósito PIX',
-      undefined // sem arquivo
+      'Depósito PIX'
     );
-
     console.log('Transação criada:', newTransaction.id);
     return newTransaction;
   } catch (error) {
@@ -213,33 +184,14 @@ async function createTransaction() {
     throw error;
   }
 }
-
-// Atualizar transação com arquivo
-async function updateWithFile(id: string, file: File) {
-  try {
-    const updated = await TransactionService.updateTransaction(
-      id,
-      TransactionType.PAYMENT,
-      299.99,
-      new Date(),
-      'Pagamento cartão',
-      file // arquivo anexado
-    );
-
-    console.log('Transação atualizada:', updated.toJSON());
-  } catch (error) {
-    console.error('Falha na atualização:', error);
-  }
-}
 ```
 
 ### ✅ Usando AccountService
 
 ```typescript
 import { AccountService } from 'shared/services/AccountService';
-import { CreateAccountDTO, UpdateAccountDTO } from 'shared/dtos/Account.dto';
+import { CreateAccountDTO } from 'shared/dtos/Account.dto';
 
-// Buscar conta atual
 async function getCurrentAccount() {
   try {
     const account = await AccountService.getAccount();
@@ -251,30 +203,11 @@ async function getCurrentAccount() {
   }
 }
 
-// Criar nova conta
 async function createNewAccount() {
   const accountData: CreateAccountDTO = {
     name: 'Minha Conta Poupança'
   };
-
-  try {
-    const account = await AccountService.createAccount(accountData);
-    console.log('Conta criada:', account.name);
-    return account;
-  } catch (error) {
-    console.error('Erro ao criar conta:', error);
-    throw error;
-  }
-}
-
-// Atualizar saldo
-async function updateBalance(accountId: string, newBalance: number) {
-  try {
-    const account = await AccountService.updateAccountBalance(accountId, newBalance);
-    console.log('Saldo atualizado:', account.balance);
-  } catch (error) {
-    console.error('Erro ao atualizar saldo:', error);
-  }
+  return AccountService.createAccount(accountData);
 }
 ```
 
@@ -285,42 +218,19 @@ import { FileUploadService } from 'shared/services/FileUploadService';
 import { TransactionType } from 'shared/types/TransactionType';
 
 async function handleFileUpload(file: File, transactionType: TransactionType) {
-  // Validação prévia
   const validation = FileUploadService.validateFile(file);
   if (!validation.isValid) {
     alert(validation.error);
     return;
   }
-
   try {
-    // Upload tipado
     const filePath = await FileUploadService.uploadFile(file, transactionType);
-    console.log('Arquivo enviado para:', filePath);
-
-    // URL para download
     const downloadUrl = FileUploadService.getDownloadUrl(filePath);
-    console.log('URL de download:', downloadUrl);
-
-    // Nome formatado
     const displayName = FileUploadService.getFileName(filePath, transactionType);
-    console.log('Nome para exibição:', displayName);
-
     return filePath;
   } catch (error) {
     console.error('Erro no upload:', error);
     throw error;
-  }
-}
-
-// Verificar se é imagem
-function handleFilePreview(filePath: string) {
-  if (FileUploadService.isImage(filePath)) {
-    // Mostrar preview da imagem
-    const url = FileUploadService.getDownloadUrl(filePath);
-    return url;
-  } else {
-    // Mostrar ícone de arquivo
-    return null;
   }
 }
 ```
@@ -336,58 +246,36 @@ import { Transaction } from 'shared/models/Transaction';
 import { Account } from 'shared/models/Account';
 import { TransactionType } from 'shared/types/TransactionType';
 
-// Criando uma transação
 function createTransaction() {
-  try {
-    const transaction = new Transaction(
-      'tx-001',
-      TransactionType.WITHDRAWAL,
-      150.00,
-      new Date(),
-      'Saque ATM',
-      undefined
-    );
-
-    // Métodos utilitários
-    console.log('É despesa?', transaction.isExpense()); // true
-    console.log('É receita?', transaction.isIncome());  // false
-    console.log('Valor formatado:', transaction.getFormattedAmount());
-    console.log('Data formatada:', transaction.getFormattedDate());
-    console.log('Tem anexo?', transaction.hasAttachment()); // false
-
-    return transaction;
-  } catch (error) {
-    console.error('Erro na validação:', error.message);
-  }
+  const transaction = new Transaction(
+    'tx-001',
+    TransactionType.WITHDRAWAL,
+    150.00,
+    new Date(),
+    'Saque ATM'
+  );
+  console.log(transaction.getFormattedAmount());
+  return transaction;
 }
 
-// Trabalhando com conta
 function manageAccount() {
   const account = new Account('acc-001', 'Conta Corrente', 1000.00);
-
-  // Métodos de manipulação
-  account.addBalance(500.00);     // Saldo: 1500.00
-  account.subtractBalance(200.00); // Saldo: 1300.00
-
-  // Verificações
+  account.addBalance(500.00);
+  account.subtractBalance(200.00);
   if (account.hasInsufficientFunds(1500.00)) {
     console.log('Saldo insuficiente');
   }
-
-  // Conversão para DTO
   const dto = account.toJSON();
   console.log('DTO:', dto);
 }
 ```
 
-### ✅ Usando interfaces nos MFEs
+### ✅ Usando interfaces centralizadas
 
 ```typescript
-// Em transactions-mfe
-import { ITransaction, ICreateTransaction } from '../interfaces/Transaction.interface';
+import { ITransaction, ICreateTransaction } from 'shared/types/transaction.types';
 import { TransactionType } from 'shared/types/TransactionType';
 
-// Dados para criar transação
 const createData: ICreateTransaction = {
   type: TransactionType.TRANSFER,
   amount: 300.00,
@@ -395,15 +283,12 @@ const createData: ICreateTransaction = {
   description: 'Transferência para poupança'
 };
 
-// Função que recebe ITransaction
 function processTransaction(transaction: ITransaction) {
   console.log(`Processando transação ${transaction.id}`);
   console.log(`Valor: R$ ${transaction.amount.toFixed(2)}`);
-
   if (transaction.description) {
     console.log(`Descrição: ${transaction.description}`);
   }
-
   if (transaction.attachmentPath) {
     console.log(`Anexo: ${transaction.attachmentPath}`);
   }
@@ -427,14 +312,8 @@ function TransactionComponent() {
     error,
     addTransaction,
     updateTransaction,
-    deleteTransaction,
-    fetchTransactions
+    deleteTransaction
   } = useTransactions();
-
-  // Estado tipado automaticamente
-  // transactions: Transaction[]
-  // loading: boolean
-  // error: Error | null
 
   const handleCreateTransaction = async () => {
     try {
@@ -446,28 +325,7 @@ function TransactionComponent() {
       );
       console.log('Criada:', newTransaction.id);
     } catch (error) {
-      console.error('Erro:', error.message);
-    }
-  };
-
-  const handleUpdateTransaction = async (id: string) => {
-    try {
-      await updateTransaction(
-        id,
-        TransactionType.PAYMENT,
-        299.99,
-        new Date(),
-        'Transação atualizada'
-      );
-    } catch (error) {
-      console.error('Erro na atualização:', error);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    const success = await deleteTransaction(id);
-    if (success) {
-      console.log('Transação removida');
+      console.error('Erro:', error instanceof Error ? error.message : error);
     }
   };
 
@@ -494,10 +352,6 @@ import { useAccount } from 'shared/hooks/useAccount';
 function AccountComponent() {
   const { account, loading, error, refreshAccount } = useAccount();
 
-  // account: Account | null
-  // loading: boolean
-  // error: Error | null
-
   if (loading) return <div>Carregando conta...</div>;
   if (error) return <div>Erro: {error.message}</div>;
   if (!account) return <div>Conta não encontrada</div>;
@@ -506,9 +360,7 @@ function AccountComponent() {
     <div>
       <h2>{account.name}</h2>
       <p>Saldo: R$ {account.balance.toFixed(2)}</p>
-      <button onClick={refreshAccount}>
-        Atualizar
-      </button>
+      <button onClick={refreshAccount}>Atualizar</button>
     </div>
   );
 }
@@ -523,9 +375,7 @@ function AccountComponent() {
 ```typescript
 import React from 'react';
 import { Transaction } from 'shared/models/Transaction';
-import { TransactionType } from 'shared/types/TransactionType';
 
-// Props bem definidas
 interface TransactionCardProps {
   transaction: Transaction;
   onEdit?: (id: string) => void;
@@ -539,11 +389,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   onDelete,
   showActions = true
 }) => {
-  // TypeScript garante que transaction é Transaction
   const handleEdit = () => {
-    onEdit?.(transaction.id); // Operador opcional tipado
+    onEdit?.(transaction.id);
   };
-
   const handleDelete = async () => {
     if (onDelete) {
       try {
@@ -553,20 +401,12 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
       }
     }
   };
-
   return (
     <div className="transaction-card">
       <h3>{transaction.getFormattedAmount()}</h3>
       <p>{transaction.getFormattedDate()}</p>
-
-      {transaction.description && (
-        <p>{transaction.description}</p>
-      )}
-
-      {transaction.hasAttachment() && (
-        <span>📎 Anexo</span>
-      )}
-
+      {transaction.description && <p>{transaction.description}</p>}
+      {transaction.hasAttachment() && <span>📎 Anexo</span>}
       {showActions && (
         <div>
           <button onClick={handleEdit}>Editar</button>
@@ -601,22 +441,16 @@ const TransactionForm: React.FC = () => {
     date: new Date(),
     description: ''
   });
-
-  const [errors, setErrors] = useState<Record<keyof TransactionFormData, string>>({} as any);
+  const [errors, setErrors] = useState<Partial<Record<keyof TransactionFormData, string>>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validação tipada
     const validation = validateObject(formData, ValidationSchemas.transaction);
-
     if (!validation.isValid) {
       setErrors(validation.errors);
       return;
     }
-
-    // Limpar erros e enviar
-    setErrors({} as any);
+    setErrors({});
     console.log('Dados válidos:', formData);
   };
 
@@ -631,7 +465,6 @@ const TransactionForm: React.FC = () => {
         }))}
       />
       {errors.amount && <span className="error">{errors.amount}</span>}
-
       <select
         value={formData.type}
         onChange={(e) => setFormData(prev => ({
@@ -643,7 +476,6 @@ const TransactionForm: React.FC = () => {
           <option key={type} value={type}>{type}</option>
         ))}
       </select>
-
       <button type="submit">Salvar</button>
     </form>
   );
@@ -658,16 +490,16 @@ const TransactionForm: React.FC = () => {
 
 ```typescript
 import { TransactionService } from 'shared/services/TransactionService';
+import { TransactionType } from 'shared/types/TransactionType';
 
 async function handleTransactionCreation() {
   try {
-    const transaction = await TransactionService.addTransaction(
+    await TransactionService.addTransaction(
       TransactionType.DEPOSIT,
-      -100, // Valor inválido propositalmente
+      -100,
       new Date()
     );
   } catch (error) {
-    // BaseService já formata erros padronizados
     if (error instanceof Error) {
       if (error.message.includes('400:')) {
         console.log('Erro de validação:', error.message);
@@ -688,6 +520,7 @@ async function handleTransactionCreation() {
 ```typescript
 import React, { useState } from 'react';
 import { useTransactions } from 'shared/hooks/useTransactions';
+import { TransactionType } from 'shared/types/TransactionType';
 
 const TransactionManager: React.FC = () => {
   const { addTransaction } = useTransactions();
@@ -696,17 +529,14 @@ const TransactionManager: React.FC = () => {
   const handleAddTransaction = async () => {
     try {
       setOperationError(null);
-
       await addTransaction(
         TransactionType.DEPOSIT,
         1000,
         new Date(),
         'Depósito teste'
       );
-
       alert('Transação criada com sucesso!');
     } catch (error) {
-      // Error tipado do hook
       if (error instanceof Error) {
         setOperationError(error.message);
       } else {
@@ -717,14 +547,9 @@ const TransactionManager: React.FC = () => {
 
   return (
     <div>
-      <button onClick={handleAddTransaction}>
-        Adicionar Transação
-      </button>
-
+      <button onClick={handleAddTransaction}>Adicionar Transação</button>
       {operationError && (
-        <div className="error-message">
-          Erro: {operationError}
-        </div>
+        <div className="error-message">Erro: {operationError}</div>
       )}
     </div>
   );
@@ -754,7 +579,6 @@ const transactionState: AsyncState<Transaction[]> = {
 // Valor que pode ser nulo
 const selectedTransaction: Nullable<Transaction> = null;
 
-// Função com callback tipado
 function processTransactions(
   transactions: Transaction[],
   callback: (transaction: Transaction) => void
@@ -769,7 +593,6 @@ function processTransactions(
 import { Transaction } from 'shared/models/Transaction';
 import { FileUploadService } from 'shared/services/FileUploadService';
 
-// Formatação de valores
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -777,7 +600,6 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-// Helpers para transações
 function getTransactionSummary(transactions: Transaction[]) {
   return {
     total: transactions.length,
@@ -788,7 +610,6 @@ function getTransactionSummary(transactions: Transaction[]) {
   };
 }
 
-// Helpers para arquivos
 function getFileInfo(filePath: string) {
   return {
     name: FileUploadService.getFileName(filePath),
@@ -803,37 +624,10 @@ function getFileInfo(filePath: string) {
 
 ## 🎯 Resumo dos Benefícios
 
-### ✅ **Antes vs Depois**
+- Tipos e utilitários centralizados em `shared/types` e `shared/utils`.
+- Imports de tipos e helpers sempre do `shared`.
+- Menos duplicidade e conflitos de tipos entre MFEs.
+- Ambiente de build e testes mais estável.
+- Refatoração e manutenção facilitadas.
 
-**Antes (sem tipagem rigorosa):**
-```typescript
-// ❌ Propenso a erros
-const transaction = await api.get('/transactions/123');
-console.log(transaction.ammount); // Typo não detectado
-```
-
-**Depois (com tipagem):**
-```typescript
-// ✅ Seguro e tipado
-const transaction = await TransactionService.getTransactionById('123');
-console.log(transaction.getFormattedAmount()); // Método sugerido pelo IDE
-```
-
-### 🛡️ **Proteções Implementadas**
-
-1. **Validação em runtime** com type guards
-2. **Erros detectados em tempo de compilação**
-3. **IntelliSense aprimorado** no VS Code
-4. **Refatoração segura** - mudanças propagam automaticamente
-5. **Documentação viva** através dos tipos
-
-### 🚀 **Próximos Passos**
-
-1. Execute `npm run type-check` regularmente
-2. Use os exemplos acima como referência
-3. Explore os tipos disponíveis com Ctrl+Space no VS Code
-4. Contribua com novos tipos conforme necessário
-
----
-
-**💡 Dica:** Use Ctrl+Space no VS Code para ver todas as propriedades e métodos disponíveis em objetos tipados!
+**💡 Dica:** Use Ctrl+Space no VS Code para explorar os tipos disponíveis!

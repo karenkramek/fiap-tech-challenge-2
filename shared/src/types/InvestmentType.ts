@@ -8,10 +8,10 @@ export enum InvestmentType {
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export const INVESTMENT_TYPE_LABELS: Record<InvestmentType, string> = {
-  [InvestmentType.FUNDS]: 'Fundos',
+  [InvestmentType.FUNDS]: 'Fundos de Investimento',
   [InvestmentType.TREASURY]: 'Tesouro Direto',
-  [InvestmentType.PENSION]: 'Previdência',
-  [InvestmentType.STOCKS]: 'Ações'
+  [InvestmentType.PENSION]: 'Previdência Privada',
+  [InvestmentType.STOCKS]: 'Bolsa de Valores'
 };
 
 export const INVESTMENT_TYPE_FILENAME: Record<InvestmentType, string> = {

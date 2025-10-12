@@ -26,7 +26,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "types": [
+      "jest"
+    ]
   },
   "include": [
     "src/**/*"

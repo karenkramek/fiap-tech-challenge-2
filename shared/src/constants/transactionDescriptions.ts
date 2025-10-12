@@ -10,8 +10,7 @@ export const TRANSACTION_DESCRIPTION_SUGGESTIONS = [
   'Salário',
   'Pix',
   'Cartão de Crédito',
-  'Entretenimento',
-  'Investimento'
+  'Entretenimento'
 ];
 
 export const INVESTMENT_DESCRIPTION_SUGGESTIONS = [

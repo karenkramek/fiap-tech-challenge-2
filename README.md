@@ -4,7 +4,7 @@ ByteBank - Arquitetura de Microfrontends com Webpack Module Federation.
 
 ## 🎯 Contexto da Fase 2
 
-Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma arquitetura de microfrontends, compondo a aplicação a partir de múltiplos MFEs integrados via Module Federation, mantendo os princípios de componentização, reutilização e tipagem estática.
+Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma arquitetura de microfrontends, compondo a aplicação a partir de múltiplos MFEs integrados via Module Federation, mantendo os princípios de componentização, reutilização, tipagem estática e centralização de regras de negócio.
 
 ## 🎥 Demo e Design
 
@@ -16,47 +16,50 @@ Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP 
 - Shell App (porta 3030) — Host principal da aplicação
 - Dashboard MFE (porta 3031) — Microfrontend de Dashboard
 - Transactions MFE (porta 3032) — Microfrontend de Transações
+- Investments MFE (porta 3036) — Microfrontend de Investimentos e Metas
 - Shared Library (porta 3033) — Biblioteca compartilhada (componentes, hooks, utils)
 - API Server (porta 3034) — Backend mock com JSON Server
 - Upload Server (porta 3035) — Servidor para upload de arquivos
 
 ### Componentes e responsabilidades
 
-| Camada                | Função principal                                                                 | Destaques técnicos |
-|-----------------------|-----------------------------------------------------------------------------------|--------------------|
-| `shell/`              | Orquestra layout, roteamento e consumo dos remotes via Module Federation.        | Webpack host expõe `dashboardMFE`, `transactionsMFE`, `shared`. |
-| `dashboard-mfe/`      | Entrega o dashboard de saldo, gráficos e cartões informativos.                   | Exposto como `dashboardMFE/Dashboard`. |
-| `transactions-mfe/`   | Lista, filtra e cria transações, delegando componentes de domínio à `shared`.    | Exposto como `transactionsMFE/TransactionsPage`. |
-| `shared/`             | Biblioteca federada com componentes UI, hooks, serviços, DTOs e utilidades.      | Compartilhamento de estado/serviços entre MFEs. |
-| `upload-server/`      | API Express dedicada a upload/remoção de anexos (persistidos em `uploads/`).     | Usa Multer, expõe `/api/upload` e `/uploads`. |
-| `db.json` + JSON API  | Mock persistido do domínio (contas, transações) servido pelo `json-server`.       | Endpoint base `http://localhost:3034`. |
+| Camada               | Função principal                                                                                  | Destaques técnicos |
+|----------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| `shell/`             | Orquestra layout, roteamento e consumo dos remotes via Module Federation.                         | Webpack host expõe `dashboardMFE`, `transactionsMFE`, `investmentsMFE`, `shared`. |
+| `dashboard-mfe/`     | Saldo, listagem, gestão de transações, delegando componentes de domínio à `shared`.               | Exposto como `dashboardMFE/Dashboard`.                                            |
+| `transactions-mfe/`  | Listagem, filtro e gestão de transações, delegando componentes de domínio à `shared`.             | Exposto como `transactionsMFE/TransactionsPage`.                                  |
+| `investments-mfe/`   | Gráficos, gestão de investimentos, metas, resgates e análise de performance.                      | Exposto como `investmentsMFE/InvestmentsPage`.                                    |
+| `shared/`            | Biblioteca federada com componentes UI, hooks, serviços, DTOs e utilidades.                       | Compartilhamento de estado/serviços entre MFEs.                                   |
+| `upload-server/`     | API Express dedicada a upload/remoção de anexos (persistidos em `uploads/`).                      | Usa Multer, expõe `/api/upload` e `/uploads`.                                     |
+| `db.json` + JSON API | Mock persistido do domínio (contas, transações, investimentos, metas) servido pelo `json-server`. | Endpoint base `http://localhost:3034`.                                            |
 
 ### Fluxo entre os módulos
 
 1. `shared` publica remotes de componentes e serviços reutilizáveis (`shared@.../remoteEntry.js`).
-2. `dashboard-mfe` e `transactions-mfe` consomem `shared` e expõem suas páginas como remotes próprios.
+2. Os MFEs (`dashboard-mfe`, `transactions-mfe`, `investments-mfe`) consomem `shared` e expõem suas páginas como remotes próprios.
 3. O `shell` carrega esses remotes dinamicamente e renderiza o conteúdo dentro do layout host.
-4. Tanto os MFEs quanto o `shell` chamam o `json-server` para dados do domínio e o `upload-server` para anexos.
+4. Todos os MFEs e o `shell` consomem o `json-server` para dados do domínio e o `upload-server` para anexos.
 5. Os arquivos enviados ficam disponíveis via `/uploads`, servidos diretamente pelo servidor de upload.
 
-Essa separação permite evoluir os MFEs e a lib compartilhada de forma independente, mantendo contratos via DTOs/serviços, e já antecipa uma implantação distribuída (por exemplo, buckets S3 + CloudFront para MFEs e ECS/Fargate para APIs) — tópico que podemos detalhar na próxima etapa.
+Essa separação permite evoluir MFEs e a lib compartilhada de forma independente, mantendo contratos via DTOs/serviços, e já antecipa uma implantação distribuída (ex: buckets S3 + CloudFront para MFEs e ECS/Fargate para APIs).
 
 ## ✨ Funcionalidades
 
-- Dashboard intuitivo com saldo e extrato
-- Listagem de transações com visualização, edição e remoção
-- Adição de novas transações (depósito, transferência, etc.)
-- Upload de arquivos anexos às transações (PDF, imagens, documentos)
-- Edição de transações existentes
+- Dashboard intuitivo com saldo, listagem e gestão de transações
+- Gestão completa de Transações (listar, filtrar, criar, editar e remover)
+- Gestão completa de Investimentos e Metas (resgatar, listar, filtrar, criar, editar e remover)
+- Diferentes tipos de gráficos que possibilitam análisar e comparar a fundo, transações, entradas, saidas, investimentos e metas
+- Upload de arquivos anexos às transações
 - Design system consistente e responsivo (Tailwind CSS)
 - Tipagem estática com TypeScript
+- Centralização de regras de negócio e cálculos em hooks e utils compartilhados
 
 ## 🛠️ Tecnologias
 
 - React
 - TypeScript
 - Webpack 5 Module Federation
-- Tailwind CSS (no `dashboard-mfe` e nos componentes compartilhados conforme aplicável)
+- Tailwind CSS
 - JSON Server (API mock)
 - Node.js/Express (servidor de upload)
 - Multer (upload de arquivos)
@@ -81,15 +84,16 @@ rm db.json && npm run setup:db
 
 ## 🚀 Como Executar Localmente
 
-### Pré-requisitos (Docker)
+### Pré-requisitos
 
 - Node.js (versão 18+ recomendada)
 - npm ou yarn
 - Git
+- Docker Desktop (opcional, para ambiente containerizado)
 
 ### 📦 Instalação das Dependências
 
-Como este é um projeto de microfrontends, **é necessário instalar as dependências de cada aplicação separadamente**:
+Como este é um monorepo de microfrontends, **é necessário instalar as dependências de cada aplicação separadamente**:
 
 **Opção 1 - Instalação automática (recomendada):**
 
@@ -116,6 +120,7 @@ npm install
 cd shell && npm install && cd ..
 cd dashboard-mfe && npm install && cd ..
 cd transactions-mfe && npm install && cd ..
+cd investments-mfe && npm install && cd ..
 cd shared && npm install && cd ..
 cd upload-server && npm install && cd ..
 ```
@@ -125,7 +130,7 @@ cd upload-server && npm install && cd ..
 Após instalar todas as dependências, execute na raiz do repositório:
 
 ```bash
-# Inicie tudo de uma vez (API + Upload Server + Shared + Dashboard + Transactions + Shell)
+# Inicie tudo de uma vez (API + Upload Server + Shared + Dashboard + Transactions + Investments + Shell)
 npm run dev:all
 ```
 
@@ -147,7 +152,7 @@ npm run dev:api
 # Upload Server (porta 3035)
 npm run dev:upload
 
-# Biblioteca compartilhada (porta 3033)
+# Shared Library (porta 3033)
 npm run dev:shared
 
 # Dashboard MFE (porta 3031)
@@ -155,6 +160,9 @@ npm run dev:dashboard
 
 # Transactions MFE (porta 3032)
 npm run dev:transactions
+
+# Investments MFE (porta 3036)
+npm run dev:investments
 
 # Shell - aplicação principal (porta 3030)
 npm run dev:shell
@@ -178,7 +186,7 @@ Para facilitar o desenvolvimento isolado ou integrado, adicionamos uma estrutura
 ### Pré-requisitos
 
 - Docker Desktop (ou engine) >= 24 com Compose V2.
-- Porta 3030-3035 liberadas no host.
+- Porta 3030-3036 liberadas no host.
 - (Opcional) Execute `npm run setup:db` uma vez para garantir a presença de `db.json` antes do primeiro build; se não existir, o entrypoint da API cria a partir do template.
 
 ### Subir apenas um serviço
@@ -189,12 +197,12 @@ Você pode abrir um único serviço e suas dependências básicas em modo intera
 docker compose -f docker/docker-compose.dev.yml up shell
 ```
 
-Esse comando inicia `shared`, `dashboard`, `transactions`, `api` e `upload` automaticamente por causa do `depends_on`, além do próprio Shell.
+Esse comando inicia `shared`, `dashboard`, `transactions`, `investments`, `api` e `upload` automaticamente por causa do `depends_on`, além do próprio Shell.
 
-Para iniciar outro MFE em isolamento, aponte para o serviço correspondente. Exemplo para o dashboard:
+Para iniciar outro MFE em isolamento, aponte para o serviço correspondente. Exemplo para o investments:
 
 ```bash
-docker compose -f docker/docker-compose.dev.yml up dashboard shared api upload
+docker compose -f docker/docker-compose.dev.yml up investments shared api upload
 ```
 
 ### Subir toda a stack de uma vez
@@ -221,21 +229,20 @@ Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker
 
 ## 🧪 Testes
 
-Este projeto conta com uma suíte completa de testes automatizados cobrindo todos os microfrontends e utilitários compartilhados.
+O projeto conta com uma suíte completa de testes automatizados cobrindo todos os microfrontends e utilitários compartilhados.
 
 ### Cobertura de Testes
 
-| Módulo | Arquivos de Teste | Total de Testes | Status |
-|--------|-------------------|-----------------|---------|
-| **Módulo Shared** | 2 | 25 testes | ✅ Todos passando |
-| **Shell App** | 1 | 7 testes | ✅ Todos passando |
-| **Dashboard MFE** | 1 | 11 testes | ✅ Todos passando |
-| **Transactions MFE** | 1 | 14 testes | ✅ Todos passando |
-| **TOTAL** | **5** | **57 testes** | **✅ 100% passando** |
+| Módulo               | Arquivos de Teste | Total de Testes | Status               |
+|----------------------|-------------------------------------|----------------------|
+| **Shared**           | 2    | 25 testes                    | ✅ Todos passando   |
+| **Shell App**        | 1    | 7 testes                     | ✅ Todos passando   |
+| **Dashboard MFE**    | 1    | 11 testes                    | ✅ Todos passando   |
+| **Transactions MFE** | 1    | 14 testes                    | ✅ Todos passando   |
+| **Investments MFE**  | 1    | 18 testes                    | ✅ Todos passando   |
+| **TOTAL**            | **6**| **75 testes**                | **✅ 100% passando**|
 
 ### 🏃‍♂️ Executando os Testes
-
-**Executar todos os testes (recomendado):**
 
 ```bash
 # Executa os testes em todos os módulos
@@ -245,30 +252,31 @@ npm run test:all
 **Executar testes por módulo específico:**
 
 ```bash
-# Testes do módulo shared (utilitários e hooks)
+# Testes do módulo shared
 cd shared && npm test
 
-# Testes do Shell App (roteamento e layout)
+# Testes do Shell App
 cd shell && npm test
 
-# Testes do Dashboard MFE (componentes de dashboard)
+# Testes do Dashboard MFE
 cd dashboard-mfe && npm test
 
-# Testes do Transactions MFE (gestão de transações)
+# Testes do Transactions MFE
 cd transactions-mfe && npm test
+
+# Testes do Investments MFE
+cd investments-mfe && npm test
 ```
 
 **Modo de desenvolvimento (watch mode):**
 
 ```bash
-# Em qualquer módulo, para execução contínua durante desenvolvimento
 npm run test:watch
 ```
 
 **Relatórios de cobertura:**
 
 ```bash
-# Gerar relatório de cobertura de testes
 npm run test:coverage
 ```
 
@@ -299,6 +307,7 @@ npm run test:coverage
 | Shared Library     | 3033  | [http://localhost:3033](http://localhost:3033) |
 | API Server (Mock)  | 3034  | [http://localhost:3034](http://localhost:3034) |
 | Upload Server      | 3035  | [http://localhost:3035](http://localhost:3035) |
+| Investments MFE    | 3036  | [http://localhost:3036](http://localhost:3036) |
 
 ## 📜 Scripts Disponíveis
 
@@ -311,6 +320,7 @@ npm run test:coverage
 - `npm run dev:shell` — Inicia apenas o Shell
 - `npm run dev:dashboard` — Inicia apenas o Dashboard MFE
 - `npm run dev:transactions` — Inicia apenas o Transactions MFE
+- `npm run dev:investments` — Inicia apenas o Investments MFE
 - `npm run dev:shared` — Inicia apenas a Shared Library
 - `npm run dev:api` — Inicia apenas o JSON Server (API mock)
 - `npm run dev:upload` — Inicia apenas o Upload Server
@@ -321,6 +331,7 @@ npm run test:coverage
 - `npm run test:shell` — Testes apenas do Shell App
 - `npm run test:dashboard` — Testes apenas do Dashboard MFE
 - `npm run test:transactions` — Testes apenas do Transactions MFE
+- `npm run test:investments` — Testes apenas do Investments MFE
 - `npm run test:watch` — Modo watch para todos os módulos (desenvolvimento)
 - `npm run test:coverage` — Gera relatórios de cobertura para todos os módulos
 
@@ -328,8 +339,9 @@ npm run test:coverage
 
 - Evolução para microfrontends com integração via Module Federation
 - Separação de responsabilidades por MFE e biblioteca compartilhada
-- Integração com API mock para fluxo de transações e dashboard
+- Integração com API mock para fluxo de transações, investimentos, metas e dashboard
 - Reutilização de componentes, hooks e utilitários entre MFEs
+- Centralização de regras de negócio e cálculos
 
 ## 🛑 Encerrando a Execução
 
@@ -337,10 +349,8 @@ Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodan
 
 ## 🔧 Troubleshooting
 
-**Problemas gerais:** Consulte o documento [Troubleshooting](./docs/troubleshooting.md) para um checklist rápido de erros comuns, comandos úteis e links para guias complementares.
-
-**Problemas com testes:** Para questões específicas relacionadas à execução de testes, consulte [Troubleshooting de Testes](./docs/testing-troubleshooting.md).
-
-## 🧹 Limpeza do Ambiente (Clean All)
-
-Veja [Limpeza do Ambiente](./docs/environment-cleanup.md) para detalhes dos scripts disponíveis e orientações sobre quando utilizá-los.
+Consulte os documentos em `docs/` para dúvidas, problemas comuns e dicas de manutenção:
+- [Troubleshooting](./docs/troubleshooting.md) (checklist rápido de erros comuns, comandos úteis e links para guias complementares.)
+- [Troubleshooting de Testes](./docs/testing-troubleshooting.md) (questões específicas relacionadas à execução de testes)
+- [Limpeza do Ambiente](./docs/environment-cleanup.md) (detalhes dos scripts disponíveis e orientações sobre quando utilizá-los)
+- [JSON Server Guide](./docs/json-server-guide.md) (detalhes operacionais do mock de API utilizado)

@@ -16,7 +16,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     updateTransaction: (
       id: string,
@@ -24,7 +26,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     deleteTransaction: (id: string) => Promise<boolean>;
   };
@@ -227,6 +231,8 @@ declare module 'shared/models/Transaction' {
     date: string | Date;
     description?: string;
     attachmentPath?: string;
+    goalId?: string;
+    investmentId?: string;
     isIncome(): boolean;
     isExpense(): boolean;
   }
@@ -302,6 +308,8 @@ declare module 'shared/dtos/Transaction.dto' {
     amount: number;
     date: string;
     description?: string;
+    goalId?: string;
+    investmentId?: string;
   }
 }
 

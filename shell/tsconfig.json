@@ -29,7 +29,11 @@
       "react",
       "react-dom",
       "node"
-    ]
+    ],
+    "baseUrl": "src",
+    "paths": {
+      "shared/*": ["../../shared/src/*"]
+    }
   },
   "include": [
     "src/**/*",

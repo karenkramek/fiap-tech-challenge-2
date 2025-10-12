@@ -9,10 +9,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/src/__mocks__/fileMock.js',
-    '^shared/(.*)$': '<rootDir>/../shared/src/$1',
-    '^dashboardMFE/(.*)$': '<rootDir>/src/__mocks__/dashboardMFE.js',
-    '^transactionsMFE/(.*)$': '<rootDir>/src/__mocks__/transactionsMFE.js',
-    '^investmentsMFE/(.*)$': '<rootDir>/src/__mocks__/investmentsMFE.js'
+    '^shared/(.*)$': '<rootDir>/../shared/src/$1'
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
