@@ -270,7 +270,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
       
       {/* Lista de transações agrupadas por mês/ano */}
       {!isLoading && filteredTransactions.length > 0 ? (
-        <div>
+        <div role="region" aria-label="Lista de transações agrupadas por mês">
           {sortedKeys.map((key, idx) => {
             const [month, year] = key.split("-");
             const isLast = idx === sortedKeys.length - 1;
@@ -302,7 +302,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                           />
                         </div>
                         {isFullMode && isLastGroup && isLastItem && showAllRecordsMessage && (
-                          <div className="w-full flex justify-center py-4">
+                          <div className="w-full flex justify-center py-4" aria-live="polite">
                             <span className="text-gray-500 text-sm">Todos os registros foram exibidos.</span>
                           </div>
                         )}

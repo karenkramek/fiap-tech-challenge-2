@@ -30,38 +30,38 @@ const App = () => {
   return (
     <>
       <FeedbackProvider />
-        <div className="min-h-screen">
+        <div className="min-h-screen" role="main" aria-label="Painel de investimentos">
           {/* Titulo e Totalizadores */}
-          <div className="mb-6 px-6">
+          <div className="mb-6 px-6" aria-label="Cabeçalho de investimentos">
             <InvestmentsHeader />
           </div>
 
           {/* Cards de análise */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6" aria-label="Análises e cards de investimentos">
             {/* Riscos vs Retorno */}
-            <div className="flex flex-col">
+            <div className="flex flex-col" aria-label="Risco versus Retorno">
               <RiskReturnCard />
             </div>
 
             {/* Análise de Transações */}
-            <div className="flex flex-col">
+            <div className="flex flex-col" aria-label="Análise de transações">
               <TransactionsAnalysisCard />
             </div>
 
             {/* Investimentos */}
-            <div className="flex flex-col">
+            <div className="flex flex-col" aria-label="Investimentos">
                 <InvestmentsCard 
                   fetchInvestmentsAndTransactions={fetchInvestmentsAndTransactions}
                 />
             </div>
 
             {/* Metas */}
-            <div className="flex flex-col">
+            <div className="flex flex-col" aria-label="Metas de investimento">
               <GoalsCard fetchInvestmentsAndTransactions={fetchInvestmentsAndTransactions} />
             </div>
 
             {/* Entradas e Saídas / Investimentos e Metas */}
-            <div className="flex flex-col">
+            <div className="flex flex-col" aria-label="Entradas e saídas, investimentos e metas">
               <TransactionsSummaryCard />
             </div>
           </div>

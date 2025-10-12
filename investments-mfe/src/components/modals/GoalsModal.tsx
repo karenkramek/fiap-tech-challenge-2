@@ -118,6 +118,7 @@ const GoalsModal: React.FC<GoalsModalProps> = ({
           <button
             type="submit"
             className="w-full py-3 bg-tertiary-600 hover:bg-tertiary-700 text-white-50 font-medium rounded-lg shadow-md"
+            aria-label={initialGoal ? 'Atualizar meta' : 'Adicionar meta'}
           >
             {initialGoal ? 'Atualizar' : 'Adicionar'}
           </button>

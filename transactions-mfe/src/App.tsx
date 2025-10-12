@@ -73,12 +73,13 @@ const TransactionsPage: React.FC = () => {
       <FeedbackProvider />
       {/* Extrato */}
       <Card>
-        <div className="min-h-screen">
+        <div className="min-h-screen" role="main" aria-label="Extrato de transações">
           <div className="flex justify-between items-center mb-6">
             <h2 className="transactions-title text-primary-700">Extrato</h2>
             <Button 
               onClick={() => setAddModalOpen(true)}
               className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+              aria-label="Adicionar nova transação"
             >
               Nova Transação
             </Button>
@@ -86,7 +87,7 @@ const TransactionsPage: React.FC = () => {
 
           <ErrorBoundary>
             {/* Input de busca */}
-            <div className="flex items-center gap-2 mb-6 bg-white-50 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
+            <div className="flex items-center gap-2 mb-6 bg-white-50 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500" role="search" aria-label="Buscar transações">
               <Search className="h-5 w-5 text-gray-400" />
               <input
                 type="text"
@@ -94,6 +95,7 @@ const TransactionsPage: React.FC = () => {
                 className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
+                aria-label="Buscar transações"
               />
             </div>
             <TransactionList

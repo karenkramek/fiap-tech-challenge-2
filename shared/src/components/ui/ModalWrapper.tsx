@@ -42,7 +42,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay" role="dialog" aria-modal="true">
       <div
         ref={modalRef}
         className={`relative bg-white-50 rounded-xl shadow-lg w-full ${sizeClasses[size]} mx-4 p-6 ${className}`}

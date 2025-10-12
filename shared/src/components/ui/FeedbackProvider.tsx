@@ -8,6 +8,10 @@ export const showError = (msg: string, duration?: number) =>
 export const showLoading = (msg: string) => toast.loading(msg);
 export const dismissLoading = () => toast.dismiss();
 
-const FeedbackProvider: React.FC = () => <Toaster position="top-right" />;
+const FeedbackProvider: React.FC = () => (
+  <div aria-live="polite" aria-atomic="true">
+    <Toaster position="top-right" />
+  </div>
+);
 
 export default FeedbackProvider;
