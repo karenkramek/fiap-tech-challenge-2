@@ -1,61 +1,59 @@
 {
-  "transactions": [
+  "investments": [
     {
-      "id": "1",
+      "id": "vij32dj",
       "accountId": "acc001",
-      "type": "DEPOSIT",
-      "amount": 3000,
-      "date": "2025-07-01T09:30:00Z",
-      "description": "Depósito de salário"
-    },
-    {
-      "id": "2",
-      "accountId": "acc001",
-      "type": "PAYMENT",
-      "amount": 500,
-      "date": "2025-07-05T14:15:00Z",
-      "description": "Aluguel"
-    },
-    {
-      "id": "3",
-      "accountId": "acc001",
-      "type": "TRANSFER",
-      "amount": 300,
-      "date": "2025-07-10T16:45:00Z",
-      "description": "Transferência para Beltrano"
-    },
-    {
-      "id": "4",
-      "accountId": "acc001",
-      "type": "WITHDRAWAL",
-      "amount": 200,
-      "date": "2025-07-20T03:00:00.000Z",
-      "description": "Saque no caixa eletrônico"
+      "type": "STOCKS",
+      "amount": 100,
+      "description": "",
+      "date": "2025-10-12T15:43:18.913Z"
     }
   ],
- "accounts": [
+  "goals": [
+    {
+      "id": "81ai4dc",
+      "accountId": "acc001",
+      "name": "Comprar carro",
+      "value": 300,
+      "assigned": 50,
+      "createdAt": "2025-10-12T15:43:29.470Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "44771bb0-2892-406b-81ce-727a1b76ee97",
+      "accountId": "acc001",
+      "type": "DEPOSIT",
+      "amount": 1000,
+      "date": "2025-10-12T15:43:07.955Z",
+      "description": "Salário"
+    },
+    {
+      "id": "c4fbe491-54e8-413c-8f7e-7b358121b016",
+      "accountId": "acc001",
+      "type": "INVESTMENT",
+      "amount": 100,
+      "date": "2025-10-12T15:43:18.913Z",
+      "description": "",
+      "investmentId": "vij32dj"
+    },
+    {
+      "id": "86e044d9-92ae-476d-96c1-1590d81615c3",
+      "accountId": "acc001",
+      "type": "GOAL",
+      "amount": 50,
+      "date": "2025-10-12T15:43:33.400Z",
+      "description": "Comprar carro",
+      "goalId": "81ai4dc"
+    }
+  ],
+  "accounts": [
     {
       "id": "acc001",
       "name": "Fulana de Tal",
+      "balance": 850,
       "email": "fulana@email.com",
-      "password": "senha123",
-      "balance": 2530,
-      "investments": [
-        {
-          "id": "o6fgpzu",
-          "type": "FUNDOS",
-          "amount": 100,
-          "description": "",
-          "date": "2025-09-27T04:18:08.092Z"
-        },
-        {
-          "id": "855ws9r",
-          "type": "BOLSA",
-          "amount": 700,
-          "description": "",
-          "date": "2025-09-27T04:18:19.175Z"
-        }
-      ]
+      "password": "123456"
     }
   ]
 }
