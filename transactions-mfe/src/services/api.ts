@@ -2,7 +2,10 @@ import axios from 'axios';
 import { Account } from 'shared/models/Account';
 import { Transaction } from 'shared/models/Transaction';
 
-const API_BASE_URL = 'http://localhost:3034';
+// Declaração global para TypeScript reconhecer a variável injetada pelo Webpack
+declare const REACT_APP_API_BASE_URL: string | undefined;
+
+const API_BASE_URL = typeof REACT_APP_API_BASE_URL !== 'undefined' ? REACT_APP_API_BASE_URL : 'http://localhost:3034';
 
 class TransactionAPIService {
   private api = axios.create({

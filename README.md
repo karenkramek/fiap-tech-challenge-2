@@ -1,15 +1,71 @@
 # Tech Challenge - Fase 2 - Grupo 28 - 4FRNT
 
-ByteBank - Arquitetura de Microfrontends com Webpack Module Federation.
+ByteBank: Arquitetura de Microfrontends com Webpack Module Federation + Cloud (AWS EC2 & Vercel).
+
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Webpack](https://img.shields.io/badge/Webpack-5-8DD6F9?style=flat&logo=webpack&logoColor=white)](https://webpack.js.org/)
+[![Module Federation](https://img.shields.io/badge/Module_Federation-5-FF6B6B?style=flat&logo=webpack&logoColor=white)](https://webpack.js.org/concepts/module-federation/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Jest](https://img.shields.io/badge/Jest-29.7-C21325?style=flat&logo=jest&logoColor=white)](https://jestjs.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
+[![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/ec2/)
 
 ## 🎯 Contexto da Fase 2
 
-Esta é a evolução do projeto da Fase 1 para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma arquitetura de microfrontends, compondo a aplicação a partir de múltiplos MFEs integrados via Module Federation, mantendo os princípios de componentização, reutilização, tipagem estática e centralização de regras de negócio.
+Esta é a evolução do [projeto da Fase 1](https://github.com/karenkramek/bytebank-fiap) para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma **arquitetura de microfrontends**, compondo a aplicação a partir de múltiplos MFEs integrados via **Module Federation**, mantendo os princípios de componentização, reutilização e tipagem estática.
 
-## 🎥 Demo e Design
+### 🚀 Principais Implementações da Fase 2:
 
-- 📹 Vídeo de Apresentação (Fase 1 – conceito e UI): [Assista no Loom](https://www.loom.com/share/35534aa22a264f7da957a72e228920e7?sid=1991a61a-66c3-4387-a536-83a96cf53144)
-- 🎨 Design no Figma: [Protótipo no Figma](https://www.figma.com/design/Y2JoXXiG50h2nj9FiG71i7/ByteBank-4FRNT---Fase1?node-id=0-1&p=f&t=vmoSPz2lFa4bemW4-0)
+- **Arquitetura de Microfrontends:** Webpack Module Federation para integração dinâmica entre Shell, Dashboard, Transactions e Shared Library
+- **Gerenciamento de Estado:** Redux Toolkit com TypeScript para estado global compartilhado entre MFEs
+- **Autenticação e Autorização:** Sistema de login/logout com proteção de rotas e controle de acesso
+- **Deployment Híbrido Cloud:**
+  - **Vercel (Frontends):** 4 projetos deployados com CDN global, HTTPS automático e deploy contínuo via GitHub
+  - **AWS EC2 (Backend):** API Server e Upload Server containerizados com Docker em instância t3.micro (free tier)
+- **CI/CD:** GitHub Actions para build e push automático de imagens Docker para Docker Hub
+- **Testes Automatizados:** 57 testes com Jest e React Testing Library cobrindo componentes, hooks e integrações
+- **Containerização:** Docker Compose para ambiente de desenvolvimento consistente e isolado
+
+## 📋 Gestão de Projeto
+
+- 📊 **Trello (Fase 2):** [Board de Acompanhamento de Atividades](https://trello.com/b/rP7VdDRt/fase-2)
+- 🎨 **Figma (Fase 2):** [Protótipo e Design System](https://www.figma.com/design/tpk67fOWALc2rEf9r6bZjG/ByteBank-4FRNT---Fase2?node-id=1-750)
+- 📹 **Vídeo de Apresentação (Fase 2):** TBD (em produção)
+- 🔗 **Repositório Fase 1:** [bytebank-fiap](https://github.com/karenkramek/bytebank-fiap)
+
+## 👥 Integrantes do Grupo
+
+| Nome                                            | Email                                                         | RM                                          |
+|-------------------------------------------------|---------------------------------------------------------------|---------------------------------------------|
+| Fernanda Raquel Campos Jiacinto                 | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com)     | [366526](mailto:RM366526@fiap.com.br)       |
+| Kaique Kenichi Furukawa Endo                    | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com)   | [366448](mailto:RM366448@fiap.com.br)       |
+| Karen Cristina Kramek                           | [kakakramek@gmail.com](mailto:kakakramek@gmail.com)           | [361140](mailto:RM361140@fiap.com.br)       |
+| Tatiane Gabrielle Marçal Rodrigues da Costa     | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | [365215](mailto:RM365215@fiap.com.br)     |
+
+## 🌐 Deploy em Produção
+
+A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combinando o melhor de cada plataforma:
+
+### 🚀 Frontends (Vercel)
+- **Shell App:** https://bytebank-shell.vercel.app
+- **Dashboard MFE:** https://dashboard-mfe-eta.vercel.app
+- **Transactions MFE:** https://transactions-mfe-iota.vercel.app
+- **Shared Library:** https://bytebank-shared.vercel.app
+
+### 🖥️ Backend (AWS EC2)
+- **API Server:** http://44.206.72.128:3034
+- **Upload Server:** http://44.206.72.128:3035
+
+> ⚠️ **Nota de Segurança:** Este é um ambiente de demonstração para fins acadêmicos.
+> A API é pública e contém apenas dados mock/exemplo. Não utilize para dados sensíveis reais.
+
+📖 **Arquitetura de Deploy:** Ver [Deployment Híbrido Vercel + AWS](./docs/hybrid-deployment.md) para entender como funciona a estratégia de deploy em múltiplas clouds.
+
+🔒 **Segurança e Boas Práticas:** Ver [Práticas de Segurança em Cloud](./docs/SECURITY_PRACTICES.md) para detalhes sobre autenticação, autorização, proteção de rotas, configurações de segurança AWS/Vercel e checklist de conformidade.
+
+🔄 **Reset Automático do Banco de Dados:** O `db.json` é automaticamente resetado a cada deploy no EC2 (importante para novos módulos como investimentos).
 
 ## 🧱 Visão da Arquitetura
 
@@ -45,14 +101,53 @@ Essa separação permite evoluir MFEs e a lib compartilhada de forma independent
 
 ## ✨ Funcionalidades
 
-- Dashboard intuitivo com saldo, listagem e gestão de transações
-- Gestão completa de Transações (listar, filtrar, criar, editar e remover)
-- Gestão completa de Investimentos e Metas (resgatar, listar, filtrar, criar, editar e remover)
-- Diferentes tipos de gráficos que possibilitam análisar e comparar a fundo, transações, entradas, saidas, investimentos e metas
-- Upload de arquivos anexos às transações
+### 🏦 Dashboard e Visualização
+- Dashboard intuitivo com saldo atual e controle de visibilidade
+- Visualização de transações recentes (últimas 5)
+- Cartões informativos com dados financeiros
+
+### 💰 Gestão de Transações
+- Listagem completa de transações com paginação
+- **Filtro e pesquisa de transações** por descrição, valor, tipo e data
+- **Scroll infinito** com carregamento progressivo (5 itens por vez)
+- Adição de novas transações (depósito, saque, transferência, pagamento)
+- Edição e exclusão de transações existentes
+- **Sugestões inteligentes de descrições** durante o preenchimento
+- **Validações completas** de formulário (valor, data, tipo, descrição)
+- Upload de arquivos anexos às transações (PDF, imagens, documentos)
+- Visualização e download de anexos
+
+### 📈 Gestão de Investimentos e Metas
+- Visualização de investimentos e metas
+- Gráficos de performance e evolução dos investimentos
+- Cadastro, acompanhamento e resgate de investimentos
+- Cadastro, acompanhamento e resgate de metas financeiras
+
+### 🔐 Autenticação e Segurança
+- Sistema completo de login e registro de usuários
+- **Proteção de rotas** com redirecionamento automático
+- Persistência de sessão (localStorage)
+- Logout com limpeza de dados sensíveis
+- Validação de campos com feedback em tempo real
+
+### 🎨 Interface e Experiência
 - Design system consistente e responsivo (Tailwind CSS)
-- Tipagem estática com TypeScript
-- Centralização de regras de negócio e cálculos em hooks e utils compartilhados
+- **Página About/Sobre** com informações institucionais
+- **Página Home** com hero image animada e apresentação
+- **Notificações toast** para feedback de ações (sucesso, erro, loading)
+- **Error Boundary** para captura e tratamento de erros
+- Loading states e skeletons para melhor UX
+- Sidebar responsiva com navegação intuitiva
+- Header dinâmico com informações do usuário
+- Footer com links e informações
+
+### 🔧 Recursos Técnicos
+- Tipagem estática completa com TypeScript
+- Redux Toolkit para gerenciamento de estado global
+- Custom hooks reutilizáveis (useTransactions, useAccount, useAuthProtection)
+- Serviços tipados com validação (TransactionService, AccountService)
+- Utilitários para formatação de moeda e datas
+- Normalização de texto para busca sem acentos
 
 ## 🛠️ Tecnologias
 
@@ -82,14 +177,67 @@ rm db.json && npm run setup:db
 
 📖 **Guia completo:** Ver [JSON Server Guide](./docs/json-server-guide.md)
 
-## 🚀 Como Executar Localmente
+## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
 
-- Node.js (versão 18+ recomendada)
-- npm ou yarn
-- Git
-- Docker Desktop (opcional, para ambiente containerizado)
+#### 🐳 Execução com Docker (Recomendado)
+
+A forma mais simples e consistente de rodar o projeto é via Docker, garantindo que todos os serviços funcionem corretamente sem conflitos de ambiente.
+
+- **Docker Engine** e **Docker Compose V2**
+  - **macOS:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) ou [Colima](https://github.com/abiosoft/colima) (alternativa leve)
+  - **Linux:** [Docker Engine](https://docs.docker.com/engine/install/) + [Docker Compose Plugin](https://docs.docker.com/compose/install/linux/)
+  - **Windows:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) com backend WSL2
+- **Portas 3030-3035** disponíveis no host
+- **Git** para clonar o repositório
+
+#### 💻 Execução local (alternativa)
+
+Se preferir rodar sem Docker:
+
+- **Node.js** versão 18 ou superior ([Download](https://nodejs.org/))
+- **npm** (incluído com Node.js) ou **yarn**
+- **Git** para clonar o repositório
+
+---
+
+## 🐳 Opção 1: Executar com Docker (Recomendado)
+
+A estrutura Docker oferece hot reload, isolamento por serviço e ambiente consistente entre diferentes máquinas.
+
+### Quick Start
+
+```bash
+# 1) Clone o repositório
+git clone <url-do-repositorio>
+cd fiap-tech-challenge-2
+
+# 2) Suba todos os serviços
+docker compose -f docker/docker-compose.dev.yml up
+```
+
+> 💡 Use `-d` para rodar em segundo plano: `docker compose -f docker/docker-compose.dev.yml up -d`
+
+**Pronto!** Acesse a aplicação em [http://localhost:3030](http://localhost:3030)
+
+### Recursos do ambiente Docker
+
+- **Hot reload** — Alterações no código refletem automaticamente nos containers
+- **Isolamento** — Cada serviço roda em seu próprio container
+- **Volumes persistentes** — Dados do JSON Server e uploads são mantidos
+- **Dependências gerenciadas** — Não há conflito com node_modules do host
+
+### Próximos passos e documentação
+
+Para operações avançadas, rebuild, troubleshooting e comandos específicos por sistema operacional, consulte:
+
+- [Fluxos de Trabalho no Docker](./docs/docker-workflow.md) — Rebuild de imagens, checklist pós-`git pull`, comandos úteis e passo a passo por SO.
+- [JSON Server Guide](./docs/json-server-guide.md) — Inspeção de volume, exportação e reset do `db.json`.
+
+---
+
+## 💻 Opção 2: Executar Localmente (Sem Docker)
 
 ### 📦 Instalação das Dependências
 
@@ -172,60 +320,7 @@ npm run dev:shell
 
 **🌐 Acesso:** Quando todos estiverem rodando, acesse: [http://localhost:3030](http://localhost:3030)
 
-## 🐳 Ambiente com Docker
-
-Para facilitar o desenvolvimento isolado ou integrado, adicionamos uma estrutura Docker pensada em hot reload e isolamento por serviço.
-
-### Estrutura gerada
-
-- `docker/Dockerfile.frontend` — base Node 22 + webpack dev server para os MFEs e o Shell.
-- `docker/Dockerfile.node` — imagem Node 22 para o servidor de upload.
-- `docker/Dockerfile.jsonserver` + `docker/scripts/api-entrypoint.sh` — `json-server` com setup automático do `db.json` a partir do template.
-- `docker/docker-compose.dev.yml` — orquestra shell, MFEs, shared, API mock e upload server.
-
-### Pré-requisitos
-
-- Docker Desktop (ou engine) >= 24 com Compose V2.
-- Porta 3030-3036 liberadas no host.
-- (Opcional) Execute `npm run setup:db` uma vez para garantir a presença de `db.json` antes do primeiro build; se não existir, o entrypoint da API cria a partir do template.
-
-### Subir apenas um serviço
-
-Você pode abrir um único serviço e suas dependências básicas em modo interativo:
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up shell
-```
-
-Esse comando inicia `shared`, `dashboard`, `transactions`, `investments`, `api` e `upload` automaticamente por causa do `depends_on`, além do próprio Shell.
-
-Para iniciar outro MFE em isolamento, aponte para o serviço correspondente. Exemplo para o investments:
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up investments shared api upload
-```
-
-### Subir toda a stack de uma vez
-
-```bash
-docker compose -f docker/docker-compose.dev.yml up
-```
-
-Use `-d` para rodar em segundo plano. Para desligar, utilize `Ctrl+C` ou `docker compose down` com o mesmo arquivo.
-
-### Hot reload e volumes
-
-- O código-fonte de cada pacote é montado como volume (`./<pacote>:/app`), permitindo que alterações locais reflitam instantaneamente nos containers.
-- `node_modules` fica dentro do container via volume anônimo (`/app/node_modules`) para evitar conflito com as máquinas host.
-- O diretório `uploads/` é montado em `/uploads` dentro do container, preservando anexos enviados.
-- O `json-server` utiliza o volume nomeado `docker_db-data`, evitando travamentos de I/O com o host. O conteúdo inicial é carregado a partir de `db.template.json`.
-
-### Leituras complementares
-
-- [Fluxos de Trabalho no Docker](./docs/docker-workflow.md) — Rebuild de imagens, checklist pós-`git pull` e passo a passo por sistema operacional.
-- [JSON Server Guide](./docs/json-server-guide.md) — Dicas para inspeção de volume, exportação e reset do `db.json`.
-- [Troubleshooting](./docs/troubleshooting.md) — Diagnóstico rápido para erros comuns em desenvolvimento.
-- [Limpeza do Ambiente](./docs/environment-cleanup.md) — Scripts e boas práticas para limpeza completa dos pacotes.
+---
 
 ## 🧪 Testes
 
@@ -312,10 +407,12 @@ npm run test:coverage
 ## 📜 Scripts Disponíveis
 
 ### Instalação e Setup
+
 - `npm run install:all` — Instala dependências em todos os projetos (raiz, shell, MFEs e shared)
 - `npm run setup:db` — Cria db.json a partir do template se não existir
 
 ### Desenvolvimento
+
 - `npm run dev:all` — Inicia todos os serviços em paralelo
 - `npm run dev:shell` — Inicia apenas o Shell
 - `npm run dev:dashboard` — Inicia apenas o Dashboard MFE
@@ -326,6 +423,7 @@ npm run test:coverage
 - `npm run dev:upload` — Inicia apenas o Upload Server
 
 ### Testes
+
 - `npm test` — Executa todos os testes de todos os módulos
 - `npm run test:shared` — Testes apenas do módulo shared
 - `npm run test:shell` — Testes apenas do Shell App
@@ -334,14 +432,6 @@ npm run test:coverage
 - `npm run test:investments` — Testes apenas do Investments MFE
 - `npm run test:watch` — Modo watch para todos os módulos (desenvolvimento)
 - `npm run test:coverage` — Gera relatórios de cobertura para todos os módulos
-
-## 🧩 Escopo da Fase 2 (Resumo)
-
-- Evolução para microfrontends com integração via Module Federation
-- Separação de responsabilidades por MFE e biblioteca compartilhada
-- Integração com API mock para fluxo de transações, investimentos, metas e dashboard
-- Reutilização de componentes, hooks e utilitários entre MFEs
-- Centralização de regras de negócio e cálculos
 
 ## 🛑 Encerrando a Execução
 

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  api:
+    image: karenkramekfiap/bytebank-api:latest
+    container_name: bytebank-api
+    ports:
+      - "3034:3034"
+    volumes:
+      - ../:/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    environment:
+      - PORT=3034
+    restart: unless-stopped
+    networks:
+      - bytebank-network
+    entrypoint: >
+      sh -c "
+        if [ -f /docker-entrypoint-initdb.d/init-db.sh ]; then
+          sh /docker-entrypoint-initdb.d/init-db.sh;
+        fi &&
+        exec json-server --watch /data/db.json --host 0.0.0.0 --port 3034
+      "
+
+  upload:
+    image: karenkramekfiap/bytebank-upload:latest
+    container_name: bytebank-upload
+    ports:
+      - "3035:3035"
+    volumes:
+      - ../uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - bytebank-network
+
+networks:
+  bytebank-network:
+    driver: bridge

@@ -5,7 +5,6 @@ import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
 import { TOAST_MESSAGES } from 'shared/constants/toast';
 import AccountService from 'shared/services/AccountService';
 import Footer from './Footer';
-import Header from './Header';
 import Sidebar from './Sidebar';
 
 // Hook personalizado para animação de contadores
@@ -106,8 +105,6 @@ const About: React.FC = () => {
 
   return (
     <>
-      <Header toggleSidebar={toggleSidebar} showAuthButtons={true} />
-
       <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">

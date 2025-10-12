@@ -1,6 +1,5 @@
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const webpack = require('webpack');
-const path = require('path');
 
 module.exports = {
   mode: 'development',
@@ -117,7 +116,8 @@ module.exports = {
       }
     }),
     new webpack.DefinePlugin({
-      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || 'http://localhost:3034')
+      'REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL ?? 'http://localhost:3034'),
+      'REACT_APP_UPLOAD_URL': JSON.stringify(process.env.REACT_APP_UPLOAD_URL ?? 'http://localhost:3035')
     })
   ],
   entry: './src/app/index.ts',

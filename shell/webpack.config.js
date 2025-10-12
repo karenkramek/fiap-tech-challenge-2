@@ -1,6 +1,8 @@
+const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const path = require('path');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const { DefinePlugin } = require("webpack");
 
 module.exports = {
   entry: "./src/app/index.tsx",
@@ -55,13 +57,18 @@ module.exports = {
     ],
   },
   plugins: [
+    new DefinePlugin({
+      'NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      'REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL ?? 'http://localhost:3034'),
+      'REACT_APP_UPLOAD_URL': JSON.stringify(process.env.REACT_APP_UPLOAD_URL ?? 'http://localhost:3035')
+    }),
     new ModuleFederationPlugin({
       name: "shell",
       remotes: {
-        shared: 'shared@http://localhost:3033/remoteEntry.js',
-        dashboardMFE: 'dashboardMFE@http://localhost:3031/remoteEntry.js',
-        transactionsMFE: 'transactionsMFE@http://localhost:3032/remoteEntry.js',
-        investmentsMFE: 'investmentsMFE@http://localhost:3036/remoteEntry.js',
+        dashboardMFE: `dashboardMFE@${process.env.REACT_APP_DASHBOARD_URL || 'http://localhost:3031'}/remoteEntry.js`,
+        transactionsMFE: `transactionsMFE@${process.env.REACT_APP_TRANSACTIONS_URL || 'http://localhost:3032'}/remoteEntry.js`,
+        shared: `shared@${process.env.REACT_APP_SHARED_URL || 'http://localhost:3033'}/remoteEntry.js`,
+        investmentsMFE: `investmentsMFE@${process.env.REACT_APP_INVESTMENTS_URL || 'http://localhost:3036'}/remoteEntry.js`,
       },
       shared: {
         react: {
@@ -107,6 +114,17 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: "public",
+          to: ".",
+          globOptions: {
+            ignore: ["**/index.html"],
+          },
+        },
+      ],
     }),
   ],
 };
