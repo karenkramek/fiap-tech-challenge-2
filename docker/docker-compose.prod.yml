@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
       - REACT_APP_DASHBOARD_URL=http://localhost:3031
       - REACT_APP_TRANSACTIONS_URL=http://localhost:3032
+      - REACT_APP_INVESTMENTS_URL=http://localhost:3036
       - REACT_APP_SHARED_URL=http://localhost:3033
       - DANGEROUSLY_DISABLE_HOST_CHECK=true
     networks:
