@@ -1,33 +1,25 @@
-import React from 'react';
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
+// import App from '../App';
+// import '../styles/styles.css';
+
+// const container = document.getElementById('root')!;
+// const root = ReactDOM.createRoot(container);
+// root.render(<App />);
+
 import { createRoot } from 'react-dom/client';
 import App from '../App';
 import '../styles/styles.css';
-import { BrowserRouter, useLocation, Navigate } from 'react-router-dom';
-import ErrorBoundary from 'shared/components/ui/ErrorBoundary';
-import { useAuthProtection } from 'shared/hooks/useAuthProtection';
-import { Provider } from 'react-redux';
-import store from 'shared/store';
+import { BrowserRouter } from 'react-router-dom';
 
 const container = document.getElementById('root');
 if (!container) {
   throw new Error('Root element not found');
 }
 
-function ProtectedApp() {
-  const location = useLocation();
-  const { isAuthenticated, loading, isPublicRoute } = useAuthProtection(location.pathname);
-  if (loading) return <div>Carregando...</div>;
-  if (!isAuthenticated && !isPublicRoute) return <Navigate to="/" replace />;
-  return <App />;
-}
-
 const root = createRoot(container);
 root.render(
-  <Provider store={store}>
-    <ErrorBoundary>
-      <BrowserRouter>
-        <ProtectedApp />
-      </BrowserRouter>
-    </ErrorBoundary>
-  </Provider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );

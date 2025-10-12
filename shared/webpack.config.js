@@ -11,12 +11,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
-    alias: {
-      react: require('path').resolve(__dirname, '../shell/node_modules/react'),
-      'react-dom': require('path').resolve(__dirname, '../shell/node_modules/react-dom'),
-      'react-redux': require('path').resolve(__dirname, '../shell/node_modules/react-redux'),
-      '@reduxjs/toolkit': require('path').resolve(__dirname, '../shell/node_modules/@reduxjs/toolkit')
-    }
   },
   module: {
     rules: [

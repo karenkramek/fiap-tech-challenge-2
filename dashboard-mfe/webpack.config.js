@@ -1,4 +1,3 @@
-const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const { DefinePlugin } = require('webpack');
@@ -15,12 +14,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
-    alias: {
-      react: path.resolve(__dirname, '../shell/node_modules/react'),
-      'react-dom': path.resolve(__dirname, '../shell/node_modules/react-dom'),
-      'react-redux': path.resolve(__dirname, '../shell/node_modules/react-redux'),
-      '@reduxjs/toolkit': path.resolve(__dirname, '../shell/node_modules/@reduxjs/toolkit')
-    }
   },
   module: {
     rules: [
