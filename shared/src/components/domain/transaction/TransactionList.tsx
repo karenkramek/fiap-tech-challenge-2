@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from 'lucide-react';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useGroupedTransactions } from "../../../hooks/useGroupedTransactions";
 import { useModal } from '../../../hooks/useModal';
 import { useTransactions } from '../../../hooks/useTransactions';
@@ -113,7 +113,20 @@ export interface TransactionListProps {
 const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactions: propTransactions, onTransactionsChanged, mode = 'dashboard', search = '', totalTransactions }) => {
   const { transactions: hookTransactions, deleteTransaction, fetchTransactions, loading } = useTransactions();
   const transactions = propTransactions || hookTransactions;
-  const filteredTransactions = filterTransactions(transactions, search);
+  const lastFilterRef = useRef<string>("");
+  const lastTransactionsRef = useRef<Transaction[] | null>(null);
+  const lastFilteredRef = useRef<Transaction[]>([]);
+
+  // Filtro otimizado: só filtra se search mudou ou transactions mudou
+  let filteredTransactions: Transaction[];
+  if (search !== lastFilterRef.current || transactions !== lastTransactionsRef.current) {
+    filteredTransactions = filterTransactions(transactions, search);
+    lastFilterRef.current = search;
+    lastTransactionsRef.current = transactions;
+    lastFilteredRef.current = filteredTransactions;
+  } else {
+    filteredTransactions = lastFilteredRef.current;
+  }
 
   // Limitar para dashboard: mostrar só as 5 mais recentes
   const displayedTransactions =
@@ -125,11 +138,29 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
   const [page, setPage] = useState(1);
   const [infiniteTransactions, setInfiniteTransactions] = useState<Transaction[]>([]);
 
+  // Resetar paginação ao mudar o filtro de busca ou modo
+  useEffect(() => {
+    if (mode === 'full') {
+      setPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, mode]);
+
+  // Atualizar lista paginada ao mudar a página, displayedTransactions ou mode
   useEffect(() => {
     if (mode === 'full') {
       setInfiniteTransactions(displayedTransactions.slice(0, page * ITEMS_PER_PAGE));
     }
-  }, [displayedTransactions, page, mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, displayedTransactions, mode]);
+
+  // Corrigir possível loop: se page > 1 e displayedTransactions mudou (ex: novo filtro), garantir que page volte para 1
+  useEffect(() => {
+    if (mode === 'full' && page > 1 && infiniteTransactions.length > displayedTransactions.length) {
+      setPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedTransactions]);
 
   const transactionsToRender = mode === 'full' ? infiniteTransactions : displayedTransactions;
 
@@ -253,7 +284,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
                     const isLastGroup = idx === sortedKeys.length - 1;
                     const isLastItem = tIdx === grouped[key].length - 1;
                     const isFullMode = mode === 'full';
-                    const showGradient = isFullMode && isLastGroup && isLastItem && !showAllRecordsMessage;
+                    const showGradient = isFullMode && isLastGroup && isLastItem && !showAllRecordsMessage && filteredTransactions.length >= 6;
                     return (
                       <React.Fragment key={transaction.id}>
                         <div style={showGradient ? {

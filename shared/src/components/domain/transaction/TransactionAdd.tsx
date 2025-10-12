@@ -69,8 +69,8 @@ const TransactionAdd: React.FC<TransactionAddProps> = ({
           required
         >
           {Object.values(TransactionType)
-            .filter(type => type !== TransactionType.INVESTMENT && type !== TransactionType.GOAL)
-            .map((type) => (
+            .filter((type: TransactionType) => type !== TransactionType.INVESTMENT && type !== TransactionType.GOAL)
+            .map((type: TransactionType) => (
               <option key={type} value={type}>{getTransactionTypeLabel(type)}</option>
             ))}
         </select>

@@ -281,7 +281,7 @@ export class TransactionService extends BaseService {
   }
 
   /**
-   * Atualiza o saldo da conta, enviando todos os campos obrigatórios via PUT.
+   * Atualiza o saldo da conta, enviando apenas o campo balance via PATCH.
    */
   private static async updateAccountBalance(accountId: string, balanceChange: number): Promise<void> {
     try {
@@ -290,26 +290,19 @@ export class TransactionService extends BaseService {
       const account = accountsData.find(acc => acc.id === accountId);
       if (!account) throw new Error('Conta não encontrada');
       const newBalance = account.balance + balanceChange;
-      await service.put(`/accounts/${accountId}`, {
-        id: account.id,
-        name: account.name,
-        balance: newBalance
-      });
+      // PATCH apenas o campo balance
+      await service.patch(`/accounts/${accountId}`, { balance: newBalance });
     } catch (error) {
-      // Fallback usando fetch direto com PUT
+      // Fallback usando fetch direto com PATCH
       try {
         const accountResponse = await fetch(`http://localhost:3034/accounts/${accountId}`);
         if (!accountResponse.ok) throw new Error('Account not found');
         const accountData = await accountResponse.json();
         const newBalance = accountData.balance + balanceChange;
         await fetch(`http://localhost:3034/accounts/${accountId}`, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: accountData.id,
-            name: accountData.name,
-            balance: newBalance
-          })
+          body: JSON.stringify({ balance: newBalance })
         });
       } catch (fallbackError) {
         throw fallbackError;
