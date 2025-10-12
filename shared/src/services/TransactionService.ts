@@ -293,17 +293,12 @@ export class TransactionService extends BaseService {
       // PATCH apenas o campo balance
       await service.patch(`/accounts/${accountId}`, { balance: newBalance });
     } catch (error) {
-      // Fallback usando fetch direto com PATCH
+      // Fallback usando api direto com PATCH
       try {
-        const accountResponse = await fetch(`http://localhost:3034/accounts/${accountId}`);
-        if (!accountResponse.ok) throw new Error('Account not found');
-        const accountData = await accountResponse.json();
+        const accountResponse = await api.get(`/accounts/${accountId}`);
+        const accountData = accountResponse.data;
         const newBalance = accountData.balance + balanceChange;
-        await fetch(`http://localhost:3034/accounts/${accountId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ balance: newBalance })
-        });
+        await api.patch(`/accounts/${accountId}`, { balance: newBalance });
       } catch (fallbackError) {
         throw fallbackError;
       }

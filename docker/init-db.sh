@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # Script de inicialização do banco de dados
-# Este script é executado SEMPRE que o container sobe
-# Garante que o db.json seja resetado a partir do template
+# Executado UMA VEZ quando o container inicia
+# Cria db.json a partir do template se não existir ou estiver desatualizado
 
 set -e
 
 DB_FILE="/data/db.json"
 TEMPLATE_FILE="/data/db.template.json"
+LOCK_FILE="/data/.db-initialized"
 
-echo "🔄 Inicializando banco de dados..."
+echo "🔄 Verificando inicialização do banco de dados..."
 
 # Verifica se o template existe
 if [ ! -f "$TEMPLATE_FILE" ]; then
@@ -17,29 +18,14 @@ if [ ! -f "$TEMPLATE_FILE" ]; then
     exit 1
 fi
 
-# SEMPRE sobrescreve o db.json com o template
-echo "📋 Resetando db.json a partir do template..."
+# Se o db.json não existe OU se foi solicitado reset, cria a partir do template
+if [ ! -f "$DB_FILE" ]; then
+    echo "📋 Criando db.json a partir do template..."
+    cp "$TEMPLATE_FILE" "$DB_FILE"
+    echo "✅ Banco de dados criado com sucesso!"
+else
+    echo "ℹ️  db.json já existe, mantendo dados atuais"
+    echo "💡 Para resetar, delete o arquivo db.json e reinicie o container"
+fi
 
-# Define arquivo temporário com PID único
-TEMP_FILE="/data/db.json.tmp.$$"
-
-# Função de limpeza em caso de erro
-cleanup() {
-    if [ -f "$TEMP_FILE" ]; then
-        echo "🧹 Limpando arquivo temporário..."
-        rm -f "$TEMP_FILE"
-    fi
-}
-
-# Registra função de limpeza para executar em caso de erro ou saída
-trap cleanup EXIT ERR
-
-# Copia template para arquivo temporário
-cp "$TEMPLATE_FILE" "$TEMP_FILE"
-
-# Move atomicamente (sobrescreve o arquivo existente)
-# mv é atômico e funciona mesmo se o arquivo estiver aberto
-mv -f "$TEMP_FILE" "$DB_FILE"
-
-echo "✅ Banco de dados resetado com sucesso!"
-echo "ℹ️  Base limpa iniciada a partir do template"
+echo "✅ Inicialização concluída!"

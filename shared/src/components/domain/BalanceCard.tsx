@@ -6,6 +6,7 @@ import { formatCurrencyWithSymbol } from '../../utils/currency';
 import { Transaction } from '../../models/Transaction';
 import { TransactionType } from '../../types/TransactionType';
 import { useAccount } from '../../hooks/useAccount';
+import api from '../../services/api';
 
 interface BalanceCardProps {
   transactions: Transaction[];
@@ -32,24 +33,17 @@ function calculateBalance(transactions: Transaction[]) {
 const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, onToggleBalance }) => {
   const { account, currentUser, refreshAccount } = useAccount();
   const [realBalance, setRealBalance] = useState<number>(0);
-  
+
   const accountName = currentUser?.name || account?.name || '';
-  
+
   // Buscar saldo real da API
   const fetchRealBalance = async () => {
     try {
       const accountId = account?.id || currentUser?.id || '1';
-      
-      const response = await fetch(`http://localhost:3034/accounts/${accountId}`);
-      if (!response.ok) {
-        // Fallback: usar saldo do Redux ou calculado das transações
-        setRealBalance(account?.balance || currentUser?.balance || calculateBalance(transactions));
-        return;
-      }
-      
-      const accountData = await response.json();
-      setRealBalance(accountData.balance);
-      
+
+      const response = await api.get(`/accounts/${accountId}`);
+      setRealBalance(response.data.balance);
+
     } catch (error) {
       // Fallback: usar saldo do Redux ou calculado das transações
       setRealBalance(account?.balance || currentUser?.balance || calculateBalance(transactions));
@@ -76,7 +70,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({ transactions, showBalance, on
     };
 
     window.addEventListener('balanceUpdated', handleBalanceUpdate);
-    
+
     return () => window.removeEventListener('balanceUpdated', handleBalanceUpdate);
   }, [refreshAccount]);
 

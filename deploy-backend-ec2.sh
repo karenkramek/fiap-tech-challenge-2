@@ -22,26 +22,26 @@ echo -e "${BLUE}[2/5] Atualizando repositório...${NC}"
 cd ~/fiap-tech-challenge-2
 git pull
 
-# 3. Configurar banco de dados (template)
+# 3. Verificar template do banco de dados
 echo -e "${BLUE}[3/5] Verificando template do banco de dados...${NC}"
 if [ ! -f "db.template.json" ]; then
     echo -e "${RED}❌ Erro: db.template.json não encontrado!${NC}"
     exit 1
 fi
-echo -e "${GREEN}✓ Template encontrado (db.json será resetado automaticamente no próximo start)${NC}"
+echo -e "${GREEN}✓ Template encontrado (será usado pelo container)${NC}"
 
 # 4. Tornar script de inicialização executável
 chmod +x docker/init-db.sh
 
-# 4. Criar pasta de uploads
+# 5. Criar pasta de uploads
 mkdir -p uploads
 
-# 5. Subir apenas API + Upload
+# 6. Subir apenas API + Upload
 echo -e "${BLUE}[4/5] Iniciando API e Upload Server...${NC}"
 docker compose -f docker/docker-compose.backend.yml pull
 docker compose -f docker/docker-compose.backend.yml up -d
 
-# 6. Verificar
+# 7. Verificar
 echo -e "${BLUE}[5/5] Verificando containers...${NC}"
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 

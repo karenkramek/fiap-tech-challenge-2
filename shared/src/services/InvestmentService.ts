@@ -1,9 +1,6 @@
-import axios from 'axios';
 import { InvestmentDTO } from '../dtos/Investment.dto';
 import type { AccountDTO } from '../dtos/Account.dto';
-
-const API_URL = 'http://localhost:3034/investments';
-const ACCOUNT_API_URL = 'http://localhost:3034/accounts';
+import api from './api';
 
 /**
  * Service responsável por operações de investimentos.
@@ -14,41 +11,41 @@ export const InvestmentService = {
    * Busca todos os investimentos de uma conta.
    */
   async getAll(accountId: string): Promise<InvestmentDTO[]> {
-    const res = await axios.get(`${API_URL}?accountId=${accountId}`);
+    const res = await api.get(`/investments?accountId=${accountId}`);
     return res.data || [];
   },
   /**
    * Busca um investimento pelo ID.
    */
   async getById(id: string): Promise<InvestmentDTO | null> {
-    const res = await axios.get(`${API_URL}/${id}`);
+    const res = await api.get(`/investments/${id}`);
     return res.data || null;
   },
   /**
    * Cria um novo investimento.
    */
   async create(investment: InvestmentDTO): Promise<InvestmentDTO> {
-    const res = await axios.post(API_URL, investment);
+    const res = await api.post('/investments', investment);
     return res.data;
   },
   /**
    * Atualiza um investimento existente.
    */
   async update(id: string, data: Partial<InvestmentDTO>): Promise<InvestmentDTO> {
-    const res = await axios.patch(`${API_URL}/${id}`, data);
+    const res = await api.patch(`/investments/${id}`, data);
     return res.data;
   },
   /**
    * Remove um investimento pelo ID.
    */
   async remove(id: string): Promise<void> {
-    await axios.delete(`${API_URL}/${id}`);
+    await api.delete(`/investments/${id}`);
   },
   /**
    * Busca uma conta pelo ID.
    */
   async getAccountById(accountId: string): Promise<AccountDTO | null> {
-    const res = await axios.get(`${ACCOUNT_API_URL}?id=${accountId}`);
+    const res = await api.get(`/accounts?id=${accountId}`);
     if (Array.isArray(res.data) && res.data.length > 0) {
       return res.data[0];
     }
@@ -58,12 +55,12 @@ export const InvestmentService = {
    * Atualiza o saldo da conta, enviando todos os campos obrigatórios via PUT.
    */
   async updateAccountBalance(accountId: string, newBalance: number): Promise<AccountDTO> {
-    const resGet = await axios.get(`${ACCOUNT_API_URL}/${accountId}`);
+    const resGet = await api.get(`/accounts/${accountId}`);
     const account: AccountDTO = resGet.data;
     if (!account || !account.name) {
       throw new Error('Conta não encontrada ou sem nome');
     }
-    const res = await axios.put(`${ACCOUNT_API_URL}/${accountId}`, {
+    const res = await api.put(`/accounts/${accountId}`, {
       id: account.id,
       name: account.name,
       balance: newBalance
