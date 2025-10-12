@@ -42,10 +42,10 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay" role="dialog" aria-modal="true">
       <div
         ref={modalRef}
-        className={`relative bg-white-50 rounded-xl shadow-lg w-full ${sizeClasses[size]} mx-4 ${className} p-6`}
+        className={`relative bg-white-50 rounded-xl shadow-lg w-full ${sizeClasses[size]} mx-4 p-6 ${className}`}
       >
         <ModalCloseButton onClick={onClose} />
         {title && <h2 className="text-xl font-semibold text-primary-700 mb-4 pr-8">{title}</h2>}

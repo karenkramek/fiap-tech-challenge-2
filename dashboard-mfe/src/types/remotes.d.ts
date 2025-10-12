@@ -1,11 +1,11 @@
 // Tipos dos módulos remotos do shared para uso com Module Federation.
-// Mantenha este arquivo atualizado para garantir tipagem ao importar do shared.
-// Só é necessário para o TypeScript (não afeta o runtime).
+// Atualizado para refletir todos os tipos, campos e hooks reais do domínio.
 
 // HOOKS
 
 declare module 'shared/hooks/useTransactions' {
-  import { Transaction, TransactionType } from 'shared/models/Transaction';
+  import { Transaction } from 'shared/models/Transaction';
+  import { TransactionType } from 'shared/types/TransactionType';
   export function useTransactions(): {
     transactions: Transaction[];
     loading: boolean;
@@ -16,7 +16,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     updateTransaction: (
       id: string,
@@ -24,7 +26,9 @@ declare module 'shared/hooks/useTransactions' {
       amount: number,
       date: Date,
       description?: string,
-      attachmentFile?: File
+      attachmentFile?: File,
+      goalId?: string,
+      investmentId?: string
     ) => Promise<Transaction>;
     deleteTransaction: (id: string) => Promise<boolean>;
   };
@@ -59,6 +63,28 @@ declare module 'shared/hooks/useGroupedTransactions' {
   };
 }
 
+declare module 'shared/hooks/useAuthProtection' {
+  export interface AuthConfig {
+    publicRoutes?: string[];
+    redirectTo?: string;
+    showToast?: boolean;
+    toastMessage?: string;
+  }
+  export interface AuthCheckResult {
+    isAuthenticated: boolean;
+    loading: boolean;
+    isPublicRoute: boolean;
+    shouldRedirect: boolean;
+    shouldShowToast: boolean;
+    currentUser: { id: string; name: string; email: string } | null;
+  }
+  export const DEFAULT_PUBLIC_ROUTES: string[];
+  export function useAuthProtection(
+    currentPath: string,
+    config?: AuthConfig
+  ): AuthCheckResult;
+}
+
 // COMPONENTES
 
 declare module 'shared/components/ui/Button' {
@@ -80,17 +106,21 @@ declare module 'shared/components/ui/Icon' {
 }
 
 declare module 'shared/components/ui/ConfirmationModal' {
-  interface Props {
+  import * as React from 'react';
+  interface ConfirmationModalProps {
     open: boolean;
     title: string;
-    description: string;
-    confirmText: string;
-    cancelText: string;
+    description: React.ReactNode;
+    confirmText?: string;
+    cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
     loading?: boolean;
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    showCancelButton?: boolean;
+    confirmVariant?: 'danger' | 'warning' | 'success';
   }
-  const ConfirmationModal: React.FC<Props>;
+  const ConfirmationModal: React.FC<ConfirmationModalProps>;
   export default ConfirmationModal;
 }
 
@@ -196,8 +226,6 @@ declare module 'shared/components/domain/BalanceCard' {
 declare module 'shared/components/ui/FeedbackProvider' {
   const FeedbackProvider: React.ComponentType;
   export default FeedbackProvider;
-
-  // Toast functions
   export function showSuccess(msg: string, duration?: number): void;
   export function showError(msg: string, duration?: number): void;
   export function showLoading(msg: string): void;
@@ -212,7 +240,6 @@ declare module 'shared/components/ui/LoadingSpinner' {
   const LoadingSpinner: React.ComponentType<{ size?: number }>;
   export default LoadingSpinner;
 }
-
 declare module 'shared/components/ui/ModalCloseButton' {
   const ModalCloseButton: React.FC<{
     onClick: () => void;
@@ -222,24 +249,41 @@ declare module 'shared/components/ui/ModalCloseButton' {
   export default ModalCloseButton;
 }
 
+declare module 'shared/components/ui/BadgeSuggestions' {
+  interface BadgeSuggestionsProps {
+    suggestions: string[];
+    onSelect: (value: string) => void;
+  }
+  const BadgeSuggestions: React.FC<BadgeSuggestionsProps>;
+  export default BadgeSuggestions;
+}
+
+declare module 'shared/constants/transactionDescriptions' {
+  export const TRANSACTION_DESCRIPTION_SUGGESTIONS: string[];
+  export const INVESTMENT_DESCRIPTION_SUGGESTIONS: string[];
+}
+
 // MODELS & TYPES
 
 declare module 'shared/models/Transaction' {
-  export interface Transaction {
-    id: string;
-    type: any;
+  import { TransactionType } from 'shared/types/TransactionType';
+  export class Transaction {
+    readonly id: string;
+    accountId: string;
+    type: TransactionType;
     amount: number;
-    date: string | Date;
+    date: Date;
     description?: string;
     attachmentPath?: string;
+    goalId?: string;
+    investmentId?: string;
     isIncome(): boolean;
     isExpense(): boolean;
-  }
-  export enum TransactionType {
-    DEPOSIT = 'DEPOSIT',
-    WITHDRAWAL = 'WITHDRAWAL',
-    TRANSFER = 'TRANSFER',
-    PAYMENT = 'PAYMENT'
+    getFormattedAmount(): string;
+    getFormattedDate(): string;
+    hasAttachment(): boolean;
+    toJSON(): any;
+    // ...outros métodos
   }
 }
 
@@ -248,6 +292,9 @@ declare module 'shared/models/Account' {
     id: string;
     name: string;
     balance: number;
+    email?: string;
+    password?: string;
+    // ...outros métodos
   }
 }
 
@@ -256,8 +303,12 @@ declare module 'shared/types/TransactionType' {
     DEPOSIT = 'DEPOSIT',
     WITHDRAWAL = 'WITHDRAWAL',
     TRANSFER = 'TRANSFER',
-    PAYMENT = 'PAYMENT'
+    PAYMENT = 'PAYMENT',
+    INVESTMENT = 'INVESTMENT',
+    GOAL = 'GOAL'
   }
+  export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string>;
+  export const TRANSACTION_TYPE_FILENAME: Record<TransactionType, string>;
   export function getTransactionTypeLabel(type: TransactionType): string;
 }
 
@@ -301,12 +352,17 @@ declare module 'shared/services/api' {
 // DTOS
 
 declare module 'shared/dtos/Transaction.dto' {
+  import { TransactionType } from 'shared/types/TransactionType';
   export interface TransactionDTO {
     id: string;
-    type: string;
+    accountId: string;
+    type: TransactionType;
     amount: number;
     date: string;
     description?: string;
+    attachmentPath?: string;
+    goalId?: string;
+    investmentId?: string;
   }
 }
 
@@ -315,5 +371,30 @@ declare module 'shared/dtos/Account.dto' {
     id: string;
     name: string;
     balance: number;
+    email?: string;
+    password?: string;
   }
+}
+
+declare module 'shared/constants/toast' {
+  export const TOAST_DURATION: { SHORT: number; NORMAL: number; LONG: number };
+  export const TOAST_MESSAGES: {
+    LOGIN_SUCCESS: string;
+    LOGOUT_SUCCESS: string;
+    REGISTER_SUCCESS: string;
+    REGISTER_ERROR: string;
+    AUTH_REQUIRED: string;
+    TRANSACTION_SUCCESS: string;
+    TRANSACTION_ERROR: string;
+    INVALID_AMOUNT: string;
+  };
+}
+
+declare module 'shared/store' {
+  import { Store } from 'redux';
+  import { ThunkDispatch } from '@reduxjs/toolkit';
+  export type RootState = ReturnType<Store['getState']>;
+  export type AppDispatch = ThunkDispatch<RootState, any, any>;
+  const store: Store;
+  export default store;
 }

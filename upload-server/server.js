@@ -7,6 +7,14 @@ const fs = require('fs');
 const app = express();
 const PORT = 3035;
 
+const TRANSACTION_TYPE_FILENAME = {
+  'DEPOSIT': 'deposito',
+  'WITHDRAWAL': 'saque',
+  'TRANSFER': 'transferencia',
+  'PAYMENT': 'pagamento',
+  'INVESTMENT': 'investimento'
+};
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -26,28 +34,9 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const { transactionType } = req.body;
     const timestamp = Date.now();
-
-    console.log('📁 Upload filename generation:');
-    console.log('  - transactionType received:', transactionType);
-    console.log('  - timestamp:', timestamp);
-    console.log('  - original filename:', file.originalname);
-
-    // Mapeia os tipos para nomes mais limpos
-    const typeMapping = {
-      'DEPOSIT': 'deposito',
-      'WITHDRAWAL': 'saque',
-      'TRANSFER': 'transferencia',
-      'PAYMENT': 'pagamento'
-    };
-
-    const typeName = typeMapping[transactionType] || 'transacao';
+    const typeName = TRANSACTION_TYPE_FILENAME[transactionType] || 'transacao';
     const fileExtension = file.originalname.split('.').pop();
-
-    // Formato simples: timestamp_tipo.extensao
     const fileName = `${timestamp}_${typeName}.${fileExtension}`;
-
-    console.log('  - final fileName:', fileName);
-
     cb(null, fileName);
   }
 });

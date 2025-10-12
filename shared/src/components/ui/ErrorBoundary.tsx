@@ -26,7 +26,7 @@ class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div style={{ padding: '2rem', background: '#fee', border: '1px solid #f00' }}>
+        <div style={{ padding: '2rem', background: '#fee', border: '1px solid #f00' }} role="alert" aria-live="assertive">
           <h2>Ocorreu um erro ao carregar o microfrontend!</h2>
           <details>
             <pre>{this.state.error?.message}</pre>

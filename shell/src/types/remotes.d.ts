@@ -11,6 +11,11 @@ declare module 'transactionsMFE/TransactionsPage' {
   export default TransactionsPage;
 }
 
+declare module 'investmentsMFE/InvestmentsPage' {
+  const InvestmentsPage: React.ComponentType<any>;
+  export default InvestmentsPage;
+}
+
 declare module 'shared/hooks/useAccount' {
   interface Account {
     id: string;
@@ -126,3 +131,7 @@ declare module 'shared/components/ui/ModalCloseButton' {
   }>;
   export default ModalCloseButton;
 }
+
+declare module 'shared/store';
+declare module 'shared/components/domain/login/LoginModal';
+declare module 'shared/components/domain/login/RegisterModal';

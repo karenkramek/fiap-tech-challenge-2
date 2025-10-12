@@ -12,102 +12,66 @@ ByteBank: Arquitetura de Microfrontends com Webpack Module Federation + Cloud (A
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
 [![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?style=flat&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/ec2/)
 
-## 🎯 Contexto da Fase 2
+## 1. O que é o ByteBank?
 
-Esta é a evolução do [projeto da Fase 1](https://github.com/karenkramek/bytebank-fiap) para a Fase 2 do Tech Challenge (FIAP - Front-end Engineering). Nesta fase avançamos para uma **arquitetura de microfrontends**, compondo a aplicação a partir de múltiplos MFEs integrados via **Module Federation**, mantendo os princípios de componentização, reutilização e tipagem estática.
+O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetura de microfrontends, utilizando React, TypeScript, Webpack Module Federation, Tailwind CSS e infraestrutura híbrida (Vercel + AWS EC2). O objetivo é demonstrar integração de múltiplos MFEs, componentização, reutilização, tipagem estática e boas práticas de DevOps.
 
-### 🚀 Principais Implementações da Fase 2:
+## 2. Contexto do Projeto
 
-- **Arquitetura de Microfrontends:** Webpack Module Federation para integração dinâmica entre Shell, Dashboard, Transactions e Shared Library
-- **Gerenciamento de Estado:** Redux Toolkit com TypeScript para estado global compartilhado entre MFEs
-- **Autenticação e Autorização:** Sistema de login/logout com proteção de rotas e controle de acesso
-- **Deployment Híbrido Cloud:**
-  - **Vercel (Frontends):** 4 projetos deployados com CDN global, HTTPS automático e deploy contínuo via GitHub
-  - **AWS EC2 (Backend):** API Server e Upload Server containerizados com Docker em instância t3.micro (free tier)
-- **CI/CD:** GitHub Actions para build e push automático de imagens Docker para Docker Hub
-- **Testes Automatizados:** 57 testes com Jest e React Testing Library cobrindo componentes, hooks e integrações
-- **Containerização:** Docker Compose para ambiente de desenvolvimento consistente e isolado
+- Evolução do [projeto da Fase 1](https://github.com/karenkramek/bytebank-fiap) para arquitetura de microfrontends.
+- Integração dinâmica entre Shell, Dashboard, Transactions, Investments e Shared Library.
+- Deploy híbrido: frontends na Vercel, backends na AWS EC2.
+- CI/CD, testes automatizados, containerização e segurança.
 
-## 📋 Gestão de Projeto
+## 3. Visão Geral da Arquitetura
 
-- 📊 **Trello (Fase 2):** [Board de Acompanhamento de Atividades](https://trello.com/b/rP7VdDRt/fase-2)
-- 🎨 **Figma (Fase 2):** [Protótipo e Design System](https://www.figma.com/design/tpk67fOWALc2rEf9r6bZjG/ByteBank-4FRNT---Fase2?node-id=1-750)
-- 📹 **Vídeo de Apresentação (Fase 2):** TBD (em produção)
-- 🔗 **Repositório Fase 1:** [bytebank-fiap](https://github.com/karenkramek/bytebank-fiap)
-
-## 👥 Integrantes do Grupo
-
-| Nome                                            | Email                                                         | RM                                          |
-|-------------------------------------------------|---------------------------------------------------------------|---------------------------------------------|
-| Fernanda Raquel Campos Jiacinto                 | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com)     | [366526](mailto:RM366526@fiap.com.br)       |
-| Kaique Kenichi Furukawa Endo                    | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com)   | [366448](mailto:RM366448@fiap.com.br)       |
-| Karen Cristina Kramek                           | [kakakramek@gmail.com](mailto:kakakramek@gmail.com)           | [361140](mailto:RM361140@fiap.com.br)       |
-| Tatiane Gabrielle Marçal Rodrigues da Costa     | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | [365215](mailto:RM365215@fiap.com.br)     |
-
-## 🌐 Deploy em Produção
-
-A aplicação ByteBank está deployada em **arquitetura híbrida cloud**, combinando o melhor de cada plataforma:
-
-### 🚀 Frontends (Vercel)
-- **Shell App:** https://bytebank-shell.vercel.app
-- **Dashboard MFE:** https://dashboard-mfe-eta.vercel.app
-- **Transactions MFE:** https://transactions-mfe-iota.vercel.app
-- **Shared Library:** https://bytebank-shared.vercel.app
-
-### 🖥️ Backend (AWS EC2)
-- **API Server:** http://44.206.72.128:3034
-- **Upload Server:** http://44.206.72.128:3035
-
-> ⚠️ **Nota de Segurança:** Este é um ambiente de demonstração para fins acadêmicos.
-> A API é pública e contém apenas dados mock/exemplo. Não utilize para dados sensíveis reais.
-
-📖 **Arquitetura de Deploy:** Ver [Deployment Híbrido Vercel + AWS](./docs/hybrid-deployment.md) para entender como funciona a estratégia de deploy em múltiplas clouds.
-
-🔒 **Segurança e Boas Práticas:** Ver [Práticas de Segurança em Cloud](./docs/SECURITY_PRACTICES.md) para detalhes sobre autenticação, autorização, proteção de rotas, configurações de segurança AWS/Vercel e checklist de conformidade.
-
-🔄 **Reset Automático do Banco de Dados:** O `db.json` é automaticamente resetado a cada deploy no EC2 (importante para novos módulos como investimentos).
-
-## 🧱 Visão da Arquitetura
+### 3.1. Diagrama e Fluxo
 
 - Shell App (porta 3030) — Host principal da aplicação
 - Dashboard MFE (porta 3031) — Microfrontend de Dashboard
 - Transactions MFE (porta 3032) — Microfrontend de Transações
+- Investments MFE (porta 3036) — Microfrontend de Investimentos e Metas
 - Shared Library (porta 3033) — Biblioteca compartilhada (componentes, hooks, utils)
 - API Server (porta 3034) — Backend mock com JSON Server
 - Upload Server (porta 3035) — Servidor para upload de arquivos
 
-### Componentes e responsabilidades
+#### Fluxo entre os módulos
 
-| Camada                | Função principal                                                                 | Destaques técnicos |
-|-----------------------|-----------------------------------------------------------------------------------|--------------------|
-| `shell/`              | Orquestra layout, roteamento e consumo dos remotes via Module Federation.        | Webpack host expõe `dashboardMFE`, `transactionsMFE`, `shared`. |
-| `dashboard-mfe/`      | Entrega o dashboard de saldo, gráficos e cartões informativos.                   | Exposto como `dashboardMFE/Dashboard`. |
-| `transactions-mfe/`   | Lista, filtra e cria transações, delegando componentes de domínio à `shared`.    | Exposto como `transactionsMFE/TransactionsPage`. |
-| `shared/`             | Biblioteca federada com componentes UI, hooks, serviços, DTOs e utilidades.      | Compartilhamento de estado/serviços entre MFEs. |
-| `upload-server/`      | API Express dedicada a upload/remoção de anexos (persistidos em `uploads/`).     | Usa Multer, expõe `/api/upload` e `/uploads`. |
-| `db.json` + JSON API  | Mock persistido do domínio (contas, transações) servido pelo `json-server`.       | Endpoint base `http://localhost:3034`. |
+1. `shared` publica remotes de componentes e serviços reutilizáveis.
+2. MFEs consomem `shared` e expõem suas páginas como remotes próprios.
+3. O `shell` carrega esses remotes dinamicamente e renderiza o conteúdo.
+4. Todos consomem o `json-server` para dados e o `upload-server` para anexos.
+5. Arquivos enviados ficam disponíveis via `/uploads`.
 
-### Fluxo entre os módulos
+#### Deploy em Produção
 
-1. `shared` publica remotes de componentes e serviços reutilizáveis (`shared@.../remoteEntry.js`).
-2. `dashboard-mfe` e `transactions-mfe` consomem `shared` e expõem suas páginas como remotes próprios.
-3. O `shell` carrega esses remotes dinamicamente e renderiza o conteúdo dentro do layout host.
-4. Tanto os MFEs quanto o `shell` chamam o `json-server` para dados do domínio e o `upload-server` para anexos.
-5. Os arquivos enviados ficam disponíveis via `/uploads`, servidos diretamente pelo servidor de upload.
+- **Frontends (Vercel):**
+  - Shell App: https://bytebank-shell.vercel.app
+  - Dashboard MFE: https://dashboard-mfe-eta.vercel.app
+  - Transactions MFE: https://transactions-mfe-iota.vercel.app
+  - Shared Library: https://bytebank-shared.vercel.app
+- **Backend (AWS EC2):**
+  - API Server: http://44.206.72.128:3034
+  - Upload Server: http://44.206.72.128:3035
 
-Essa separação permite evoluir os MFEs e a lib compartilhada de forma independente, mantendo contratos via DTOs/serviços, e já antecipa uma implantação distribuída (por exemplo, buckets S3 + CloudFront para MFEs e ECS/Fargate para APIs) — tópico que podemos detalhar na próxima etapa.
+> ⚠️ Ambiente de demonstração acadêmico. Não utilize para dados sensíveis reais.
 
-## ✨ Funcionalidades
+## 4. Funcionalidades
+
+### ♿ Acessibilidade
+- Uso de `aria-label`, `role`, `aria-live` e outros atributos para tornar componentes acessíveis a leitores de tela
+- Botões, campos de busca, modais e feedbacks com suporte a navegação assistiva
+- Feedback dinâmico anunciado para usuários de tecnologias assistivas
+- Estrutura semântica para navegação por teclado e leitores de tela
 
 ### 🏦 Dashboard e Visualização
 - Dashboard intuitivo com saldo atual e controle de visibilidade
-- Visualização de transações recentes (últimas 5)
+- Gestão, inclusão e visualização de transações
 - Cartões informativos com dados financeiros
-- Gráficos e estatísticas de transações
 
 ### 💰 Gestão de Transações
-- Listagem completa de transações com paginação
-- **Filtro e pesquisa de transações** por descrição, valor, tipo e data
+- Listagem completa de transações
+- **Busca de transações** por descrição, valor, tipo e data
 - **Scroll infinito** com carregamento progressivo (5 itens por vez)
 - Adição de novas transações (depósito, saque, transferência, pagamento)
 - Edição e exclusão de transações existentes
@@ -115,6 +79,12 @@ Essa separação permite evoluir os MFEs e a lib compartilhada de forma independ
 - **Validações completas** de formulário (valor, data, tipo, descrição)
 - Upload de arquivos anexos às transações (PDF, imagens, documentos)
 - Visualização e download de anexos
+
+### 📈 Gestão de Investimentos e Metas
+- Visualização de investimentos e metas
+- Gráficos de performance e evolução dos investimentos
+- Cadastro, acompanhamento e resgate de investimentos
+- Cadastro, acompanhamento e resgate de metas financeiras
 
 ### 🔐 Autenticação e Segurança
 - Sistema completo de login e registro de usuários
@@ -142,35 +112,18 @@ Essa separação permite evoluir os MFEs e a lib compartilhada de forma independ
 - Utilitários para formatação de moeda e datas
 - Normalização de texto para busca sem acentos
 
-## 🛠️ Tecnologias
+## 5. Tecnologias Utilizadas
 
 - React
 - TypeScript
 - Webpack 5 Module Federation
-- Tailwind CSS (no `dashboard-mfe` e nos componentes compartilhados conforme aplicável)
+- Tailwind CSS
 - JSON Server (API mock)
 - Node.js/Express (servidor de upload)
 - Multer (upload de arquivos)
 - Docker & Docker Compose (ambiente containerizado para desenvolvimento)
 
-## 📋 Banco de Dados
-
-O projeto utiliza um sistema de banco de dados modelo que mantém dados de exemplo no repositório:
-
-- **`db.template.json`** - Arquivo modelo versionado no Git
-- **`db.json`** - Arquivo local criado automaticamente (ignorado pelo Git)
-
-```bash
-# O comando dev:all automaticamente cria db.json do template
-npm run dev:all
-
-# Para resetar dados locais:
-rm db.json && npm run setup:db
-```
-
-📖 **Guia completo:** Ver [JSON Server Guide](./docs/json-server-guide.md)
-
-## 🚀 Como Executar o Projeto
+## 6. Como Executar o Projeto
 
 ### Pré-requisitos
 
@@ -234,7 +187,7 @@ Para operações avançadas, rebuild, troubleshooting e comandos específicos po
 
 ### 📦 Instalação das Dependências
 
-Como este é um projeto de microfrontends, **é necessário instalar as dependências de cada aplicação separadamente**:
+Como este é um monorepo de microfrontends, **é necessário instalar as dependências de cada aplicação separadamente**:
 
 **Opção 1 - Instalação automática (recomendada):**
 
@@ -261,6 +214,7 @@ npm install
 cd shell && npm install && cd ..
 cd dashboard-mfe && npm install && cd ..
 cd transactions-mfe && npm install && cd ..
+cd investments-mfe && npm install && cd ..
 cd shared && npm install && cd ..
 cd upload-server && npm install && cd ..
 ```
@@ -270,7 +224,7 @@ cd upload-server && npm install && cd ..
 Após instalar todas as dependências, execute na raiz do repositório:
 
 ```bash
-# Inicie tudo de uma vez (API + Upload Server + Shared + Dashboard + Transactions + Shell)
+# Inicie tudo de uma vez (API + Upload Server + Shared + Dashboard + Transactions + Investments + Shell)
 npm run dev:all
 ```
 
@@ -292,7 +246,7 @@ npm run dev:api
 # Upload Server (porta 3035)
 npm run dev:upload
 
-# Biblioteca compartilhada (porta 3033)
+# Shared Library (porta 3033)
 npm run dev:shared
 
 # Dashboard MFE (porta 3031)
@@ -300,6 +254,9 @@ npm run dev:dashboard
 
 # Transactions MFE (porta 3032)
 npm run dev:transactions
+
+# Investments MFE (porta 3036)
+npm run dev:investments
 
 # Shell - aplicação principal (porta 3030)
 npm run dev:shell
@@ -313,21 +270,20 @@ npm run dev:shell
 
 ## 🧪 Testes
 
-Este projeto conta com uma suíte completa de testes automatizados cobrindo todos os microfrontends e utilitários compartilhados.
+O projeto conta com uma suíte completa de testes automatizados cobrindo todos os microfrontends e utilitários compartilhados.
 
 ### Cobertura de Testes
 
-| Módulo | Arquivos de Teste | Total de Testes | Status |
-|--------|-------------------|-----------------|---------|
-| **Módulo Shared** | 2 | 25 testes | ✅ Todos passando |
-| **Shell App** | 1 | 7 testes | ✅ Todos passando |
-| **Dashboard MFE** | 1 | 11 testes | ✅ Todos passando |
-| **Transactions MFE** | 1 | 14 testes | ✅ Todos passando |
-| **TOTAL** | **5** | **57 testes** | **✅ 100% passando** |
+| Módulo               | Arquivos de Teste | Total de Testes | Status               |
+|----------------------|-------------------------------------|----------------------|
+| **Shared**           | 2    | 25 testes                    | ✅ Todos passando   |
+| **Shell App**        | 1    | 7 testes                     | ✅ Todos passando   |
+| **Dashboard MFE**    | 1    | 11 testes                    | ✅ Todos passando   |
+| **Transactions MFE** | 1    | 14 testes                    | ✅ Todos passando   |
+| **Investments MFE**  | 1    | 18 testes                    | ✅ Todos passando   |
+| **TOTAL**            | **6**| **75 testes**                | **✅ 100% passando**|
 
 ### 🏃‍♂️ Executando os Testes
-
-**Executar todos os testes (recomendado):**
 
 ```bash
 # Executa os testes em todos os módulos
@@ -337,30 +293,31 @@ npm run test:all
 **Executar testes por módulo específico:**
 
 ```bash
-# Testes do módulo shared (utilitários e hooks)
+# Testes do módulo shared
 cd shared && npm test
 
-# Testes do Shell App (roteamento e layout)
+# Testes do Shell App
 cd shell && npm test
 
-# Testes do Dashboard MFE (componentes de dashboard)
+# Testes do Dashboard MFE
 cd dashboard-mfe && npm test
 
-# Testes do Transactions MFE (gestão de transações)
+# Testes do Transactions MFE
 cd transactions-mfe && npm test
+
+# Testes do Investments MFE
+cd investments-mfe && npm test
 ```
 
 **Modo de desenvolvimento (watch mode):**
 
 ```bash
-# Em qualquer módulo, para execução contínua durante desenvolvimento
 npm run test:watch
 ```
 
 **Relatórios de cobertura:**
 
 ```bash
-# Gerar relatório de cobertura de testes
 npm run test:coverage
 ```
 
@@ -391,6 +348,7 @@ npm run test:coverage
 | Shared Library     | 3033  | [http://localhost:3033](http://localhost:3033) |
 | API Server (Mock)  | 3034  | [http://localhost:3034](http://localhost:3034) |
 | Upload Server      | 3035  | [http://localhost:3035](http://localhost:3035) |
+| Investments MFE    | 3036  | [http://localhost:3036](http://localhost:3036) |
 
 ## 📜 Scripts Disponíveis
 
@@ -405,6 +363,7 @@ npm run test:coverage
 - `npm run dev:shell` — Inicia apenas o Shell
 - `npm run dev:dashboard` — Inicia apenas o Dashboard MFE
 - `npm run dev:transactions` — Inicia apenas o Transactions MFE
+- `npm run dev:investments` — Inicia apenas o Investments MFE
 - `npm run dev:shared` — Inicia apenas a Shared Library
 - `npm run dev:api` — Inicia apenas o JSON Server (API mock)
 - `npm run dev:upload` — Inicia apenas o Upload Server
@@ -416,6 +375,7 @@ npm run test:coverage
 - `npm run test:shell` — Testes apenas do Shell App
 - `npm run test:dashboard` — Testes apenas do Dashboard MFE
 - `npm run test:transactions` — Testes apenas do Transactions MFE
+- `npm run test:investments` — Testes apenas do Investments MFE
 - `npm run test:watch` — Modo watch para todos os módulos (desenvolvimento)
 - `npm run test:coverage` — Gera relatórios de cobertura para todos os módulos
 
@@ -425,10 +385,17 @@ Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodan
 
 ## 🔧 Troubleshooting
 
-**Problemas gerais:** Consulte o documento [Troubleshooting](./docs/troubleshooting.md) para um checklist rápido de erros comuns, comandos úteis e links para guias complementares.
+Consulte os documentos em `docs/` para dúvidas, problemas comuns e dicas de manutenção:
+- [Troubleshooting](./docs/troubleshooting.md) (checklist rápido de erros comuns, comandos úteis e links para guias complementares.)
+- [Troubleshooting de Testes](./docs/testing-troubleshooting.md) (questões específicas relacionadas à execução de testes)
+- [Limpeza do Ambiente](./docs/environment-cleanup.md) (detalhes dos scripts disponíveis e orientações sobre quando utilizá-los)
+- [JSON Server Guide](./docs/json-server-guide.md) (detalhes operacionais do mock de API utilizado)
 
-**Problemas com testes:** Para questões específicas relacionadas à execução de testes, consulte [Troubleshooting de Testes](./docs/testing-troubleshooting.md).
+## 👥 Integrantes do Grupo
 
-## 🧹 Limpeza do Ambiente (Clean All)
-
-Veja [Limpeza do Ambiente](./docs/environment-cleanup.md) para detalhes dos scripts disponíveis e orientações sobre quando utilizá-los.
+| Nome                                            | Email                                                         | RM                                          |
+|-------------------------------------------------|---------------------------------------------------------------|---------------------------------------------|
+| Fernanda Raquel Campos Jiacinto                 | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com)     | [366526](mailto:RM366526@fiap.com.br)       |
+| Kaique Kenichi Furukawa Endo                    | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com)   | [366448](mailto:RM366448@fiap.com.br)       |
+| Karen Cristina Kramek                           | [kakakramek@gmail.com](mailto:kakakramek@gmail.com)           | [361140](mailto:RM361140@fiap.com.br)       |
+| Tatiane Gabrielle Marçal Rodrigues da Costa     | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | [365215](mailto:RM365215@fiap.com.br)     |

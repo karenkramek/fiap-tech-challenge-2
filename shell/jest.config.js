@@ -11,7 +11,8 @@ module.exports = {
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/src/__mocks__/fileMock.js',
     '^shared/(.*)$': '<rootDir>/../shared/src/$1',
     '^dashboardMFE/(.*)$': '<rootDir>/src/__mocks__/dashboardMFE.js',
-    '^transactionsMFE/(.*)$': '<rootDir>/src/__mocks__/transactionsMFE.js'
+    '^transactionsMFE/(.*)$': '<rootDir>/src/__mocks__/transactionsMFE.js',
+    '^investmentsMFE/(.*)$': '<rootDir>/src/__mocks__/investmentsMFE.js'
   },
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

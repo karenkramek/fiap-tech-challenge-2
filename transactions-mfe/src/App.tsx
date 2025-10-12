@@ -68,79 +68,46 @@ const TransactionsPage: React.FC = () => {
     }
   };
 
-  const ITEMS_PER_PAGE = 5;
-  const [page, setPage] = useState(1);
-  const [hasScrolled, setHasScrolled] = useState(false);
-
-  const filteredTransactions = transactions.filter(
-    t =>
-      t.description?.toLowerCase().includes(search.toLowerCase()) ||
-      t.amount?.toString().includes(search)
-  );
-
-  const paginatedTransactions = filteredTransactions.slice(0, page * ITEMS_PER_PAGE);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!hasScrolled && window.scrollY > 0) setHasScrolled(true);
-      if (
-        hasScrolled &&
-        Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 100 &&
-        paginatedTransactions.length < filteredTransactions.length
-      ) {
-        setPage(prev => prev + 1);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [paginatedTransactions.length, filteredTransactions.length, hasScrolled]);
-
-  // Resetar página ao buscar
-  useEffect(() => {
-    setPage(1);
-    setHasScrolled(false);
-  }, [search]);
-
   return (
     <>
       <FeedbackProvider />
-      
       {/* Extrato */}
       <Card>
-        <div className="min-h-screen">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="transactions-title text-primary-700">Extrato</h2>
-          <Button 
-            onClick={() => setAddModalOpen(true)}
-            className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
-          >
-            Nova Transação
-          </Button>
-        </div>
-
-        <ErrorBoundary>
-          {/* Input de busca */}
-          <div className="flex items-center gap-2 mb-6 bg-gray-100 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500">
-            <Search className="h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar"
-              className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
+        <div className="min-h-screen" role="main" aria-label="Extrato de transações">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="transactions-title text-primary-700">Extrato</h2>
+            <Button 
+              onClick={() => setAddModalOpen(true)}
+              className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+              aria-label="Adicionar nova transação"
+            >
+              Nova Transação
+            </Button>
           </div>
-          <TransactionList
-            transactions={paginatedTransactions}
-            onTransactionsChanged={fetchTransactions}
-            mode="full"
-            search={search}
-            totalTransactions={transactions.length}
-          />
-        </ErrorBoundary>
+
+          <ErrorBoundary>
+            {/* Input de busca */}
+            <div className="flex items-center gap-2 mb-6 bg-white-50 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500" role="search" aria-label="Buscar transações">
+              <Search className="h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Buscar"
+                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                aria-label="Buscar transações"
+              />
+            </div>
+            <TransactionList
+              transactions={transactions} // Passe todas as transações!
+              onTransactionsChanged={fetchTransactions}
+              mode="full"
+              search={search}
+              totalTransactions={transactions.length}
+            />
+          </ErrorBoundary>
         </div>
       </Card>
-
       {addModalOpen && (
         <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
           <ErrorBoundary>

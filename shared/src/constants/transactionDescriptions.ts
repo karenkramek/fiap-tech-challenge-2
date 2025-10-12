@@ -12,3 +12,11 @@ export const TRANSACTION_DESCRIPTION_SUGGESTIONS = [
   'Cartão de Crédito',
   'Entretenimento'
 ];
+
+export const INVESTMENT_DESCRIPTION_SUGGESTIONS = [
+  'Fundos de investimento',
+  'Tesouro Direto',
+  'Previdência Privada',
+  'Bolsa de Valores',
+  'Outros'
+];

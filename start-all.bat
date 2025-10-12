@@ -1,4 +1,5 @@
 @echo off
+
 echo 🚀 Starting ByteBank Microfrontend Architecture...
 echo 📦 This will start:
 echo    - API Server (port 3034)
@@ -6,6 +7,7 @@ echo    - Upload Server (port 3035)
 echo    - Shared Library (port 3033)
 echo    - Dashboard MFE (port 3031)
 echo    - Transactions MFE (port 3032)
+echo    - Investments MFE (port 3036)
 echo    - Shell App (port 3030)
 echo.
 echo 🌐 Once started, visit: http://localhost:3030

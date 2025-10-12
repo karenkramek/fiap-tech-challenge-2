@@ -45,7 +45,11 @@ const Button = ({
   );
 
   return (
-    <button className={classes} {...props}>
+    <button
+      className={classes}
+      aria-label={props["aria-label"] || (typeof children === 'string' ? children : undefined)}
+      {...props}
+    >
       {children}
     </button>
   );

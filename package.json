@@ -4,15 +4,16 @@
   "description": "ByteBank Microfrontend Architecture",
   "main": "index.js",
   "scripts": {
-    "install:all": "npm install && cd shell && npm install && cd ../dashboard-mfe && npm install && cd ../transactions-mfe && npm install && cd ../shared && npm install && cd ../upload-server && npm install && cd ..",
+    "install:all": "npm install && cd shell && npm install && cd ../dashboard-mfe && npm install && cd ../transactions-mfe && npm install && cd ../shared && npm install && cd ../upload-server && npm install && cd ../investments-mfe && npm install && cd ..",
     "setup:db": "node -e \"const fs=require('fs'); if(!fs.existsSync('db.json')){fs.copyFileSync('db.template.json','db.json');console.log('✅ db.json criado do template');}else{console.log('ℹ️ db.json já existe');}\"",
     "dev:shell": "cd shell && npm run dev",
     "dev:dashboard": "cd dashboard-mfe && npm run dev",
-    "dev:transactions": "cd transactions-mfe && npx webpack serve --mode development --port 3032",
+    "dev:transactions": "cd transactions-mfe && npm run dev",
+    "dev:investments": "cd investments-mfe && npm run dev",
     "dev:shared": "cd shared && npm run dev",
     "dev:api": "json-server --watch db.json --port 3034",
     "dev:upload": "cd upload-server && npm start",
-    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:shell\"",
+    "dev:all": "npm run setup:db && concurrently \"npm run dev:api\" \"npm run dev:upload\" \"npm run dev:shared\" \"npm run dev:dashboard\" \"npm run dev:transactions\" \"npm run dev:investments\" \"npm run dev:shell\"",
     "test": "npm run test:shared && npm run test:shell && npm run test:dashboard && npm run test:transactions",
     "test:shared": "cd shared && npm test",
     "test:shell": "cd shell && npm test",
@@ -31,14 +32,32 @@
   "type": "commonjs",
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/history": "^4.7.11",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^18.2.73",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-redux": "^7.1.25",
+    "@types/react-router-dom": "^5.3.3",
     "concurrently": "^9.2.1",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "json-server": "^1.0.0-beta.3",
-    "typescript": "^5.9.2"
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.9.0",
+    "@types/date-fns": "^2.6.3",
+    "axios": "^1.12.2",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.544.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-redux": "^8.1.3",
     "tailwind-merge": "^3.3.1"
   }
 }

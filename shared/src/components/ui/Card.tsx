@@ -19,7 +19,11 @@ const Card = ({ children, className, variant = 'default' }: CardProps) => {
   };
 
   return (
-    <div className={twMerge(baseClasses, variantClasses[variant], className)}>
+    <div
+      className={twMerge(baseClasses, variantClasses[variant], className)}
+      role="region"
+      aria-label="Seção de conteúdo"
+    >
       {children}
     </div>
   );

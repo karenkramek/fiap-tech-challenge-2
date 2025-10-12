@@ -1,3 +1,4 @@
+const path = require('path');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -15,6 +16,12 @@ module.exports = {
   },
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"],
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom'),
+      'react-redux': path.resolve('./node_modules/react-redux'),
+      '@reduxjs/toolkit': path.resolve('./node_modules/@reduxjs/toolkit')
+    }
   },
   module: {
     rules: [
@@ -61,17 +68,20 @@ module.exports = {
         dashboardMFE: `dashboardMFE@${process.env.REACT_APP_DASHBOARD_URL || 'http://localhost:3031'}/remoteEntry.js`,
         transactionsMFE: `transactionsMFE@${process.env.REACT_APP_TRANSACTIONS_URL || 'http://localhost:3032'}/remoteEntry.js`,
         shared: `shared@${process.env.REACT_APP_SHARED_URL || 'http://localhost:3033'}/remoteEntry.js`,
+        investmentsMFE: `investmentsMFE@${process.env.REACT_APP_INVESTMENTS_URL || 'http://localhost:3036'}/remoteEntry.js`,
       },
       shared: {
         react: {
           singleton: true,
-          requiredVersion: "^18.2.0",
+          requiredVersion: "18.2.0",
           eager: true,
+          strictVersion: true
         },
         "react-dom": {
           singleton: true,
-          requiredVersion: "^18.2.0",
+          requiredVersion: "18.2.0",
           eager: true,
+          strictVersion: true
         },
         "react-redux": {
           singleton: true,
@@ -88,6 +98,18 @@ module.exports = {
           requiredVersion: "^2.5.0",
           eager: true,
         },
+        'react-redux': {
+          singleton: true,
+          requiredVersion: "8.1.3",
+          eager: true,
+          strictVersion: true
+        },
+        '@reduxjs/toolkit': {
+          singleton: true,
+          requiredVersion: "1.9.7",
+          eager: true,
+          strictVersion: true
+        }
       },
     }),
     new HtmlWebpackPlugin({

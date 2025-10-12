@@ -6,6 +6,7 @@ import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
 import LoadingSpinner from 'shared/components/ui/LoadingSpinner';
 import { TOAST_MESSAGES } from 'shared/constants/toast';
 import { useTransactions } from 'shared/hooks/useTransactions';
+import { useAccount } from 'shared/hooks/useAccount';
 import { TransactionType } from 'shared/types/TransactionType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
 const TransactionList = React.lazy(() => import('shared/components/domain/transaction/TransactionList'));
@@ -20,6 +21,7 @@ const Dashboard: React.FC = () => {
   const [formLoading, setFormLoading] = useState(false);
 
   const { transactions, loading: transactionsLoading, addTransaction, fetchTransactions } = useTransactions();
+  const { loading: userLoading, account } = useAccount();
 
   const handleAmountChange = createCurrencyInputHandler(setAmount);
 
@@ -57,7 +59,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  if (transactionsLoading || formLoading) {
+  if (transactionsLoading || formLoading || userLoading || !account) {
     return <LoadingSpinner size={48} />;
   }
 
@@ -111,6 +113,7 @@ const Dashboard: React.FC = () => {
                     <a
                       href="/transactions"
                       className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium text-center"
+                      aria-label="Ver todas as transações"
                     >
                       Ver Transações
                     </a>

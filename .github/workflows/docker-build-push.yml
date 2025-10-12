@@ -38,6 +38,11 @@ jobs:
             dockerfile: docker/Dockerfile.frontend
             port: "3032"
             deploy_target: vercel
+          - name: investments
+            context: investments-mfe
+            dockerfile: docker/Dockerfile.frontend
+            port: "3036"
+            deploy_target: vercel
           - name: shared
             context: shared
             dockerfile: docker/Dockerfile.frontend

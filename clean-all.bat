@@ -9,7 +9,7 @@ REM
 REM ⏹️  Para interromper, pressione Ctrl+C
 
 setlocal enabledelayedexpansion
-set folders=. shared transactions-mfe dashboard-mfe shell
+set folders=. shared transactions-mfe dashboard-mfe shell investments-mfe
 
 for %%f in (%folders%) do (
     if exist "%%f\node_modules" (

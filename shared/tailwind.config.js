@@ -6,6 +6,7 @@ module.exports = {
     '../dashboard-mfe/src/**/*.{js,ts,jsx,tsx}',
     '../transactions-mfe/src/**/*.{js,ts,jsx,tsx}',
     '../shell/src/**/*.{js,ts,jsx,tsx}',
+    '../investments-mfe/src/**/*.{js,ts,jsx,tsx}',
   ],
   presets: [sharedPreset],
 };
