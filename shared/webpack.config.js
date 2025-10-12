@@ -8,6 +8,13 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
+    hot: false,
+    liveReload: false,
+    client: false,
+  },
+  optimization: {
+    runtimeChunk: false,
+    minimize: false,
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
