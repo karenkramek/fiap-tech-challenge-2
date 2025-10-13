@@ -97,8 +97,8 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, showAuthButtons = false 
   };
 
   return (
-    <header className='bg-primary-700 text-white-50 shadow-md'>
-      <div className='container mx-auto px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center'>
+    <header className='bg-primary-700 text-white-50 shadow-md w-full'>
+      <div className='w-full max-w-none px-2 sm:px-4 py-2 sm:py-3 flex justify-between items-center'>
         <div className='flex items-center space-x-2 sm:space-x-4'>
           <button onClick={toggleSidebar} className='xl:hidden lg:block hover:bg-primary-600 p-1 rounded'>
             <Menu className='h-5 w-5 sm:h-6 sm:w-6 header-icon' />
