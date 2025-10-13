@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'shared/store';
-import { GoalService, GoalDTO } from 'shared/services/GoalService';
 import { AccountService } from 'shared/services/AccountService';
+import { GoalDTO, GoalService } from 'shared/services/GoalService';
 import { TransactionService } from 'shared/services/TransactionService';
+import { RootState } from 'shared/store';
 import { TransactionType } from 'shared/types/TransactionType';
 
-export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
+export const useGoals = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [goals, setGoals] = useState<GoalDTO[]>([]);
   const [assignValues, setAssignValues] = useState<string[]>([]);
@@ -52,7 +52,9 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
       )
     );
     await GoalService.update(goal.id, { assigned: (goal.assigned || 0) + value });
-    fetchInvestmentsAndTransactions();
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user.id, type: 'goal-value-assigned' }
+    }));
   };
 
   // Cria nova meta
@@ -73,14 +75,18 @@ export const useGoals = (fetchInvestmentsAndTransactions: () => void) => {
     await GoalService.create(newGoal);
     setGoals(prevGoals => [...prevGoals, newGoal]);
     setAssignValues(prev => [...prev, '']);
-    fetchInvestmentsAndTransactions();
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user.id, type: 'goal-created' }
+    }));
   };
 
   // Edita meta existente
   const updateGoal = async (goalId: string, data: Partial<GoalDTO>) => {
     await GoalService.update(goalId, data);
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user?.id, type: 'goal-updated' }
+    }));
     await loadExistingGoals();
-    fetchInvestmentsAndTransactions();
   };
 
   useEffect(() => {

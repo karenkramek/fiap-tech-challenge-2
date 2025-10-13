@@ -1,21 +1,21 @@
-import React, { useEffect } from 'react';
-import GoalsCard from './components/cards/GoalsCard';
-import TransactionsAnalysisCard from './components/cards/TransactionsAnalysisCard';
-import RiskReturnCard from './components/cards/RiskReturnCard';
-import InvestmentsCard from './components/cards/InvestmentsCard';
-import RedeemModal from './components/modals/RedeemModal';
+import { useEffect } from 'react';
 import FeedbackProvider from 'shared/components/ui/FeedbackProvider';
-import { useInvestments } from './hooks/useInvestments';
-import { useGoals } from './hooks/useGoals';
-import { useRedeemInvestment } from './hooks/useRedeemInvestment';
-import InvestmentsHeader from './components/InvestmentsHeader';
-import TransactionsSummaryCard from './components/cards/TransactionsSummaryCard';
 import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
+import InvestmentsHeader from './components/InvestmentsHeader';
+import GoalsCard from './components/cards/GoalsCard';
+import InvestmentsCard from './components/cards/InvestmentsCard';
+import RiskReturnCard from './components/cards/RiskReturnCard';
+import TransactionsAnalysisCard from './components/cards/TransactionsAnalysisCard';
+import TransactionsSummaryCard from './components/cards/TransactionsSummaryCard';
+import RedeemModal from './components/modals/RedeemModal';
+import { useGoals } from './hooks/useGoals';
+import { useInvestments } from './hooks/useInvestments';
+import { useRedeemInvestment } from './hooks/useRedeemInvestment';
 
 const App = () => {
-  const { loading, fetchInvestmentsAndTransactions } = useInvestments();
-  const goalsHook = useGoals(fetchInvestmentsAndTransactions);
-  const redeemHook = useRedeemInvestment(fetchInvestmentsAndTransactions, () => {});
+  const { loading } = useInvestments();
+  const goalsHook = useGoals();
+  const redeemHook = useRedeemInvestment(() => {});
 
   useEffect(() => {
     if (!loading) {
@@ -50,14 +50,12 @@ const App = () => {
 
             {/* Investimentos */}
             <div className="flex flex-col" aria-label="Investimentos">
-                <InvestmentsCard 
-                  fetchInvestmentsAndTransactions={fetchInvestmentsAndTransactions}
-                />
+                <InvestmentsCard />
             </div>
 
             {/* Metas */}
             <div className="flex flex-col" aria-label="Metas de investimento">
-              <GoalsCard fetchInvestmentsAndTransactions={fetchInvestmentsAndTransactions} />
+              <GoalsCard />
             </div>
 
             {/* Entradas e Saídas / Investimentos e Metas */}

@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from 'shared/components/ui/Button';
 import ModalWrapper from 'shared/components/ui/ModalWrapper';
+import { INVESTMENT_TYPE_LABELS, InvestmentType } from 'shared/types/InvestmentType';
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
-import { InvestmentType, INVESTMENT_TYPE_LABELS } from 'shared/types/InvestmentType';
 import { useInvestments } from '../../hooks/useInvestments';
 
 export const INVESTMENT_TYPES = Object.values(InvestmentType).map((key) => ({
@@ -20,8 +20,7 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ open, onClose, editIn
   const {
     createInvestment,
     updateInvestment,
-    accountBalance,
-    fetchInvestmentsAndTransactions
+    accountBalance
   } = useInvestments();
 
   const [mode, setMode] = useState<'add' | 'edit'>('add');
@@ -74,7 +73,7 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ open, onClose, editIn
         });
       }
       onClose();
-      await fetchInvestmentsAndTransactions();
+      // Não chama fetchInvestmentsAndTransactions aqui pois já é chamado nos hooks
     } catch (err: any) {
       setError(err?.message || 'Erro ao salvar investimento');
     } finally {

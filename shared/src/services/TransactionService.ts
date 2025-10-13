@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { BaseService } from './BaseService';
 import { AccountDTO } from '../dtos/Account.dto';
 import { TransactionDTO, isTransactionDTO } from '../dtos/Transaction.dto';
 import { Transaction } from '../models/Transaction';
 import { TransactionType } from '../types/TransactionType';
-import { FileUploadService } from './FileUploadService';
 import { TransactionFilters } from '../types/api.types';
+import { BaseService } from './BaseService';
+import { FileUploadService } from './FileUploadService';
 import { GoalService } from './GoalService';
 import api from './api';
 
@@ -210,45 +210,145 @@ export class TransactionService extends BaseService {
    * Deleta uma transação do tipo INVESTMENT, remove o investimento vinculado e credita o valor ao saldo.
    */
   static async deleteInvestmentTransaction(transactionId: string, loggedAccountId: string): Promise<boolean> {
-    const transaction = await this.getTransactionById(transactionId);
-    if (
-      transaction.type === TransactionType.INVESTMENT &&
-      transaction.investmentId &&
-      transaction.accountId === loggedAccountId
-    ) {
-      // Remove investimento
-      try {
-        const { InvestmentService } = await import('./InvestmentService');
-        await InvestmentService.remove(transaction.investmentId);
-      } catch (e) {
-        // Se não conseguir remover investimento, não prossegue
+    console.log('Iniciando deleteInvestmentTransaction:', transactionId);
+
+    try {
+      const transaction = await this.getTransactionById(transactionId);
+      console.log('Transação encontrada:', transaction);
+
+      if (
+        transaction.type === TransactionType.INVESTMENT &&
+        transaction.investmentId &&
+        transaction.accountId === loggedAccountId
+      ) {
+        console.log('Removendo investimento:', transaction.investmentId);
+
+        // Remove investimento (não falha se já foi removido)
+        try {
+          const { InvestmentService } = await import('./InvestmentService');
+          await InvestmentService.remove(transaction.investmentId);
+          console.log('Investimento removido com sucesso');
+        } catch (e) {
+          console.warn('Aviso ao remover investimento (pode já ter sido removido):', e);
+          // Se o investimento não existe mais, continua o processo
+          // Isso pode acontecer se várias transações referenciam o mesmo investimento
+        }
+
+        console.log('Creditando valor ao saldo:', transaction.amount);
+
+        // Credita valor ao saldo
+        try {
+          await this.updateAccountBalance(transaction.accountId, transaction.amount);
+          console.log('Saldo creditado com sucesso');
+        } catch (e) {
+          console.error('Erro ao creditar saldo:', e);
+          // Se não conseguir creditar o saldo, falha a operação
+          return false;
+        }
+
+        console.log('Removendo transação:', transactionId);
+
+        // Remove transação
+        try {
+          const service = new TransactionService();
+          await service.delete<void>(`/transactions/${transactionId}`);
+          console.log('Transação removida com sucesso');
+        } catch (e) {
+          console.warn('Aviso ao remover transação (pode já ter sido removida):', e);
+          // Se a transação não existe mais, considera sucesso
+        }
+
+        return true;
+      } else {
+        console.log('Transação não é do tipo INVESTMENT ou não pertence ao usuário');
         return false;
       }
-      // Credita valor ao saldo
-      await this.updateAccountBalance(transaction.accountId, transaction.amount);
-      // Remove transação
-      const service = new TransactionService();
-      await service.delete<void>(`/transactions/${transactionId}`);
-      return true;
+    } catch (error) {
+      console.error('Erro em deleteInvestmentTransaction:', error);
+      return false;
     }
-    return false;
   }
 
   /**
    * Resgata todos os investimentos do usuário logado: remove transações e investimentos, credita saldo.
    */
   static async redeemAllInvestments(accountId: string): Promise<number> {
+    console.log('Iniciando redeemAllInvestments para accountId:', accountId);
+
     // Busca todas as transações do tipo INVESTMENT do usuário
     const transactions = await this.getAllTransactions(accountId);
     const investmentTransactions = transactions.filter(
       t => t.type === TransactionType.INVESTMENT && t.investmentId && t.accountId === accountId
     );
-    let total = 0;
-    for (const tx of investmentTransactions) {
-      const ok = await this.deleteInvestmentTransaction(tx.id, accountId);
-      if (ok) total += tx.amount;
+
+    console.log('Transações de investimento encontradas:', investmentTransactions.length);
+
+    if (investmentTransactions.length === 0) {
+      console.log('Nenhuma transação de investimento encontrada');
+      return 0;
     }
-    return total;
+
+    let total = 0;
+    let successCount = 0;
+    const errors: string[] = [];
+
+    // Processar transações de forma mais robusta
+    for (const tx of investmentTransactions) {
+      try {
+        console.log('Processando transação:', tx.id, 'valor:', tx.amount);
+
+        // Tenta buscar a transação novamente para verificar se ainda existe
+        let currentTransaction;
+        try {
+          currentTransaction = await this.getTransactionById(tx.id);
+        } catch (getError) {
+          console.warn(`Transação ${tx.id} não encontrada (possivelmente já foi removida):`, getError);
+          // Se a transação não existe mais, provavelmente já foi processada
+          continue;
+        }
+
+        // Só processa se a transação ainda for de investimento e pertencer ao usuário
+        if (currentTransaction.type === TransactionType.INVESTMENT &&
+            currentTransaction.investmentId &&
+            currentTransaction.accountId === accountId) {
+
+          const success = await this.deleteInvestmentTransaction(tx.id, accountId);
+          if (success) {
+            total += tx.amount;
+            successCount++;
+            console.log('Transação processada com sucesso. Total acumulado:', total);
+          } else {
+            const error = `Falha ao processar transação ${tx.id}`;
+            console.error(error);
+            errors.push(error);
+          }
+        } else {
+          console.log(`Transação ${tx.id} não é mais válida para resgate`);
+        }
+      } catch (error) {
+        const errorMsg = `Erro ao processar transação ${tx.id}: ${error}`;
+        console.error(errorMsg);
+        errors.push(errorMsg);
+      }
+    }
+
+    console.log(`Resgate finalizado. Sucessos: ${successCount}/${investmentTransactions.length}, Total resgatado: ${total}`);
+
+    // Se conseguiu resgatar pelo menos alguma coisa, considera sucesso
+    if (total > 0) {
+      if (errors.length > 0) {
+        console.warn('Alguns investimentos não puderam ser resgatados:', errors);
+      }
+      return total;
+    } else {
+      // Se não conseguiu resgatar nada e há erros, lança exceção
+      if (errors.length > 0) {
+        throw new Error(`Falha ao resgatar investimentos: ${errors.join(', ')}`);
+      } else {
+        console.log('Nenhum investimento foi resgatado (possivelmente já foram processados)');
+        return 0;
+      }
+    }
   }
 
   /**
@@ -284,22 +384,33 @@ export class TransactionService extends BaseService {
    * Atualiza o saldo da conta, enviando apenas o campo balance via PATCH.
    */
   private static async updateAccountBalance(accountId: string, balanceChange: number): Promise<void> {
+    console.log('Atualizando saldo da conta:', accountId, 'mudança:', balanceChange);
+
     try {
       const service = new TransactionService();
       const accountsData = await service.get<AccountDTO[]>('/accounts');
       const account = accountsData.find(acc => acc.id === accountId);
       if (!account) throw new Error('Conta não encontrada');
+
       const newBalance = account.balance + balanceChange;
+      console.log('Saldo atual:', account.balance, 'novo saldo:', newBalance);
+
       // PATCH apenas o campo balance
       await service.patch(`/accounts/${accountId}`, { balance: newBalance });
+      console.log('Saldo atualizado com sucesso');
     } catch (error) {
+      console.error('Erro no método principal de atualização de saldo:', error);
       // Fallback usando api direto com PATCH
       try {
+        console.log('Tentando fallback para atualização de saldo');
         const accountResponse = await api.get(`/accounts/${accountId}`);
         const accountData = accountResponse.data;
         const newBalance = accountData.balance + balanceChange;
+        console.log('Fallback - Saldo atual:', accountData.balance, 'novo saldo:', newBalance);
         await api.patch(`/accounts/${accountId}`, { balance: newBalance });
+        console.log('Fallback - Saldo atualizado com sucesso');
       } catch (fallbackError) {
+        console.error('Erro no fallback de atualização de saldo:', fallbackError);
         throw fallbackError;
       }
     }
