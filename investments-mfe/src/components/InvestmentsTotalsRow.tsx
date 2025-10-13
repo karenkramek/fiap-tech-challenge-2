@@ -6,7 +6,7 @@ import { calculateTransactionTotals } from '../utils/investmentCalculations';
 
 const InvestmentsTotalsRow: React.FC = () => {
   const { transactions, investments, accountBalance } = useInvestments();
-  const { goals } = useGoals(() => {});
+  const { goals } = useGoals();
 
   const totals = calculateTransactionTotals(transactions, investments, goals);
   const balance = accountBalance ?? 0;
@@ -51,7 +51,7 @@ const InvestmentsTotalsRow: React.FC = () => {
 const ResumoCard = ({ color, label, value, icon, destaque }: { color: string; label: string; value: number; icon: React.ReactNode; destaque?: boolean }) => (
   <div
     className={`flex flex-col items-center justify-center bg-white rounded-lg px-2 py-2 shadow border-t-4 border-${color}-400 transition-transform duration-200 hover:scale-105 ${destaque ? 'ring-2 ring-yellow-300 scale-105' : ''}`}
-    style={{ minWidth: 90, minHeight: 70, maxWidth: 120 }}
+    style={{ minWidth: 120, minHeight: 70 }}
   >
     <div className="mb-1 flex items-center justify-center">{icon}</div>
     <span className={`text-[11px] font-medium text-${color}-700 tracking-wide uppercase`}>{label}</span>
