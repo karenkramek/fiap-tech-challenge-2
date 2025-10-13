@@ -31,36 +31,38 @@ const App = () => {
     <>
       <FeedbackProvider />
         <div className="min-h-screen" role="main" aria-label="Painel de investimentos">
-          {/* Titulo e Totalizadores */}
-          <div className="mb-6 px-6" aria-label="Cabeçalho de investimentos">
-            <InvestmentsHeader />
-          </div>
-
-          {/* Cards de análise */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6" aria-label="Análises e cards de investimentos">
-            {/* Riscos vs Retorno */}
-            <div className="flex flex-col" aria-label="Risco versus Retorno">
-              <RiskReturnCard />
+          <div className="container mx-auto px-4 space-y-6">
+            {/* Titulo e Totalizadores */}
+            <div className="mb-6" aria-label="Cabeçalho de investimentos">
+              <InvestmentsHeader />
             </div>
 
-            {/* Análise de Transações */}
-            <div className="flex flex-col" aria-label="Análise de transações">
-              <TransactionsAnalysisCard />
-            </div>
+            {/* Cards de análise */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Análises e cards de investimentos">
+              {/* Riscos vs Retorno */}
+              <div className="flex flex-col" aria-label="Risco versus Retorno">
+                <RiskReturnCard />
+              </div>
 
-            {/* Investimentos */}
-            <div className="flex flex-col" aria-label="Investimentos">
-                <InvestmentsCard />
-            </div>
+              {/* Análise de Transações */}
+              <div className="flex flex-col" aria-label="Análise de transações">
+                <TransactionsAnalysisCard />
+              </div>
 
-            {/* Metas */}
-            <div className="flex flex-col" aria-label="Metas de investimento">
-              <GoalsCard />
-            </div>
+              {/* Investimentos */}
+              <div className="flex flex-col" aria-label="Investimentos">
+                  <InvestmentsCard />
+              </div>
 
-            {/* Entradas e Saídas / Investimentos e Metas */}
-            <div className="flex flex-col" aria-label="Entradas e saídas, investimentos e metas">
-              <TransactionsSummaryCard />
+              {/* Metas */}
+              <div className="flex flex-col" aria-label="Metas de investimento">
+                <GoalsCard />
+              </div>
+
+              {/* Entradas e Saídas / Investimentos e Metas */}
+              <div className="flex flex-col" aria-label="Entradas e saídas, investimentos e metas">
+                <TransactionsSummaryCard />
+              </div>
             </div>
           </div>
         </div>

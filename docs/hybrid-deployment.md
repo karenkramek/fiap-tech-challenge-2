@@ -71,73 +71,92 @@ Backend (API = leve)          → AWS EC2 (controle total)
 ### Diagrama de Arquitetura
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                             CLIENTE (Browser)                              │
-└───────────────┬───────────────────────────────┬────────────────────────────┘
-                │                               │
-                │ HTTPS                         │ HTTPS
-                ▼                               ▼
-        ┌─────────────────────┐         ┌─────────────────────┐
-        │     Vercel CDN      │         │     Vercel CDN      │
-        │     (US/Global)     │         │     (US/Global)     │
-        └──────────┬──────────┘         └──────────┬──────────┘
-                   │                               │
-                   ▼                               ▼
-        ┌────────────────────────┐     ┌────────────────────────┐
-        │   Shell (Host)         │     │   Dashboard MFE        │
-        │   vercel.app           │◄────┤   vercel.app           │
-        │   Module Federation    │     │   remoteEntry.js       │
-        └────────────────────────┘     └────────────────────────┘
-                   │
-                   ▼
-        ┌────────────────────────┐     ┌────────────────────────┐
-        │   Transactions MFE     │     │   Shared Library       │
-        │   vercel.app           │◄────┤   vercel.app           │
-        │   remoteEntry.js       │     │   remoteEntry.js       │
-        └────────────────────────┘     └────────────────────────┘
-                   │
-                   │ HTTP (API calls)
-                  ▼
-        ┌─────────────────────────────────────────────────────────────┐
-        │                  AWS EC2 (us-east-1)                       │
-        │                  IP: 44.206.72.128                         │
-        │   ┌──────────────────┐     ┌──────────────────┐            │
-        │   │  API Container   │     │ Upload Container │            │
-        │   │  Port: 3034      │     │ Port: 3035       │            │
-        │   │  JSON Server     │     │ Express + Multer │            │
-        │   └──────────────────┘     └──────────────────┘            │
-        │           │                      │                        │
-        │           ▼                      ▼                        │
-        │      db.json              uploads/ folder                  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENTE (Browser)                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ HTTPS
+                                    ▼
+                          ┌─────────────────────┐
+                          │     Vercel CDN      │
+                          │     (US/Global)     │
+                          └──────────┬──────────┘
+                                     │
+                                     ▼
+                         ┌────────────────────────┐
+                         │      Shared Library    │
+                         │      vercel.app        │
+                         │      remoteEntry.js    │
+                         └──────────┬─────────────┘
+                                    │ (consumido por)
+       ┌────────────────────────────┼───────────────────────────────┐
+       │                            │                               │
+       ▼                            ▼                               ▼
+┌────────────────────────┐  ┌────────────────────────┐  ┌────────────────────────┐
+│     Shell (Host)       │  │    Dashboard MFE       │  │   Transactions MFE     │
+│     vercel.app         │  │    vercel.app          │  │   vercel.app           │
+│     Module Federation  │  │    remoteEntry.js      │  │   remoteEntry.js       │
+└───────────┬────────────┘  └────────────────────────┘  └────────────────────────┘
+            │  carrega remotes (via MF)                         │
+            ├───────────────────────────────────────────────────┤
+            │                                                   │
+            ▼                                                   ▼
+   ┌────────────────────────┐                          ┌────────────────────────┐
+   │   Investments MFE      │                          │   (Outros MFEs)        │
+   │   vercel.app           │                          │   - se aplicável       │
+   │   remoteEntry.js       │                          │                        │
+   └────────────────────────┘                          └────────────────────────┘
+            │
+            │ HTTP (API calls)
+            ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         AWS EC2 (us-east-1)                                  │
+│                         IP: 44.206.72.128                                    │
+│   ┌──────────────────┐        ┌──────────────────┐                           │
+│   │  API Container   │        │ Upload Container │                           │
+│   │  Port: 3034      │        │ Port: 3035       │                           │
+│   │  JSON Server     │        │ Express + Multer │                           │
+│   └──────────────────┘        └──────────────────┘                           │
+│           │                             │                                    │
+│           ▼                             ▼                                    │
+│       db.json                    uploads/ folder                             │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+Nota: Shared Library é um remote provider consumido por Shell e por todos os MFEs. O Shell (host) carrega os remotes dos MFEs (Dashboard, Transactions, Investments) via Module Federation e orquestra a aplicação. Todos os frontends consomem as APIs na EC2 (JSON Server e Upload).
 
 ### Componentes e URLs
 
 #### Frontends (Vercel)
-- **Shell:** https://bytebank-shell.vercel.app
+
+- **Shell:** [https://bytebank-shell.vercel.app](https://bytebank-shell.vercel.app)
   - Orquestra os MFEs via Module Federation
   - CDN global, HTTPS, deploy automático
 
-- **Dashboard MFE:** https://dashboard-mfe-eta.vercel.app
+- **Dashboard MFE:** [https://dashboard-mfe-eta.vercel.app](https://dashboard-mfe-eta.vercel.app)
   - Microfrontend de Dashboard
   - Expõe `remoteEntry.js` para consumo do Shell
 
-- **Transactions MFE:** https://transactions-mfe-iota.vercel.app
+- **Transactions MFE:** [https://transactions-mfe-iota.vercel.app](https://transactions-mfe-iota.vercel.app)
   - Microfrontend de Transações
   - Expõe `remoteEntry.js` para consumo do Shell
 
-- **Shared Library:** https://bytebank-shared.vercel.app
+- **Investments MFE:** [https://investments-mfe.vercel.app](https://investments-mfe.vercel.app)
+  - Microfrontend de Investimentos e Metas
+  - Expõe `remoteEntry.js` para consumo do Shell
+
+- **Shared Library:** [https://bytebank-shared.vercel.app](https://bytebank-shared.vercel.app)
   - Componentes, hooks e utilitários compartilhados
   - Consumido por todos os MFEs
 
 #### Backend (AWS EC2)
-- **API Server:** http://44.206.72.128:3034
+
+- **API Server:** [http://44.206.72.128:3034](http://44.206.72.128:3034)
   - JSON Server (mock database)
   - Endpoints: `/transactions`, `/accounts`
   - Persistência em `db.json`
 
-- **Upload Server:** http://44.206.72.128:3035
+- **Upload Server:** [http://44.206.72.128:3035](http://44.206.72.128:3035)
   - Express + Multer para upload de arquivos
   - Endpoints: `/api/upload`, `/uploads/:filename`
   - Persistência em pasta `uploads/`
@@ -151,6 +170,7 @@ Backend (API = leve)          → AWS EC2 (controle total)
 Cada MFE tem seu próprio projeto Vercel com configurações específicas:
 
 #### 1. Shared Library
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -161,6 +181,7 @@ Cada MFE tem seu próprio projeto Vercel com configurações específicas:
 ```
 
 Variáveis de ambiente:
+
 ```bash
 REACT_APP_API_BASE_URL=/api
 ```
@@ -168,6 +189,7 @@ REACT_APP_API_BASE_URL=/api
 > **Nota:** A URL `/api` é um **caminho relativo** que usa o proxy configurado no `vercel.json`. O Vercel redireciona automaticamente requisições de `/api/*` para `http://44.206.72.128:3034/*`, resolvendo problemas de mixed content entre HTTPS (Vercel) e HTTP (EC2).
 
 #### 2. Dashboard MFE
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -178,6 +200,7 @@ REACT_APP_API_BASE_URL=/api
 ```
 
 Variáveis de ambiente:
+
 ```bash
 REACT_APP_API_BASE_URL=/api
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
@@ -187,6 +210,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 #### 3. Transactions MFE
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -197,6 +221,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 Variáveis de ambiente:
+
 ```bash
 REACT_APP_API_BASE_URL=/api
 REACT_APP_UPLOAD_URL=/api/upload
@@ -209,6 +234,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 > **Nota sobre UPLOAD_URL:** Use `/api/upload`. O código detecta se já contém o caminho completo para evitar duplicação. O proxy do Vercel redireciona para o EC2:3035.
 
 #### 4. Investments MFE
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -219,6 +245,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 Variáveis de ambiente:
+
 ```bash
 REACT_APP_API_BASE_URL=/api
 REACT_APP_SHARED_URL=https://bytebank-shared.vercel.app
@@ -228,6 +255,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 #### 5. Shell (Host)
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -238,6 +266,7 @@ REACT_APP_INVESTMENTS_URL=https://investments-mfe.vercel.app
 ```
 
 Variáveis de ambiente:
+
 ```bash
 REACT_APP_API_BASE_URL=/api
 REACT_APP_UPLOAD_URL=/api/upload
@@ -291,6 +320,7 @@ Isso permite que o Shell carregue dinamicamente os remotes de outros MFEs.
 ### Configuração EC2
 
 **Instância:**
+
 - Type: t3.micro
 - OS: Ubuntu 22.04 LTS
 - RAM: 914 MB (2 containers = ~150 MB)
@@ -299,6 +329,7 @@ Isso permite que o Shell carregue dinamicamente os remotes de outros MFEs.
 - IP público: 44.206.72.128
 
 **Security Group:**
+
 ```bash
 # Porta 22 (SSH) - Restrita ao IP do administrador
 Port: 22
@@ -321,6 +352,7 @@ Source: 0.0.0.0/0
 docker/docker-compose.backend.yml
 
 **Características:**
+
 - ✅ Apenas 2 containers (API + Upload)
 - ✅ Volumes persistentes (db.json + uploads)
 - ✅ Restart automático se container falhar
@@ -332,11 +364,12 @@ docker/docker-compose.backend.yml
 
 ### 1. Deploy Automático - Frontends (Vercel)
 
-```
+```text
 Developer → Push to GitHub → Vercel Webhook → Build → Deploy → CDN
 ```
 
 **Processo:**
+
 1. Developer faz push/merge na branch `main`
 2. Vercel detecta mudança via webhook
 3. Faz build do projeto (`npm run build`)
@@ -345,11 +378,12 @@ Developer → Push to GitHub → Vercel Webhook → Build → Deploy → CDN
 
 ### 2. Deploy Semi-Automático - Backend (AWS EC2)
 
-```
+```text
 Developer → Push to GitHub → GitHub Actions → Docker Hub → Manual Pull EC2
 ```
 
 **Processo:**
+
 1. Developer faz push/merge na branch `main`
 2. GitHub Actions builda imagens Docker
 3. Push automático para Docker Hub
@@ -379,6 +413,7 @@ docker-compose -f docker/docker-compose.backend.yml ps
 ```
 
 **Por que não automatizar completamente o backend?**
+
 - ✅ Evita deploys acidentais em produção
 - ✅ Permite validação manual antes de subir
 - ✅ Controle sobre momento do downtime (se necessário)
