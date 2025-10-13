@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
+import { useSelector } from 'react-redux';
 import Button from 'shared/components/ui/Button';
-import { calculateInvestmentTotals } from '../../utils/investmentCalculations';
-import { createDoughnutData, doughnutOptions } from '../../config/chartConfigs';
-import { useInvestments } from '../../hooks/useInvestments';
-import InvestmentModal from '../modals/InvestmentModal';
 import Card from 'shared/components/ui/Card';
 import ConfirmationModal from 'shared/components/ui/ConfirmationModal';
+import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
 import { TransactionService } from 'shared/services/TransactionService';
-import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
-import { useSelector } from 'react-redux';
 import { RootState } from 'shared/store';
+import { createDoughnutData, doughnutOptions } from '../../config/chartConfigs';
+import { useInvestments } from '../../hooks/useInvestments';
+import { calculateInvestmentTotals } from '../../utils/investmentCalculations';
+import InvestmentModal from '../modals/InvestmentModal';
 
 interface InvestmentsCardProps {
-  fetchInvestmentsAndTransactions: () => Promise<void>;
   onAddInvestment?: () => void;
 }
 
-const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTransactions }) => {
+const InvestmentsCard: React.FC<InvestmentsCardProps> = () => {
   const { investments } = useInvestments();
   const totals = calculateInvestmentTotals(investments);
   const hasInvestments = totals.total > 0;
@@ -37,12 +36,55 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
     setRedeemLoading(true);
     try {
       if (!user?.id) throw new Error('Usuário não autenticado');
-      await TransactionService.redeemAllInvestments(user.id);
-      showSuccess('Investimentos resgatados!');
-      await fetchInvestmentsAndTransactions();
-      setShowRedeemModal(false);
+
+      console.log('Iniciando resgate de investimentos...');
+      const totalRedeemed = await TransactionService.redeemAllInvestments(user.id);
+      console.log('Total resgatado:', totalRedeemed);
+
+      if (totalRedeemed > 0) {
+        showSuccess(`R$ ${totalRedeemed.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} resgatados com sucesso!`);
+        setShowRedeemModal(false);
+
+        window.dispatchEvent(new CustomEvent('userDataChanged', {
+          detail: { userId: user.id, type: 'all-investments-redeemed' }
+        }));
+      } else {
+        // Se totalRedeemed é 0, pode ser que já foram resgatados
+        console.log('Nenhum valor foi resgatado, disparando evento para verificação...');
+        setShowRedeemModal(false);
+
+        // Dispara evento e deixa o hook lidar com a atualização
+        window.dispatchEvent(new CustomEvent('userDataChanged', {
+          detail: { userId: user.id, type: 'all-investments-redeemed' }
+        }));
+
+        // Aguarda um pouco para a atualização e mostra mensagem apropriada
+        setTimeout(() => {
+          if (totals.total === 0) {
+            showSuccess('Todos os investimentos já foram resgatados!');
+          } else {
+            showError('Nenhum investimento pôde ser resgatado no momento. Tente novamente.');
+          }
+        }, 1000);
+      }
     } catch (e) {
-      showError('Erro ao resgatar investimentos.');
+      const error = e as Error;
+      console.error('Erro detalhado no resgate:', error);
+      setShowRedeemModal(false);
+
+      // Dispara evento mesmo com erro para verificar estado final
+      window.dispatchEvent(new CustomEvent('userDataChanged', {
+        detail: { userId: user.id, type: 'all-investments-redeemed' }
+      }));
+
+      // Aguarda atualização automática e verifica resultado
+      setTimeout(() => {
+        if (totals.total === 0) {
+          showSuccess('Investimentos resgatados com sucesso!');
+        } else {
+          showError(`Erro ao resgatar investimentos: ${error.message || 'Tente novamente.'}`);
+        }
+      }, 1500);
     } finally {
       setRedeemLoading(false);
     }
@@ -149,7 +191,7 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
                 </span>
               </div>
             }
-            showCancelButton={false} 
+            showCancelButton={false}
             confirmVariant="success"
             confirmText="Resgatar"
             onConfirm={handleRedeemInvestments}
@@ -161,7 +203,7 @@ const InvestmentsCard: React.FC<InvestmentsCardProps> = ({ fetchInvestmentsAndTr
       )}
 
       {/* Modais */}
-      <InvestmentModal 
+      <InvestmentModal
         open={investmentModalOpen}
         onClose={() => setInvestmentModalOpen(false)}
         editInvestment={editInvestment}

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'shared/store';
-import { AccountService } from 'shared/services/AccountService';
-import { TransactionService } from 'shared/services/TransactionService';
-import { InvestmentService } from 'shared/services/InvestmentService';
-import { Transaction } from 'shared/models/Transaction';
 import type { InvestmentDTO } from 'shared/dtos/Investment.dto';
+import { Transaction } from 'shared/models/Transaction';
+import { AccountService } from 'shared/services/AccountService';
+import { InvestmentService } from 'shared/services/InvestmentService';
+import { TransactionService } from 'shared/services/TransactionService';
+import { RootState } from 'shared/store';
 import { TransactionType } from 'shared/types/TransactionType';
 
 export const useInvestments = () => {
@@ -14,7 +14,7 @@ export const useInvestments = () => {
   const [investments, setInvestments] = useState<InvestmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [accountBalance, setAccountBalance] = useState<number | null>(null);
-  
+
   // Controle de modal
   const [investmentModalOpen, setInvestmentModalOpen] = useState(false);
   const [editInvestment, setEditInvestment] = useState<InvestmentDTO | null>(null);
@@ -43,7 +43,19 @@ export const useInvestments = () => {
     }
   };
 
-  useEffect(() => { fetchInvestmentsAndTransactions(); }, [user?.id]);
+  useEffect(() => {
+    fetchInvestmentsAndTransactions();
+
+    // Listener para eventos de mudança de dados do usuário
+    const handleUserDataChanged = (e: any) => {
+      if (!e.detail || e.detail.userId === user?.id) {
+        fetchInvestmentsAndTransactions();
+      }
+    };
+
+    window.addEventListener('userDataChanged', handleUserDataChanged);
+    return () => window.removeEventListener('userDataChanged', handleUserDataChanged);
+  }, [user?.id]);
 
   // CRUD de investimento
   const createInvestment = async (data: Omit<InvestmentDTO, 'id' | 'date' | 'accountId'> & { date?: string }) => {
@@ -66,16 +78,27 @@ export const useInvestments = () => {
       undefined,
       newInvestment.id
     );
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user.id, type: 'investment-created' }
+    }));
     await fetchInvestmentsAndTransactions();
   };
 
   const updateInvestment = async (id: string, data: Partial<InvestmentDTO>) => {
+    if (!user?.id) throw new Error('Usuário não autenticado');
     await InvestmentService.update(id, data);
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user.id, type: 'investment-updated' }
+    }));
     await fetchInvestmentsAndTransactions();
   };
 
   const removeInvestment = async (id: string) => {
+    if (!user?.id) throw new Error('Usuário não autenticado');
     await InvestmentService.remove(id);
+    window.dispatchEvent(new CustomEvent('userDataChanged', {
+      detail: { userId: user.id, type: 'investment-removed' }
+    }));
     await fetchInvestmentsAndTransactions();
   };
 
@@ -98,6 +121,9 @@ export const useInvestments = () => {
       await AccountService.updateAccount(user.id, { balance: account.balance + (investmentToRedeem.amount || 0) });
       showMessage('Investimento resgatado com sucesso!');
       closeRedeemModal();
+      window.dispatchEvent(new CustomEvent('userDataChanged', {
+        detail: { userId: user.id, type: 'investment-redeemed' }
+      }));
       await fetchInvestmentsAndTransactions();
     } catch (error) {
       showMessage('Erro ao resgatar investimento. Tente novamente.');

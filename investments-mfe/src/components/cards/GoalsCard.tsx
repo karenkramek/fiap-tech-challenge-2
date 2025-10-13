@@ -1,22 +1,22 @@
+import { Edit, PiggyBank, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
-import { Edit, Trash2, PiggyBank } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import Button from 'shared/components/ui/Button';
-import ModalWrapper from 'shared/components/ui/ModalWrapper';
 import Card from 'shared/components/ui/Card';
 import ConfirmationModal from 'shared/components/ui/ConfirmationModal';
-import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
+import { showError, showSuccess } from 'shared/components/ui/FeedbackProvider';
+import ModalWrapper from 'shared/components/ui/ModalWrapper';
+import { AccountService } from 'shared/services/AccountService';
+import type { GoalDTO } from 'shared/services/GoalService';
 import { GoalService } from 'shared/services/GoalService';
 import { TransactionService } from 'shared/services/TransactionService';
-import { showSuccess, showError } from 'shared/components/ui/FeedbackProvider';
+import { RootState } from 'shared/store';
+import { createCurrencyInputHandler, parseCurrencyStringToNumber } from 'shared/utils/currency';
 import { useGoals } from '../../hooks/useGoals';
 import GoalsModal from '../modals/GoalsModal';
-import type { GoalDTO } from 'shared/services/GoalService';
-import { useSelector } from 'react-redux';
-import { RootState } from 'shared/store';
-import { AccountService } from 'shared/services/AccountService';
 
-const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void> }> = ({ fetchInvestmentsAndTransactions }) => {
-  const { goals, loadExistingGoals, handleAssignValue } = useGoals(fetchInvestmentsAndTransactions);
+const GoalsCard: React.FC = () => {
+  const { goals, loadExistingGoals, handleAssignValue } = useGoals();
   const accountId = useSelector((state: RootState) => state.auth.user?.id) || '';
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -63,7 +63,6 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         const goal = goals[selectedGoalIdx];
         const goalId = goal.id;
         await handleAssignValue(selectedGoalIdx, valueToAssign, goalId);
-        await fetchInvestmentsAndTransactions();
         await loadExistingGoals();
         setTimeout(() => {}, 2500);
         setAssignModalOpen(false);
@@ -88,7 +87,9 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
       try {
         const ok = await TransactionService.deleteGoalAndTransactions(goalId, accountId);
         if (ok) {
-          await fetchInvestmentsAndTransactions();
+          window.dispatchEvent(new CustomEvent('userDataChanged', {
+            detail: { userId: accountId, type: 'goal-deleted' }
+          }));
           await loadExistingGoals();
           showSuccess('Meta excluída!');
         } else {
@@ -111,6 +112,9 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         };
         await GoalService.update(goalToEdit.id, updateData);
         showSuccess('Meta atualizada!');
+        window.dispatchEvent(new CustomEvent('userDataChanged', {
+          detail: { userId: accountId, type: 'goal-updated' }
+        }));
       } else {
         const newGoal: GoalDTO = {
           id: Math.random().toString(36).substring(2, 9),
@@ -123,13 +127,14 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         };
         await GoalService.create(newGoal);
         showSuccess('Meta criada!');
+        window.dispatchEvent(new CustomEvent('userDataChanged', {
+          detail: { userId: accountId, type: 'goal-created' }
+        }));
       }
       setGoalsModalOpen(false);
       setGoalToEdit(null);
       await loadExistingGoals();
-      await fetchInvestmentsAndTransactions();
     } catch (e) {
-      // Se houver showError no shared, pode usar aqui
     }
   };
 
@@ -318,7 +323,7 @@ const GoalsCard: React.FC<{ fetchInvestmentsAndTransactions: () => Promise<void>
         onSave={handleSaveGoal}
         initialGoal={goalToEdit}
       />
-      
+
     </Card>
   );
 };

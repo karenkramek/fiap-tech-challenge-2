@@ -1,13 +1,13 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import { calculateTransactionTotals } from '../../utils/investmentCalculations';
-import { useInvestments } from '../../hooks/useInvestments';
-import { useGoals } from '../../hooks/useGoals';
 import { createResumoBarData, resumoBarOptions } from '../../config/chartConfigs';
+import { useGoals } from '../../hooks/useGoals';
+import { useInvestments } from '../../hooks/useInvestments';
+import { calculateTransactionTotals } from '../../utils/investmentCalculations';
 
 const TransactionsSummaryCard: React.FC = () => {
   const { transactions, investments } = useInvestments();
-  const { goals } = useGoals(() => {});
+  const { goals } = useGoals();
 
   const transactionTotals = calculateTransactionTotals(transactions, investments, goals);
 

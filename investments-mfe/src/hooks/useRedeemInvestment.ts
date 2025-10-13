@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'shared/store';
 import { Investment } from 'shared/models/Investment';
 import { InvestmentService } from 'shared/services/InvestmentService';
+import { RootState } from 'shared/store';
 
-export const useRedeemInvestment = (fetchData: () => void, showMessage: (msg: string) => void) => {
+export const useRedeemInvestment = (showMessage: (msg: string) => void) => {
   const user = useSelector((state: RootState) => state.auth.user);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [investmentToRedeem, setInvestmentToRedeem] = useState<Investment | null>(null);
@@ -34,7 +34,9 @@ export const useRedeemInvestment = (fetchData: () => void, showMessage: (msg: st
 
       showMessage('Investimento resgatado com sucesso!');
       closeRedeemModal();
-      fetchData();
+      window.dispatchEvent(new CustomEvent('userDataChanged', {
+        detail: { userId: user.id, type: 'investment-redeemed' }
+      }));
     } catch (error) {
       console.error('Erro ao resgatar investimento:', error);
       showMessage('Erro ao resgatar investimento. Tente novamente.');
