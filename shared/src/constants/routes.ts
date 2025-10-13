@@ -1,7 +1,8 @@
 // Constantes de rotas para toda a aplicação
 export const PUBLIC_ROUTES = [
   '/',           // Home
-  '/about',      // Sobre (futuro)
+  '/sobre',      // Sobre
+  '/about',      // Sobre (alias)
   '/contact',    // Contato (futuro)
   '/help',       // Ajuda (futuro)
   '/terms',      // Termos (futuro)
