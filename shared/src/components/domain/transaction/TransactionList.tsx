@@ -13,6 +13,7 @@ import { TransactionType } from '../../../types/TransactionType';
 import ModalWrapper from '../../ui/ModalWrapper';
 import { Transaction } from '../../../models/Transaction';
 import { filterTransactions } from '../../../utils/transactionFilter';
+import Tooltip from '../../ui/Tooltip';
 
 
 // Componente para detalhes da transação
@@ -57,6 +58,10 @@ const TransactionItem: React.FC<{
   loading?: boolean;
 }> = React.memo(({ transaction, mode, onEdit, onDelete, loading }) => {
   const isEditable = transaction.type !== TransactionType.GOAL && transaction.type !== TransactionType.INVESTMENT;
+  const tooltipMessage = transaction.type === TransactionType.INVESTMENT
+    ? 'Operação não permitida (investimentos)'
+    : 'Operação não permitida (metas)';
+
   return (
     <div className={`flex flex-col border-b py-2 ${mode === 'full' ? 'px-2' : ''}`}>
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -65,24 +70,28 @@ const TransactionItem: React.FC<{
           <span className="text-sm text-gray-500">{formatDate(transaction.date)}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-primary-50' : 'bg-gray-100 cursor-not-allowed'}`}
-            title="Editar"
-            aria-label="Editar transação"
-            onClick={() => onEdit(transaction.id)}
-            disabled={!isEditable || loading}
-          >
-            <Edit className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-primary-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
-          </button>
-          <button
-            className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-error-50' : 'bg-gray-100 cursor-not-allowed'}`}
-            title="Excluir"
-            aria-label="Excluir transação"
-            onClick={() => onDelete(transaction.id)}
-            disabled={!isEditable || loading}
-          >
-            <Trash2 className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-error-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
-          </button>
+          <Tooltip content={tooltipMessage} disabled={isEditable || loading}>
+            <button
+              className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-primary-50' : 'bg-gray-100 cursor-not-allowed'}`}
+              title={isEditable ? "Editar" : tooltipMessage}
+              aria-label="Editar transação"
+              onClick={() => onEdit(transaction.id)}
+              disabled={!isEditable || loading}
+            >
+              <Edit className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-primary-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+            </button>
+          </Tooltip>
+          <Tooltip content={tooltipMessage} disabled={isEditable || loading}>
+            <button
+              className={`p-1 rounded ${isEditable && !loading ? 'hover:bg-error-50' : 'bg-gray-100 cursor-not-allowed'}`}
+              title={isEditable ? "Excluir" : tooltipMessage}
+              aria-label="Excluir transação"
+              onClick={() => onDelete(transaction.id)}
+              disabled={!isEditable || loading}
+            >
+              <Trash2 className={`h-5 w-5 text-white-800 ${isEditable && !loading ? 'hover:text-error-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} ${loading || !isEditable ? 'opacity-50' : ''}`} />
+            </button>
+          </Tooltip>
         </div>
       </div>
       <div className="flex items-stretch mb-2 p-1">
@@ -193,12 +202,12 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
     setTransactionToEdit(id);
     editModal.openModal();
   };
-  
+
   const closeEditModal = () => {
     editModal.closeModal();
     setTransactionToEdit(null);
   };
-  
+
   const openDeleteModal = (id: string) => {
     setTransactionToDelete(id);
     deleteModal.openModal();
@@ -267,7 +276,7 @@ const TransactionList: React.FC<TransactionListProps> = React.memo(({ transactio
           ))}
         </div>
       )}
-      
+
       {/* Lista de transações agrupadas por mês/ano */}
       {!isLoading && filteredTransactions.length > 0 ? (
         <div role="region" aria-label="Lista de transações agrupadas por mês">

@@ -18,6 +18,7 @@ services:
     depends_on:
       - dashboard
       - transactions
+      - investments
       - shared
       - api
       - upload

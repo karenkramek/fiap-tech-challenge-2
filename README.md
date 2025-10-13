@@ -23,6 +23,13 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 - Deploy híbrido: frontends na Vercel, backends na AWS EC2.
 - CI/CD, testes automatizados, containerização e segurança.
 
+## 📋 Gestão de Projeto
+
+- 📊 [Trello (Fase 2)](https://trello.com/b/rP7VdDRt/fase-2)
+- 🎨 [Figma (Fase 2)](https://www.figma.com/design/tpk67fOWALc2rEf9r6bZjG/ByteBank-4FRNT---Fase2?node-id=1-750)
+- 📹 Vídeo de Apresentação (Fase 2): [Assista aqui](https://drive.google.com/file/d/19sdYG134m8hwAC-g7g1-sGrhbQ2PNCyd/view?usp=drive_link)
+- 🔗 [Repositório Fase 1](https://github.com/karenkramek/bytebank-fiap)
+
 ## 3. Visão Geral da Arquitetura
 
 ### 3.1. Diagrama e Fluxo
@@ -46,31 +53,38 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 #### Deploy em Produção
 
 - **Frontends (Vercel):**
-  - Shell App: https://bytebank-shell.vercel.app
-  - Dashboard MFE: https://dashboard-mfe-eta.vercel.app
-  - Transactions MFE: https://transactions-mfe-iota.vercel.app
-  - Investments MFE: https://investments-mfe.vercel.app
-  - Shared Library: https://bytebank-shared.vercel.app
+  - Shell App: [bytebank-shell.vercel.app](https://bytebank-shell.vercel.app)
+  - Dashboard MFE: [dashboard-mfe-eta.vercel.app](https://dashboard-mfe-eta.vercel.app)
+  - Transactions MFE: [transactions-mfe-iota.vercel.app](https://transactions-mfe-iota.vercel.app)
+  - Investments MFE: [investments-mfe.vercel.app](https://investments-mfe.vercel.app)
+  - Shared Library: [bytebank-shared.vercel.app](https://bytebank-shared.vercel.app)
 - **Backend (AWS EC2):**
-  - API Server: http://44.206.72.128:3034
-  - Upload Server: http://44.206.72.128:3035
+  - API Server: [http://44.206.72.128:3034](http://44.206.72.128:3034)
+  - Upload Server: [http://44.206.72.128:3035](http://44.206.72.128:3035)
 
 > ⚠️ Ambiente de demonstração acadêmico. Não utilize para dados sensíveis reais.
+
+📖 Arquitetura de Deploy: veja em `docs/hybrid-deployment.md`.
+
+🔒 Segurança e boas práticas: veja em `docs/SECURITY_PRACTICES.md`.
 
 ## 4. Funcionalidades
 
 ### ♿ Acessibilidade
+
 - Uso de `aria-label`, `role`, `aria-live` e outros atributos para tornar componentes acessíveis a leitores de tela
 - Botões, campos de busca, modais e feedbacks com suporte a navegação assistiva
 - Feedback dinâmico anunciado para usuários de tecnologias assistivas
 - Estrutura semântica para navegação por teclado e leitores de tela
 
 ### 🏦 Dashboard e Visualização
+
 - Dashboard intuitivo com saldo atual e controle de visibilidade
 - Gestão, inclusão e visualização de transações
 - Cartões informativos com dados financeiros
 
 ### 💰 Gestão de Transações
+
 - Listagem completa de transações
 - **Busca de transações** por descrição, valor, tipo e data
 - **Scroll infinito** com carregamento progressivo (5 itens por vez)
@@ -82,12 +96,14 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 - Visualização e download de anexos
 
 ### 📈 Gestão de Investimentos e Metas
+
 - Visualização de investimentos e metas
 - Gráficos de performance e evolução dos investimentos
 - Cadastro, acompanhamento e resgate de investimentos
 - Cadastro, acompanhamento e resgate de metas financeiras
 
 ### 🔐 Autenticação e Segurança
+
 - Sistema completo de login e registro de usuários
 - **Proteção de rotas** com redirecionamento automático
 - Persistência de sessão (localStorage)
@@ -95,6 +111,7 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 - Validação de campos com feedback em tempo real
 
 ### 🎨 Interface e Experiência
+
 - Design system consistente e responsivo (Tailwind CSS)
 - **Página About/Sobre** com informações institucionais
 - **Página Home** com hero image animada e apresentação
@@ -106,6 +123,7 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 - Footer com links e informações
 
 ### 🔧 Recursos Técnicos
+
 - Tipagem estática completa com TypeScript
 - Redux Toolkit para gerenciamento de estado global
 - Custom hooks reutilizáveis (useTransactions, useAccount, useAuthProtection)
@@ -123,6 +141,25 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio de arquitetur
 - Node.js/Express (servidor de upload)
 - Multer (upload de arquivos)
 - Docker & Docker Compose (ambiente containerizado para desenvolvimento)
+
+## 📋 Banco de Dados
+
+O projeto utiliza dados de exemplo versionados e provisionados automaticamente:
+
+- `db.template.json` — Arquivo modelo versionado no Git
+- `db.json` — Arquivo local gerado a partir do template (ignorado pelo Git)
+
+Comandos úteis:
+
+```bash
+# Cria o db.json a partir do template, se ainda não existir
+npm run setup:db
+
+# Reset local rápido (apaga e recria do template)
+rm db.json && npm run setup:db
+```
+
+Mais detalhes em `docs/json-server-guide.md`.
 
 ## 6. Como Executar o Projeto
 
@@ -387,6 +424,7 @@ Para encerrar, use `Ctrl + C` no(s) terminal(is) em execução. Se estiver rodan
 ## 🔧 Troubleshooting
 
 Consulte os documentos em `docs/` para dúvidas, problemas comuns e dicas de manutenção:
+
 - [Troubleshooting](./docs/troubleshooting.md) (checklist rápido de erros comuns, comandos úteis e links para guias complementares.)
 - [Troubleshooting de Testes](./docs/testing-troubleshooting.md) (questões específicas relacionadas à execução de testes)
 - [Limpeza do Ambiente](./docs/environment-cleanup.md) (detalhes dos scripts disponíveis e orientações sobre quando utilizá-los)
