@@ -85,7 +85,7 @@ const About: React.FC = () => {
 
   const handleRegister = async (name: string, email: string, password: string) => {
     try {
-      const newAccount = await AccountService.createAccount(name, email, password);
+      await AccountService.createAccount(name, email, password);
 
       // Toast para cadastro
       showSuccess(`Conta criada para ${name}!`);
