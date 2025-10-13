@@ -49,11 +49,11 @@ const Footer: React.FC = () => {
                   </ul>
                </div>
 
-               {/* Desenvolvido por Alura */}
+               {/* Desenvolvido por Bytebank */}
                <div>
                   <div className="flex flex-col items-start md:items-end">
                      <div className="mb-4">
-                        <p className="text-white text-sm mb-2">Desenvolvido por Alura</p>
+                        <p className="text-white text-sm mb-2">Desenvolvido por</p>
                         <div className="text-2xl font-bold text-white">Bytebank</div>
                      </div>
 

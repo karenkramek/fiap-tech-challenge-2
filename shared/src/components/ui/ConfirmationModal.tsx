@@ -40,7 +40,7 @@ function ConfirmationModal({
             </Button>
           )}
           <Button variant={confirmVariant} onClick={onConfirm} disabled={loading}>
-            {loading ? 'Excluindo...' : confirmText}
+            {loading ? 'Carregando...' : confirmText}
           </Button>
         </div>
       </div>
