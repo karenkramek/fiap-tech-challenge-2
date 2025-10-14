@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import Button from '../../ui/Button';
-import ModalWrapper from '../../ui/ModalWrapper';
+import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../../store/authSlice';
-import { RootState, AppDispatch } from '../../../store/index';
+import { AppDispatch, RootState } from '../../../store/index';
+import Button from '../../ui/Button';
+import ModalWrapper from '../../ui/ModalWrapper';
 
 interface LoginModalProps {
   open: boolean;
@@ -26,15 +26,15 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.auth);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setEmail('');
     setPassword('');
     setFormErrors({});
     setLocalError(null);
     onClose();
-  };
+  }, [onClose]);
 
-  const validateFields = () => {
+  const validateFields = useCallback(() => {
     const errors: LoginFormErrors = {};
     if (!email) {
       errors.email = 'Este campo é obrigatório';
@@ -45,9 +45,9 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
       errors.password = 'Este campo é obrigatório';
     }
     return errors;
-  };
+  }, [email, password]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     let errorMsg = '';
     if (!value) {
@@ -66,9 +66,9 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
       }
       return newErrors;
     });
-  };
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     if (id === 'email') setEmail(value);
     if (id === 'password') setPassword(value);
@@ -77,9 +77,9 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
       delete newErrors[id as keyof LoginFormErrors];
       return newErrors;
     });
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLocalLoading(true);
     setLocalError(null);
@@ -98,7 +98,7 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onLoginS
     } finally {
       setLocalLoading(false);
     }
-  };
+  }, [email, password, dispatch, onLoginSuccess, handleClose, validateFields]);
 
   if (!open) return null;
 

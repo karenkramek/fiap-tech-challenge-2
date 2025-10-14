@@ -33,10 +33,23 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
     // Bloquear scroll do body quando modal está aberto
     document.body.style.overflow = 'hidden';
 
-    // Focar no modal quando abrir
-    if (modalRef.current) {
-      modalRef.current.focus();
-    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    // Focar no modal quando abrir (apenas na primeira vez)
+    const focusModal = () => {
+      if (modalRef.current) {
+        modalRef.current.focus();
+      }
+    };
+
+    // Usar setTimeout para garantir que o modal seja focado após render
+    const timeoutId = setTimeout(focusModal, 0);
 
     function handleClickOutside(event: MouseEvent) {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -55,11 +68,11 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
     document.addEventListener('keydown', handleEscKey);
 
     return () => {
-      document.body.style.overflow = 'unset';
+      clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscKey);
     };
-  }, [open, onClose]);
+  }, [open]); // Removido onClose da dependência para evitar re-execução
 
   if (!open) return null;
 
@@ -74,6 +87,12 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
         ref={modalRef}
         className={`relative bg-white-50 rounded-xl shadow-lg w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto p-4 sm:p-6 ${className}`}
         tabIndex={-1}
+        onFocus={(e) => {
+          // Previne o refoco automático se já há um elemento focado dentro do modal
+          if (modalRef.current && modalRef.current.contains(document.activeElement)) {
+            e.preventDefault();
+          }
+        }}
       >
         <ModalCloseButton onClick={onClose} />
         {title && (
