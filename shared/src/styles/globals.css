@@ -254,3 +254,42 @@ html, body {
   color: var(--white-800);
   margin-top: var(--space-1);
 }
+
+/* Prevent horizontal scroll and overflow */
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Universal overflow prevention */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+img, video, iframe, object, embed {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent text overflow in flex containers */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.min-w-0 {
+  min-width: 0;
+}

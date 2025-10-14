@@ -19,8 +19,8 @@ const TransactionBadge = ({ type }: TransactionBadgeProps) => {
   };
 
   return (
-     <span className={`inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium border ${getTransactionTypeColor(type)}`}>
-       {getTransactionTypeLabel(type)} 
+     <span className={`inline-flex items-center justify-center px-2 py-1 rounded-full text-xs sm:text-xs font-medium border whitespace-nowrap ${getTransactionTypeColor(type)}`}>
+       {getTransactionTypeLabel(type)}
     </span>
   );
 };

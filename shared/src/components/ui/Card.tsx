@@ -20,7 +20,7 @@ const Card = ({ children, className, variant = 'default' }: CardProps) => {
 
   return (
     <div
-      className={twMerge(baseClasses, variantClasses[variant], className)}
+      className={twMerge(baseClasses, variantClasses[variant], 'w-full max-w-full overflow-hidden', className)}
       role="region"
       aria-label="Seção de conteúdo"
     >
