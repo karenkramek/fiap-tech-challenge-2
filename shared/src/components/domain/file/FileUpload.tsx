@@ -93,7 +93,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       {/* Upload Area */}
       <div
         className={`
-          relative border-2 border-dashed rounded-lg p-6 transition-colors cursor-pointer
+          relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-colors cursor-pointer
           ${dragOver ? 'border-primary-500 bg-primary-50' : 'border-white-700'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary-500 hover:bg-primary-50'}
           ${error ? 'border-red-300 bg-red-50' : ''}
@@ -114,14 +114,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
         {currentFile ? (
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
               {isImage ? (
-                <Image className="h-8 w-8 text-primary-600" />
+                <Image className="h-6 w-6 sm:h-8 sm:w-8 text-primary-600 flex-shrink-0" />
               ) : (
-                <File className="h-8 w-8 text-primary-600" />
+                <File className="h-6 w-6 sm:h-8 sm:w-8 text-primary-600 flex-shrink-0" />
               )}
-              <div>
-                <p className="text-sm font-medium text-primary-700 truncate max-w-48">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-primary-700 truncate">
                   {currentFile.name}
                 </p>
                 {selectedFile && (
@@ -137,21 +137,22 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 e.stopPropagation();
                 handleRemoveFile();
               }}
-              className="p-1 hover:bg-red-100 rounded-full transition-colors"
+              className="p-1 hover:bg-red-100 rounded-full transition-colors flex-shrink-0 ml-2"
               disabled={disabled}
+              aria-label="Remover arquivo"
             >
-              <X className="h-5 w-5 text-red-500" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
             </button>
           </div>
         ) : (
           <div className="text-center">
-            <Upload className="mx-auto h-12 w-12 text-white-700" />
-            <div className="mt-4">
-              <p className="text-sm font-medium text-primary-700">
+            <Upload className="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-white-700" />
+            <div className="mt-2 sm:mt-4">
+              <p className="text-xs sm:text-sm font-medium text-primary-700">
                 Clique para selecionar ou arraste um arquivo
               </p>
               <p className="text-xs text-white-800 mt-1">
-                PDF e imagens (PNG, JPG, GIF) - Máx. 5MB
+                PDF e imagens - Máx. 5MB
               </p>
             </div>
           </div>

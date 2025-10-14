@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import TransactionAdd from "shared/components/domain/transaction/TransactionAdd";
+import TransactionList from "shared/components/domain/transaction/TransactionList";
 import Button from "shared/components/ui/Button";
 import Card from "shared/components/ui/Card";
-import TransactionList from "shared/components/domain/transaction/TransactionList";
-import TransactionAdd from "shared/components/domain/transaction/TransactionAdd";
+import ErrorBoundary from "shared/components/ui/ErrorBoundary";
+import FeedbackProvider from "shared/components/ui/FeedbackProvider";
+import ModalWrapper from "shared/components/ui/ModalWrapper";
+import { useTransactions } from "shared/hooks/useTransactions";
 import { TransactionType } from "shared/types/TransactionType";
 import { createCurrencyInputHandler, parseCurrencyStringToNumber } from "shared/utils/currency";
-import { useTransactions } from "shared/hooks/useTransactions";
-import ModalWrapper from "shared/components/ui/ModalWrapper";
-import { Search } from "lucide-react";
-import FeedbackProvider from "shared/components/ui/FeedbackProvider";
-import ErrorBoundary from "shared/components/ui/ErrorBoundary";
 
 const TransactionsPage: React.FC = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -69,16 +69,18 @@ const TransactionsPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="w-full max-w-full overflow-x-hidden">
       <FeedbackProvider />
       {/* Extrato */}
-      <Card>
-        <div className="min-h-screen" role="main" aria-label="Extrato de transações">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="transactions-title text-primary-700">Extrato</h2>
-            <Button 
+      <Card className="mx-2 sm:mx-4 lg:mx-6 w-full max-w-full">
+        <div className="min-h-screen px-4 sm:px-6 py-4 sm:py-6 w-full max-w-full overflow-hidden" role="main" aria-label="Extrato de transações">
+          <div className="flex justify-between items-center mb-6 w-full max-w-full overflow-hidden">
+            <h2 className="transactions-title text-primary-700 text-xl sm:text-2xl font-semibold flex-shrink-0">
+              Extrato
+            </h2>
+            <Button
               onClick={() => setAddModalOpen(true)}
-              className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium"
+              className="inline-block bg-primary-700 text-white-50 px-4 py-2 rounded hover:bg-primary-600 transition-colors text-sm font-medium touch-manipulation flex-shrink-0"
               aria-label="Adicionar nova transação"
             >
               Nova Transação
@@ -87,12 +89,12 @@ const TransactionsPage: React.FC = () => {
 
           <ErrorBoundary>
             {/* Input de busca */}
-            <div className="flex items-center gap-2 mb-6 bg-white-50 rounded-xl border border-gray-700 px-3 py-2 focus-within:ring-2 focus-within:ring-primary-500" role="search" aria-label="Buscar transações">
-              <Search className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center gap-2 mb-6 bg-white-50 rounded-xl border border-gray-700 px-4 py-3 sm:py-2 focus-within:ring-2 focus-within:ring-primary-500 w-full max-w-full overflow-hidden" role="search" aria-label="Buscar transações">
+              <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Buscar"
-                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none"
+                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 focus:outline-none min-w-0 w-full max-w-full"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 aria-label="Buscar transações"
@@ -109,7 +111,12 @@ const TransactionsPage: React.FC = () => {
         </div>
       </Card>
       {addModalOpen && (
-        <ModalWrapper open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Nova Transação" size="md">
+        <ModalWrapper
+          open={addModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          title="Nova Transação"
+          size="md"
+        >
           <ErrorBoundary>
             <TransactionAdd
               amount={amount}
@@ -127,7 +134,7 @@ const TransactionsPage: React.FC = () => {
           </ErrorBoundary>
         </ModalWrapper>
       )}
-    </>
+    </div>
   );
 };
 

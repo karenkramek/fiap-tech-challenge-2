@@ -12,7 +12,7 @@
   margin-bottom: var(--space-xl);
 }
 
-.transactions-section-title {
+.transactions-section-title, .transactions-title {
   font-family: var(--font-family-primary);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-2xl);
@@ -142,15 +142,36 @@
   .transactions-page-title {
     font-size: var(--font-size-2xl);
     line-height: var(--line-height-tight);
+    margin-bottom: var(--space-lg);
   }
 
-  .transactions-section-title {
+  .transactions-section-title, .transactions-title {
     font-size: var(--font-size-xl);
     line-height: var(--line-height-tight);
+    margin-bottom: var(--space-md);
   }
 
   .transactions-month-header {
     font-size: var(--font-size-base);
     line-height: var(--line-height-tight);
+    margin-bottom: var(--space-md);
+  }
+
+  /* Mobile-specific touch improvements */
+  .transaction-item {
+    padding: var(--space-lg) var(--space-md);
+    margin-bottom: var(--space-xs);
+  }
+
+  /* Better touch targets for mobile */
+  button, .btn {
+    min-height: 44px;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  /* Mobile search input */
+  input[type="text"], input[type="search"] {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: var(--space-sm);
   }
 }
